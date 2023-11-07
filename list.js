@@ -1,47 +1,53 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const mainCharacterName = [];
-const subCharacterName = [];
-const numPages = 10; // 크롤링할 페이지 수
 
-async function scrapeRankTable(url,a) {
+async function scrapeRankTable(url) {
   try {
     const response = await axios.get(url);
     const html = response.data;
     const $ = cheerio.load(html);
 
-    // class가 rank_table인 표를 식별합니다.
+    const characterNames = [];
+
     const rankTable = $("table.rank_table");
 
-    // 표에서 a 태그 안의 정보를 추출
     rankTable.find("tr").each((rowIndex, row) => {
       $(row)
         .find("td a")
         .each((colIndex, link) => {
-          a.push($(link).text().trim());
+          characterNames.push($(link).text().trim());
         });
     });
+
+    return characterNames;
   } catch (error) {
     console.error("오류 발생:", error);
+    return [];
   }
 }
 
-async function scrapeData() {
+async function scrapeData(gid, numPages) {
   const promises = [];
-  
-  for (let i = 1; i <= numPages; i++) {
-    const url = `https://maplestory.nexon.com/Common/Guild?gid=402812&wid=0&orderby=1&page=${i}`;
-    promises.push(scrapeRankTable(url,mainCharacterName));
-  }
-  for (let i = 1; i <= numPages; i++) {
-    const url = `https://maplestory.nexon.com/Common/Guild?gid=312443&wid=0&orderby=1&page=${i}`;
-    promises.push(scrapeRankTable(url,subCharacterName));
-  }
-  
-  await Promise.all(promises);
 
-  console.log(mainCharacterName);
-  console.log(subCharacterName);
+  for (let i = 1; i <= numPages; i++) {
+    const url = `https://maplestory.nexon.com/Common/Guild?gid=${gid}&wid=0&orderby=1&page=${i}`;
+    promises.push(scrapeRankTable(url));
+  }
+
+  const characterNames = await Promise.all(promises);
+  return characterNames.flat(); // 2D 배열을 1D 배열로 평탄화
 }
 
-scrapeData();
+async function main() {
+  const mainGuildId = 402812;
+  const subGuildId = 312443;
+  const numPages = 10;
+
+  const mainCharacterNames = await scrapeData(mainGuildId, numPages);
+  const subCharacterNames = await scrapeData(subGuildId, numPages);
+
+  console.log("Main Character Names:", mainCharacterNames);
+  console.log("Sub Character Names:", subCharacterNames);
+}
+
+main();
