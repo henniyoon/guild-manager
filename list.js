@@ -1,30 +1,47 @@
-const express = require('express');
-const axios = require('axios');
-const cheerio = require('cheerio');
+const axios = require("axios");
+const cheerio = require("cheerio");
+const mainCharacterName = [];
+const subCharacterName = [];
+const numPages = 10; // 크롤링할 페이지 수
 
-const app = express();
-const port = 3000;
+async function scrapeRankTable(url,a) {
+  try {
+    const response = await axios.get(url);
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-app.get('/', (req, res) => {
-  const url = 'https://example.com'; // 스크랩할 웹 페이지의 URL을 입력하세요.
+    // class가 rank_table인 표를 식별합니다.
+    const rankTable = $("table.rank_table");
 
-  axios.get(url)
-    .then((response) => {
-      if (response.status === 200) {
-        const html = response.data;
-        const $ = cheerio.load(html);
-
-        // 원하는 데이터 추출
-        const title = $('h1').text(); // 예: <h1> 태그 내의 텍스트 가져오기
-
-        res.send(`페이지 제목: ${title}`);
-      }
-    })
-    .catch((error) => {
-      res.status(500).send('데이터 가져오기 실패');
+    // 표에서 a 태그 안의 정보를 추출
+    rankTable.find("tr").each((rowIndex, row) => {
+      $(row)
+        .find("td a")
+        .each((colIndex, link) => {
+          a.push($(link).text().trim());
+        });
     });
-});
+  } catch (error) {
+    console.error("오류 발생:", error);
+  }
+}
 
-app.listen(port, () => {
-  console.log(`서버가 http://localhost:${port} 포트에서 실행 중입니다.`);
-});
+async function scrapeData() {
+  const promises = [];
+  
+  for (let i = 1; i <= numPages; i++) {
+    const url = `https://maplestory.nexon.com/Common/Guild?gid=402812&wid=0&orderby=1&page=${i}`;
+    promises.push(scrapeRankTable(url,mainCharacterName));
+  }
+  for (let i = 1; i <= numPages; i++) {
+    const url = `https://maplestory.nexon.com/Common/Guild?gid=312443&wid=0&orderby=1&page=${i}`;
+    promises.push(scrapeRankTable(url,subCharacterName));
+  }
+  
+  await Promise.all(promises);
+
+  console.log(mainCharacterName);
+  console.log(subCharacterName);
+}
+
+scrapeData();
