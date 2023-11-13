@@ -1,5 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
+const saveMember = require('../../db.js');
 
 async function scrapeRankTable(url) {
   try {
@@ -46,8 +47,11 @@ async function main() {
   const mainCharacterNames = await scrapeData(mainGuildId, numPages);
   const subCharacterNames = await scrapeData(subGuildId, numPages);
 
-  console.log("Main Character Names:", mainCharacterNames);
-  console.log("Sub Character Names:", subCharacterNames);
+  // console.log("Main Character Names:", mainCharacterNames);
+  // console.log("Sub Character Names:", subCharacterNames);
+
+  // 데이터베이스에 저장
+  saveMember(mainCharacterNames);
 }
 
 main();
