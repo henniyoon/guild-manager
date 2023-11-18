@@ -17,7 +17,7 @@ const MainMember = sequelize.define('MainMember', {
 }, {
     tableName: 'main_member', // 실제 테이블 이름
     freezeTableName: true, // 테이블 이름 고정
-    primaryKey: false, // 자동 생성되는 기본 키 사용 안 함
+    timestamps: false, // createdAt 및 updatedAt 필드 생성 안 함
 });
 
 module.exports = MainMember;
