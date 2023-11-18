@@ -15,3 +15,5 @@ const MainMember = sequelize.define('MainMember', {
         allowNull: false,
     },
 });
+
+module.exports = MainMember;
