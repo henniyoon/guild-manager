@@ -14,6 +14,10 @@ const MainMember = sequelize.define('MainMember', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+}, {
+    tableName: 'main_member', // 실제 테이블 이름
+    freezeTableName: true, // 테이블 이름 고정
+    primaryKey: false, // 자동 생성되는 기본 키 사용 안 함
 });
 
 module.exports = MainMember;
