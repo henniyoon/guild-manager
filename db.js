@@ -48,8 +48,8 @@ pool.getConnection()
             })
             .finally(() => {
                 // 연결 반환
-                conn.release();
-                console.log('연결 반환');
+                // conn.release();
+                // console.log('연결 반환');
             });
     })
     .catch((err) => {
