@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
+const MainMember = require('./mainMember'); // mainMember 모델을 불러옴
 
-// MariaDB 연결 정보
 const sequelize = new Sequelize({
     dialect: 'mariadb',
     host: 'localhost',
@@ -10,20 +10,6 @@ const sequelize = new Sequelize({
     database: 'guild_manager',
 });
 
-// MainMember 모델 정의
-const MainMember = sequelize.define('MainMember', {
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true, // 중복되지 않도록 설정
-    },
-}, {
-    tableName: 'main_member', // 실제 테이블 이름
-    freezeTableName: true, // 테이블 이름 고정
-    timestamps: false, // createdAt 및 updatedAt 필드 생성 안 함
-});
-
-// SubMember 모델 정의
 const SubMember = sequelize.define('SubMember', {
     name: {
         type: DataTypes.STRING,
@@ -34,8 +20,8 @@ const SubMember = sequelize.define('SubMember', {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
-            model: 'main_members', // 참조하는 테이블 이름
-            key: 'name', // 참조하는 테이블의 기본 키
+            model: MainMember.MainMember, // mainMember 모델을 참조
+            key: 'name', // mainMember 테이블의 어떤 컬럼을 외래키로 사용할 것인지 설정
         },
     },
 }, {
@@ -44,4 +30,4 @@ const SubMember = sequelize.define('SubMember', {
     timestamps: false, // createdAt 및 updatedAt 필드 생성 안 함
 });
 
-module.exports = { MainMember, SubMember };
+module.exports = SubMember;
