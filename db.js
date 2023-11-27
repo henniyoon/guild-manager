@@ -1,13 +1,13 @@
-const mariadb = require('mariadb');
+const { Sequelize } = require('sequelize');
 
 // MariaDB 연결 정보
-const pool = mariadb.createPool({
+const sequelize = new Sequelize({
+    dialect: 'mariadb',
     host: 'localhost',
     port: '3307',
-    user: 'root',
+    username: 'root',
     password: '0000',
     database: 'guild_manager',
-    connectionLimit: 10, // 동시에 유지될 연결 수
 });
 
 // 배열의 각 요소를 데이터베이스에 저장
@@ -31,27 +31,4 @@ async function saveMember(characterNames) {
     }
 }
 
-module.exports = saveMember;
-
-// MariaDB 연결 풀에서 연결
-pool.getConnection()
-    .then((conn) => {
-        console.log('MariaDB에 연결됨');
-
-        // 쿼리 실행 또는 다른 작업 수행
-        conn.query('SELECT * FROM main_member')
-            .then((rows) => {
-                console.log(rows);  // 쿼리 결과 출력
-            })
-            .catch((err) => {
-                console.error('쿼리 에러', err);
-            })
-            .finally(() => {
-                // 연결 반환
-                conn.release();
-                console.log('연결 반환');
-            });
-    })
-    .catch((err) => {
-        console.error('DB 연결 에러', err);
-    });
+module.exports = { saveMember, sequelize };
