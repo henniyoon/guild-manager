@@ -1,16 +1,7 @@
 const { Sequelize } = require('sequelize');
-const MainMember = require('./models/mainMember.js');
+const { MainMember, SubMember, sequelize } = require('./models/mainMember.js');
 
 async function fetchData() {
-    const sequelize = new Sequelize({
-        dialect: 'mariadb',
-        host: 'localhost',
-        port: '3307',
-        username: 'root',
-        password: '0000',
-        database: 'guild_manager',
-    });
-
     try {
         // 데이터베이스 연결 확인
         await sequelize.authenticate();
@@ -18,6 +9,7 @@ async function fetchData() {
         
         // 데이터베이스에 테이블이 없다면 생성
         await MainMember.sync();
+        await SubMember.sync();
 
         // 데이터 조회
         const members = await MainMember.findAll({
