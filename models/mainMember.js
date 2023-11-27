@@ -1,14 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
-
-// MariaDB 연결 정보
-const sequelize = new Sequelize({
-    dialect: 'mariadb',
-    host: 'localhost',
-    port: '3307',
-    username: 'root',
-    password: '0000',
-    database: 'guild_manager',
-});
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../db.js');
 
 // 본캐릭 길드 테이블 정의
 const MainMember = sequelize.define('MainMember', {

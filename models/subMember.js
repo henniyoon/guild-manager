@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('./mainMember'); // mainMember 모델에서 sequelize 객체를 가져옴
+const { sequelize } = require('../db.js');
 
 // 부캐릭 길드 테이블 정의
 const SubMember = sequelize.define('SubMember', {
