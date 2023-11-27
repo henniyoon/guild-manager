@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const { sequelize } = require('../db.js');
+const sequelize = require('../db.js');
 
 // 본캐릭 길드 테이블 정의
 const MainMember = sequelize.define('MainMember', {
@@ -14,4 +14,4 @@ const MainMember = sequelize.define('MainMember', {
     timestamps: false, // createdAt 및 updatedAt 필드 생성 안 함
 });
 
-module.exports = { MainMember, sequelize };
+module.exports = MainMember;
