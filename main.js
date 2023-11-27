@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
-const { MainMember, SubMember, sequelize } = require('./models/mainMember.js');
+const { MainMember, sequelize } = require('./models/mainMember.js');
+const { SubMember } = require('./models/subMember.js');
 
 async function fetchData() {
     try {
