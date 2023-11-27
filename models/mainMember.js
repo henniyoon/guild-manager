@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
+// MariaDB 연결 정보
 const sequelize = new Sequelize({
     dialect: 'mariadb',
     host: 'localhost',
@@ -9,6 +10,7 @@ const sequelize = new Sequelize({
     database: 'guild_manager',
 });
 
+// 본캐릭 길드 테이블 정의
 const MainMember = sequelize.define('MainMember', {
     name: {
         type: DataTypes.STRING,
@@ -21,4 +23,4 @@ const MainMember = sequelize.define('MainMember', {
     timestamps: false, // createdAt 및 updatedAt 필드 생성 안 함
 });
 
-module.exports = MainMember;
+module.exports = { MainMember, sequelize };
