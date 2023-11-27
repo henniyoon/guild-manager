@@ -34,7 +34,7 @@ const SubMember = sequelize.define('SubMember', {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
-            model: 'main_members',
+            model: 'main_member',
             key: 'name',
         },
     },
