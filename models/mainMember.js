@@ -1,14 +1,7 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db.js');
 
-const sequelize = new Sequelize({
-    dialect: 'mariadb',
-    host: 'localhost',
-    port: '3307',
-    username: 'root',
-    password: '0000',
-    database: 'guild_manager',
-});
-
+// 본캐릭 길드 테이블 정의
 const MainMember = sequelize.define('MainMember', {
     name: {
         type: DataTypes.STRING,
