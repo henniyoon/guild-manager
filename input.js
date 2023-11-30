@@ -77,5 +77,5 @@ app.post('/addMembers', async (req, res) => {
 
 // 서버 시작
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`http://localhost:${port}`);
 });
