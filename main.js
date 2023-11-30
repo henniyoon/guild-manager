@@ -2,6 +2,7 @@ const sequelize = require('./db.js');
 const { fetchData } = require('./services/dataService.js');
 const { saveIfNotExists, findAllMembers } = require('./services/memberService.js');
 const MainMember = require('./models/mainMember.js');
+const SubMember = require('./models/subMember.js');
 
 async function main() {
   try {
