@@ -27,7 +27,7 @@ const server = http.createServer(async (req, res) => {
     html += '</ul></body></html>';
   
     // 응답 전송
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
   
     // 연결 해제
