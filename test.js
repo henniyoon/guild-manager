@@ -29,6 +29,7 @@ const server = http.createServer(async (req, res) => {
   });
 
   // index.html 수정
+  // replace 메서드 : 앞 인자를 뒤의 인자로 바꿈
   const modifiedHTML = htmlFile.replace('<div id="root"></div>', `<div id="root">${membersHTML}</div>`);
 
   // 응답 전송
