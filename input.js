@@ -53,6 +53,9 @@ app.get('/', (req, res) => {
   <input type="hidden" id="namesInput" name="names" value="">
 </form>
 <script>
+  // names 배열 초기화
+  let namesArray = [];
+
   function addName() {
     const nameInput = document.getElementById('name');
     const name = nameInput.value.trim();
@@ -70,7 +73,7 @@ app.get('/', (req, res) => {
   }
 
   // submit 버튼 클릭 시 namesInput에 배열 값을 할당
-  document.querySelector('form').addEventListener('submit', function () {
+  document.querySelector('form').addEventListener('submit', function (event) {
     const namesInput = document.getElementById('namesInput');
     namesInput.value = JSON.stringify(namesArray);
   });
@@ -104,5 +107,5 @@ app.post('/addMembers', async (req, res) => {
 
 // 서버 시작
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`http://localhost:${port}`);
 });
