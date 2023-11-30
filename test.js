@@ -42,5 +42,5 @@ const server = http.createServer(async (req, res) => {
 
 // 서버를 3000 포트에서 실행
 server.listen(3030, () => {
-  console.log('http://localhost:3000');
+  console.log('http://localhost:3030');
 });
