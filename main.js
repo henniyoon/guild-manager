@@ -9,6 +9,7 @@ async function main() {
     console.log('데이터베이스 연결 성공');
 
     await MainMember.sync(); // 테이블이 없다면 생성
+    await SubMember.sync();
 
     // 데이터 스크래핑
     const mainGuildId = 402812;
@@ -16,7 +17,7 @@ async function main() {
     const numPages = 10;
 
     const mainCharacterNames = await fetchData(mainGuildId, numPages);
-    const subCharacterNames = await fetchData(subGuildId, numPages);
+    // const subCharacterNames = await fetchData(subGuildId, numPages);
 
     // 본캐릭 길드원 DB 저장
     await saveIfNotExists(mainCharacterNames);
