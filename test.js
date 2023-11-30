@@ -1,6 +1,7 @@
 // 필요한 모듈을 불러옵니다.
 const http = require('http');
 const mariadb = require('mariadb');
+const fs = require('fs');
 
 // MariaDB 연결 정보 설정
 const pool = mariadb.createPool({
@@ -13,26 +14,30 @@ const pool = mariadb.createPool({
 
 // HTTP 서버 생성
 const server = http.createServer(async (req, res) => {
-    // 데이터베이스 쿼리
-    const conn = await pool.getConnection();
-    const rows = await conn.query('SELECT * FROM main_member');
-  
-    // HTML 생성
-    let html = '<html><head><title>Member List</title></head><body><h1>Member List</h1><ul>';
-  
-    rows.forEach((row) => {
-      html += `<li>ID: ${row.id}, Name: ${row.name}</li>`;
-    });
-  
-    html += '</ul></body></html>';
-  
-    // 응답 전송
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(html);
-  
-    // 연결 해제
-    conn.release();
+  // index.html 파일 읽기
+  const htmlFile = fs.readFileSync('./public/index.html', 'utf8');
+
+  // 데이터베이스 쿼리
+  const conn = await pool.getConnection();
+  const rows = await conn.query('SELECT * FROM main_member');
+
+  // HTML 생성
+  let membersHTML = '';
+
+  rows.forEach((row) => {
+    membersHTML += `<p>ID: ${row.id}, Name: ${row.name}</p>`;
   });
+
+  // index.html 수정
+  const modifiedHTML = htmlFile.replace('<div id="root"></div>', `<div id="root">${membersHTML}</div>`);
+
+  // 응답 전송
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(modifiedHTML);
+
+  // 연결 해제
+  conn.release();
+});
 
 // 서버를 3000 포트에서 실행
 server.listen(3000, () => {
