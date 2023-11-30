@@ -1,14 +1,14 @@
 # guild-manager
 
-## 설치 모듈
+## 설치된 모듈
 express  
-express mysql12  
 mariadb  
-tesseract.js  
-multer
 sequelize
 axios
 cheerio
+
+## 사용 예정 모듈
+tesseract.js  
 debug
 
 
