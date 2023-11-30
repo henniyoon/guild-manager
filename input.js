@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
   res.send(`
   <form action="/addMembers" method="post" id="memberForm">
   <label for="name">Name:</label>
-  <input type="text" id="name" name="name" required>
+  <input type="text" id="name" name="name">
   <button type="button" onclick="addName()">Add Name</button>
   <button type="submit">Add Members</button>
   <ul id="nameList"></ul>
@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
     const nameInput = document.getElementById('name');
     const name = nameInput.value.trim();
 
-    if (name) {
+    if (name !== '') {
       namesArray.push(name);
       nameInput.value = '';
 
@@ -71,10 +71,8 @@ app.get('/', (req, res) => {
 
   // form submit 이벤트 시 namesInput에 배열 값을 할당
   document.getElementById('memberForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // 기본 동작 중단
     const namesInput = document.getElementById('namesInput');
     namesInput.value = JSON.stringify(namesArray);
-    this.submit(); // 폼 제출
   });
 </script>
   `);
