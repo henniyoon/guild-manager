@@ -9,6 +9,7 @@ multer
 sequelize
 axios
 cheerio
+debug
 
 
 ## 파일 구조
