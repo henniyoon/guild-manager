@@ -41,34 +41,39 @@ createTable();
 // GET 요청 처리 - 폼 반환
 app.get('/', (req, res) => {
   res.send(`
-    <form action="/addMember" method="post">
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required>
-      <button type="submit">Add Member</button>
+    <form action="/addMembers" method="post">
+      <label for="names">Names (comma-separated):</label>
+      <input type="text" id="names" name="names" required>
+      <button type="submit">Add Members</button>
     </form>
   `);
 });
 
 // POST 요청 처리
-app.post('/addMember', async (req, res) => {
-  const { name } = req.body;
+app.post('/addMembers', async (req, res) => {
+  const { names } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ error: 'Name is required' });
+  if (!names) {
+    return res.status(400).json({ error: 'Names are required' });
   }
+
+  const namesArray = names.split(',');
 
   let conn;
   try {
     conn = await pool.getConnection();
-    await conn.query('INSERT INTO members (name) VALUES (?)', [name]);
-    res.status(200).json({ message: 'Member added successfully' });
+
+    for (const name of namesArray) {
+      await conn.query('INSERT INTO members (name) VALUES (?)', [name.trim()]);
+    }
+
+    res.status(200).json({ message: 'Members added successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   } finally {
     if (conn) conn.end();
   }
 });
-
 // 서버 시작
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
