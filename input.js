@@ -41,11 +41,40 @@ createTable();
 // GET 요청 처리 - 폼 반환
 app.get('/', (req, res) => {
   res.send(`
-    <form action="/addMembers" method="post">
-      <label for="names">Names (comma-separated):</label>
-      <input type="text" id="names" name="names" required>
-      <button type="submit">Add Members</button>
-    </form>
+  <form action="/addMembers" method="post">
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" required>
+  <button type="button" onclick="addName()">Add Name</button>
+  <button type="submit">Add Members</button>
+  <ul id="nameList"></ul>
+  <input type="hidden" id="namesInput" name="names" value="">
+</form>
+<script>
+  // names 배열 초기화
+  let namesArray = [];
+
+  function addName() {
+    const nameInput = document.getElementById('name');
+    const name = nameInput.value.trim();
+
+    if (name) {
+      namesArray.push(name);
+      nameInput.value = '';
+
+      // 추가된 이름을 화면에 표시
+      const nameList = document.getElementById('nameList');
+      const listItem = document.createElement('li');
+      listItem.textContent = name;
+      nameList.appendChild(listItem);
+    }
+  }
+
+  // submit 버튼 클릭 시 namesInput에 배열 값을 할당
+  document.querySelector('form').addEventListener('submit', function (event) {
+    const namesInput = document.getElementById('namesInput');
+    namesInput.value = JSON.stringify(namesArray);
+  });
+</script>
   `);
 });
 
@@ -74,6 +103,7 @@ app.post('/addMembers', async (req, res) => {
     if (conn) conn.end();
   }
 });
+
 
 // 서버 시작
 app.listen(port, () => {
