@@ -84,15 +84,15 @@ app.get('/', (req, res) => {
 app.post('/addMembers', async (req, res) => {
   const { names } = req.body;
 
-  if (!names) {
+  if (!names || names.length === 0) {
     return res.status(400).json({ error: 'Names are required' });
   }
-
-  const namesArray = names.split(',');
 
   let conn;
   try {
     conn = await pool.getConnection();
+
+    const namesArray = JSON.parse(names);
 
     for (const name of namesArray) {
       await conn.query('INSERT INTO members (name) VALUES (?)', [name.trim()]);
@@ -105,8 +105,6 @@ app.post('/addMembers', async (req, res) => {
     if (conn) conn.end();
   }
 });
-
-
 // 서버 시작
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
