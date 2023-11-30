@@ -1,10 +1,14 @@
 # guild-manager
 
+## 설치 모듈
 express  
 express mysql12  
 mariadb  
 tesseract.js  
-multer  
+multer
+sequelize
+axios
+cheerio
 
 
 ## 파일 구조
