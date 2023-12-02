@@ -39,5 +39,4 @@ GUILD-MANAGER
 ---
 
 ## TODO
-- main_member에 DB 저장 시 main_member 테이블에 이미 있는 데이터는 업데이트 하지 않고, 없는 데이터만 저장 (saveIfNotExists) + 테이블에 있으나 스크래핑된 데이터엔 없으면 테이블에서 삭제
 - DB에 저장 된 main_member, sub_member 테이블 목록 서버에 출력
