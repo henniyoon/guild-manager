@@ -19,33 +19,11 @@ const pool = mariadb.createPool({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --------------------------------------------------
-// async function createTable() {
-//   console.log('Creating table...'); // 로그 추가
-//   let conn;
-//   try {
-//     conn = await pool.getConnection();
-//     await conn.query(`
-//       CREATE TABLE IF NOT EXISTS members (
-//         id INT AUTO_INCREMENT PRIMARY KEY,
-//         name VARCHAR(255)
-//       );
-//     `);
-//   } catch (err) {
-//     console.error('Error creating table:', err); // 로그 추가
-//     throw err;
-//   } finally {
-//     if (conn) conn.end();
-//   }
-// }
-
 restriction.sync()
 
 // Express 미들웨어 설정
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// 테이블 생성 함수 호출
-// createTable();
 
 // GET 요청 처리 - 폼 반환
 app.get('/input', (req, res) => {
