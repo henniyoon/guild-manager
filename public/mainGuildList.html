@@ -29,12 +29,14 @@
 
     <script>
         // 서버에서 데이터 가져오기
-        fetch('/public/mainGuildList')
+        fetch('/mainGuildList')
             .then(response => response.json())
             .then(mainMembers => {
 
                 // 본캐 목록 출력
                 const tableBody = document.querySelector('#mainGuildList tbody');
+                tableBody.innerHTML = "";
+
                 mainMembers.forEach(mainMember => {
                     const mainCharacterRow = document.createElement('tr');
 
