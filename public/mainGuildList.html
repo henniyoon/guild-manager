@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Guild List</title>
+    <style>
+        .contextMenu {
+            list-style-type: none;
+            padding: 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 본캐 목록이 표시되는 부분 -->
+    <table id="mainGuildList">
+        <thead>
+            <tr>
+                <th>Main Character Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // 서버에서 데이터 가져오기
+        fetch('/public/mainGuildList')
+            .then(response => response.json())
+            .then(mainMembers => {
+
+                // 본캐 목록 출력
+                const tableBody = document.querySelector('#mainGuildList tbody');
+                mainMembers.forEach(mainMember => {
+                    const mainCharacterRow = document.createElement('tr');
+
+                    const mainCharacterNameCell = document.createElement('td');
+                    mainCharacterNameCell.textContent = mainMember.name;
+
+                    const actionsCell = document.createElement('td');
+                    const addSubCharacterButton = document.createElement('button');
+                    addSubCharacterButton.textContent = 'Add Sub Character';
+                    addSubCharacterButton.onclick = () => addSubCharacter(mainMember.id); // 부캐 추가 함수 호출
+
+                    actionsCell.appendChild(addSubCharacterButton);
+
+                    mainCharacterRow.appendChild(mainCharacterNameCell);
+                    mainCharacterRow.appendChild(actionsCell);
+
+                    tableBody.appendChild(mainCharacterRow);
+                });
+            })
+            .catch(error => console.error('서버 통신 에러:', error));
+
+        async function addSubCharacter(mainMemberId) {
+            const addSubCharacterName = prompt('Enter the name of the sub character:');
+
+            if (addSubCharacterName) {
+                try {
+                    const response = await fetch('/addSubCharacter', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ mainMemberId, addSubCharacterName }),
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('서버 통신 에러:', error);
+                    alert('An error occurred during server communication.');
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
