@@ -1,25 +1,23 @@
 const express = require('express');
 const path = require('path');
-const mariadb = require('mariadb');
-const restriction = require('./models/restriction');
+const db = require('./db');
+const restrictionModel = require('./models/restriction');
 
 const app = express();
 const port = 3030; // 사용할 포트 번호
 
-const pool = mariadb.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '0000',
-  database: 'guild_manager',
-  port: 3307,
-  connectionLimit: 5,
-});
-
-// public 폴더 내의 정적 파일 (index.html)을 제공
+// Public 폴더 내의 정적 파일 (index.html)을 제공
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --------------------------------------------------
-restriction.sync()
+// Sequelize 모델 동기화
+(async () => {
+  try {
+    await db.sync();
+    console.log('Sequelize models synchronized.');
+  } catch (error) {
+    console.error('Sequelize synchronization error:', error);
+  }
+})();
 
 // Express 미들웨어 설정
 app.use(express.urlencoded({ extended: true }));
@@ -70,24 +68,19 @@ app.post('/addMembers', async (req, res) => {
   const { names } = req.body;
 
   if (!names || names.length === 0) {
-    return res.status(400).json({ error: 'Names are required' });
+    return res.status(400).json({ error: '이름은 필수입니다.' });
   }
 
-  let conn;
   try {
-    conn = await pool.getConnection();
-
     const namesArray = JSON.parse(names);
 
     for (const name of namesArray) {
-      await conn.query('INSERT INTO restriction (name) VALUES (?)', [name.trim()]);
+      await restrictionModel.create({ name: name.trim() });
     }
 
-    res.status(200).json({ message: 'Members added successfully' });
+    res.status(200).json({ message: '멤버가 성공적으로 추가되었습니다.' });
   } catch (err) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    if (conn) conn.end();
+    res.status(500).json({ error: '내부 서버 오류' });
   }
 });
 
@@ -99,5 +92,5 @@ app.listen(port, () => {
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something went wrong!');
+  res.status(500).send('문제가 발생했습니다!');
 });
