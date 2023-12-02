@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const mariadb = require('mariadb');
+const restriction = require('./models/restriction');
 
 const app = express();
 const port = 3030; // 사용할 포트 번호
@@ -18,32 +19,36 @@ const pool = mariadb.createPool({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --------------------------------------------------
-async function createTable() {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    await conn.query(`
-      CREATE TABLE IF NOT EXISTS members (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255)
-      );
-    `);
-  } catch (err) {
-    throw err;
-  } finally {
-    if (conn) conn.end();
-  }
-}
+// async function createTable() {
+//   console.log('Creating table...'); // 로그 추가
+//   let conn;
+//   try {
+//     conn = await pool.getConnection();
+//     await conn.query(`
+//       CREATE TABLE IF NOT EXISTS members (
+//         id INT AUTO_INCREMENT PRIMARY KEY,
+//         name VARCHAR(255)
+//       );
+//     `);
+//   } catch (err) {
+//     console.error('Error creating table:', err); // 로그 추가
+//     throw err;
+//   } finally {
+//     if (conn) conn.end();
+//   }
+// }
+
+restriction.sync()
 
 // Express 미들웨어 설정
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // 테이블 생성 함수 호출
-createTable();
+// createTable();
 
 // GET 요청 처리 - 폼 반환
-app.get('/', (req, res) => {
+app.get('/input', (req, res) => {
   res.send(`
   <form action="/addMembers" method="post" id="memberForm">
   <label for="name">Name:</label>
@@ -97,7 +102,7 @@ app.post('/addMembers', async (req, res) => {
     const namesArray = JSON.parse(names);
 
     for (const name of namesArray) {
-      await conn.query('INSERT INTO members (name) VALUES (?)', [name.trim()]);
+      await conn.query('INSERT INTO restriction (name) VALUES (?)', [name.trim()]);
     }
 
     res.status(200).json({ message: 'Members added successfully' });
@@ -111,4 +116,10 @@ app.post('/addMembers', async (req, res) => {
 // 서버 시작
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
+});
+
+// 에러 핸들링 미들웨어
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
 });
