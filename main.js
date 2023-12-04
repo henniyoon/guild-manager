@@ -1,6 +1,6 @@
 const sequelize = require('./db.js');
 const { fetchData } = require('./services/dataService.js');
-const { saveIfNotExists, findAllMembers } = require('./services/memberService.js');
+const { saveIfNotExists, deleteNotInDb, findAllMembers } = require('./services/memberService.js');
 const MainMember = require('./models/mainMember.js');
 const SubMember = require('./models/subMember.js');
 
@@ -9,7 +9,8 @@ async function main() {
     await sequelize.authenticate();
     console.log('데이터베이스 연결 성공');
 
-    await MainMember.sync(); // 테이블이 없다면 생성
+    // 테이블이 없다면 생성
+    await MainMember.sync(); 
     await SubMember.sync();
 
     // 데이터 스크래핑
@@ -21,7 +22,8 @@ async function main() {
     // const subCharacterNames = await fetchData(subGuildId, numPages);
 
     // 본캐릭 길드원 DB 저장
-    await saveIfNotExists(mainCharacterNames);
+    await saveIfNotExists(mainCharacterNames);  // 스크랩 데이터가 DB에 없으면 저장
+    await deleteNotInDb(mainCharacterNames);    // 스크랩 데이터에 없는데 DB에 있으면 삭제
 
     // 본캐릭 길드원 조회
     const allMembers = await findAllMembers();
