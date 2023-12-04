@@ -16,6 +16,7 @@ async function main() {
     // 데이터 스크래핑
     const mainGuildId = 402812;
     const subGuildId = 312443;
+    
     const numPages = 10;
 
     const mainCharacterNames = await fetchGuildData(mainGuildId, numPages);
