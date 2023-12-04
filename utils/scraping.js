@@ -1,7 +1,8 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 
-async function scrapeRankTable(url) {
+// 비즈니스 로직: 길드 데이터 스크래핑
+async function fetchData(url) {
   try {
     const response = await axios.get(url);
     const html = response.data;
@@ -26,4 +27,4 @@ async function scrapeRankTable(url) {
   }
 }
 
-module.exports = { scrapeRankTable };
+module.exports = { fetchData };

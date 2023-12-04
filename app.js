@@ -1,13 +1,20 @@
 const express = require('express');
 const path = require('path');
+const sequelize = require('./db.js');
+const routes = require('./routes/routes.js');
+
 const db = require('./db');
 const inputRoutes = require('./routes/input');
 
 const app = express();
-const port = 3030; // 사용할 포트 번호
+
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // Public 폴더 내의 정적 파일 (index.html)을 제공
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(routes);
 
 // Sequelize 모델 동기화
 (async () => {
@@ -27,6 +34,8 @@ app.use(express.json());
 app.use('/input', inputRoutes);
 
 // 서버 시작
+const port = process.env.PORT || 3030; // 사용할 포트 번호
+// 서버를 시작
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);
 });
