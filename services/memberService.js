@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const MainMember = require('../models/mainMember.js');
+const MainMember = require('../models/mainMemberModel');
 
 // 비즈니스 로직
 // 스크래핑 리스트가 DB에 없으면 DB에 저장
