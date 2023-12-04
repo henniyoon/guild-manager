@@ -1,0 +1,49 @@
+<!-- views/mainGuildList.ejs -->
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Guild List</title>
+    <style>
+        .contextMenu {
+            list-style-type: none;
+            padding: 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <table id="mainGuildList">
+        <thead>
+            <tr>
+                <th>Main Character Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% mainMembers.forEach(mainMember => { %>
+                <tr>
+                    <td><%= mainMember.name %></td>
+                    <td><button onclick="addSubCharacter(<%= mainMember.id %>)">Add Sub Character</button></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <script>
+        async function addSubCharacter(mainMemberId) {
+            const addSubCharacterName = prompt('Enter the name of the sub character:');
+            if (addSubCharacterName) {
+                // 부캐 추가 로직 구현
+                // ...
+            }
+        }
+    </script>
+
+</body>
+
+</html>
