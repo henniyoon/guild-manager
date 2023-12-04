@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const sequelize = require('../db');
 
 // 부캐릭 길드 테이블 정의
 const SubMember = sequelize.define('SubMember', {
