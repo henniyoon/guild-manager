@@ -1,7 +1,9 @@
 const { Sequelize } = require('sequelize');
-const MainMember = require('../models/mainMember');
+const MainMember = require('../models/mainMember.js');
 
-async function saveIfNotExists(characterNames) {
+// 비즈니스 로직
+// 스크래핑 리스트가 DB에 없으면 DB에 저장
+async function saveMembersIfNotExist(characterNames) {
   try {
     for (const name of characterNames) {
       const existingMember = await MainMember.findOne({ where: { name } });
@@ -18,10 +20,11 @@ async function saveIfNotExists(characterNames) {
   }
 }
 
-async function deleteNotInDb(characterNames) {
+// DB에는 있으나 스크래핑 리스트에는 없는 데이터 DB에서 삭제
+async function deleteMembersNotInList(characterNames) {
   try {
     // main_member 테이블에서 스크래핑한 데이터에 존재하지 않는 데이터 찾기
-    const notInDb = await MainMember.findAll({
+    const notInList = await MainMember.findAll({
       where: {
         name: {
           [Sequelize.Op.notIn]: characterNames,
@@ -30,11 +33,11 @@ async function deleteNotInDb(characterNames) {
     });
 
     // 찾은 데이터 삭제
-    if (notInDb.length > 0) {
+    if (notInList.length > 0) {
       await MainMember.destroy({
         where: {
           id: {
-            [Sequelize.Op.in]: notInDb.map(member => member.id),
+            [Sequelize.Op.in]: notInList.map(member => member.id),
           },
         },
       });
@@ -48,7 +51,7 @@ async function deleteNotInDb(characterNames) {
   }
 }
 
-async function findAllMembers() {
+async function getAllMembers() {
   try {
     return await MainMember.findAll({ attributes: ['name'], raw: true });
   } catch (error) {
@@ -57,4 +60,4 @@ async function findAllMembers() {
   }
 }
 
-module.exports = { saveIfNotExists, deleteNotInDb, findAllMembers };
+module.exports = { saveMembersIfNotExist, deleteMembersNotInList, getAllMembers };
