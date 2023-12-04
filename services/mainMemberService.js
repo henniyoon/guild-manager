@@ -3,7 +3,7 @@ const MainMember = require('../models/mainMemberModel');
 
 // 비즈니스 로직
 // 스크래핑 리스트가 DB에 없으면 DB에 저장
-async function saveMembersIfNotExist(characterNames) {
+async function saveMainMembersIfNotExist(characterNames) {
   try {
     for (const name of characterNames) {
       const existingMember = await MainMember.findOne({ where: { name } });
@@ -21,7 +21,7 @@ async function saveMembersIfNotExist(characterNames) {
 }
 
 // DB에는 있으나 스크래핑 리스트에는 없는 데이터 DB에서 삭제
-async function deleteMembersNotInList(characterNames) {
+async function deleteMainMembersNotInList(characterNames) {
   try {
     // main_member 테이블에서 스크래핑한 데이터에 존재하지 않는 데이터 찾기
     const notInList = await MainMember.findAll({
@@ -51,7 +51,7 @@ async function deleteMembersNotInList(characterNames) {
   }
 }
 
-async function getAllMembers() {
+async function getAllMainMembers() {
   try {
     return await MainMember.findAll({ attributes: ['name'], raw: true });
   } catch (error) {
@@ -60,4 +60,8 @@ async function getAllMembers() {
   }
 }
 
-module.exports = { saveMembersIfNotExist, deleteMembersNotInList, getAllMembers };
+module.exports = {
+  saveMainMembersIfNotExist,
+  deleteMainMembersNotInList,
+  getAllMainMembers
+};
