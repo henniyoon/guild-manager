@@ -1,0 +1,66 @@
+<!-- views/mainMemberList.ejs -->
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Guild List</title>
+    <style>
+        .guild-tables {
+            display: flex;
+        }
+
+        .guild-table {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="guild-tables">
+        <!-- 본캐릭 길드원 테이블 -->
+        <div class="guild-table">
+            <table id="mainGuildList">
+                <thead>
+                    <tr>
+                        <th>별빛</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% mainMembers.forEach(mainMember => { %>
+                        <tr>
+                            <td><%= mainMember.name %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 부캐릭 길드원 테이블 -->
+        <div class="guild-table">
+            <table id="subGuildList">
+                <thead>
+                    <tr>
+                        <th>별빛</th>
+                        <th>새벽</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% subMembers.forEach(subMember => { %>
+                        <tr>
+                            <td><%= subMember.main_name %></td>
+                            <td><%= subMember.name %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        
+    </script>
+</body>
+
+</html>
