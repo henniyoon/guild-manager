@@ -1,16 +1,13 @@
 # guild-manager
 
-## 설치된 모듈
-express  
-mariadb  
-sequelize
-axios
-cheerio
+## 모듈 관련해서 오류가 발생하면
+1. node_modules 폴더 삭제
+2. package.json 파일 삭제
+3. 터미널 > npm install 
 
 ## 사용 예정 모듈
 tesseract.js  
 debug
-
 
 ## 파일 구조
 GUILD-MANAGER  
