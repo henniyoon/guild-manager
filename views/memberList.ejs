@@ -1,18 +1,36 @@
-<!-- views/mainMemberList.ejs -->
 <!DOCTYPE html>
 <html lang="kr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Guild List</title>
+    <title>메이플 길드 매니저 :: 길드 명부</title>
     <style>
-        .guild-tables {
+         .guild-tables, button {
             display: flex;
         }
 
         .guild-table {
             margin-right: 20px;
+        }
+
+        .editable-cell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .editable-cell input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+        }
+
+        .editable-cell .display-value {
+            display: block;
         }
     </style>
 </head>
@@ -21,25 +39,27 @@
     <div class="guild-tables">
         <!-- 본캐릭 길드원 테이블 -->
         <div class="guild-table">
-            <table id="mainGuildList">
+            <table id="mainMemberList">
                 <thead>
                     <tr>
                         <th>별빛</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% mainMembers.forEach(mainMember => { %>
+                    <% mainMembers.forEach(mainMember=> { %>
                         <tr>
-                            <td><%= mainMember.name %></td>
+                            <td>
+                                <%= mainMember.name %>
+                            </td>
                         </tr>
-                    <% }); %>
+                        <% }); %>
                 </tbody>
             </table>
         </div>
 
         <!-- 부캐릭 길드원 테이블 -->
         <div class="guild-table">
-            <table id="subGuildList">
+            <table id="subMemberList">
                 <thead>
                     <tr>
                         <th>별빛</th>
@@ -47,20 +67,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% subMembers.forEach(subMember => { %>
+                    <% subMembers.forEach(subMember=> { %>
                         <tr>
-                            <td><%= subMember.main_name %></td>
-                            <td><%= subMember.name %></td>
+                            <td class="editable-cell" onclick="toggleEditable(this, '<%= subMember.name %>')">
+                                <span class="display-value"><%= subMember.main_name %></span>
+                                <input type="text" value="<%= subMember.main_name %>" style="display: none;">
+                            </td>
+                            <td>
+                                <%= subMember.name %>
+                            </td>
                         </tr>
-                    <% }); %>
+                        <% }); %>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <script>
-        
-    </script>
+    <script src="./js/memberListActions.js"></script>
 </body>
 
 </html>
