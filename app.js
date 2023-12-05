@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { sequelize, findCharacter } = require('./findCharacter'); // sequelize-setup.js에서 가져오기
+const { sequelize, findNobleLimit } = require('./findNobleLimit');
 const routes = require('./routes/routes');
 const inputRoutes = require('./routes/input');
 
@@ -28,11 +28,16 @@ async function startServer() {
   app.use(routes);
   app.use('/input', inputRoutes);
 
-  // '/data' 엔드포인트에 데이터 조회 및 API 제공
-  app.get('/data', async (req, res) => {
+  // '/data' 엔드포인트에 데이터 조회 및 EJS 템플릿을 사용하여 렌더링
+  app.get('/nobleLimit', async (req, res) => {
     try {
-      const result = await findCharacter();
-      res.json(result);
+      const results = await findNobleLimit();
+
+      // main_name만 추출
+      const mainNames = results.map((result) => result.main_name);
+
+      // EJS 템플릿 렌더링
+      res.render('nobleLimit', { mainNames });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: '내부 서버 오류' });
