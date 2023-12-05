@@ -5,7 +5,7 @@ const restriction = sequelize.define('restriction', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true, // 중복되지 않도록 설정
+        unique: false,
     },
     createdAt: {
         type: DataTypes.DATE,
