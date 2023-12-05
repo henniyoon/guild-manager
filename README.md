@@ -1,12 +1,5 @@
 # guild-manager
 
-## 설치된 모듈
-express  
-mariadb  
-sequelize
-axios
-cheerio
-ejs
 =======
 ## 모듈 관련해서 오류가 발생하면
 1. node_modules 폴더 삭제
@@ -58,3 +51,16 @@ GUILD-MANAGER
 
 ## TODO
 - 노블 제한 로직
+
+- DB > nobleLimit 에서 타임스탬프가 현재시각-09:00 으로 찍힘
+  time_zone 설정 서울로 되어 있는데 왜 이러는지 모르겠음
+
+- 부캐 테이블에 본캐 정보 입력하고 노블제한 로직을 짜야 편할 것 같음
+
+- OCR 정확도가 떨어지는데 어떻게 적용할 것인지 연구해보기
+
+- 인터페이스 템플릿 정하기
+
+- TypeScript나 React로 바꿀 예정
+
+- AWS로 배포해보기
