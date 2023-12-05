@@ -8,6 +8,7 @@ const {
 
 const MainMember = require('./models/mainMemberModel');
 const SubMember = require('./models/subMemberModel');
+const restriction = require('./models/restriction')
 
 async function fetchAndSaveMembers(guildId, numPages, MemberModel) {
   try {
@@ -30,6 +31,7 @@ async function main() {
     // 테이블이 없다면 생성
     await MainMember.sync();
     await SubMember.sync();
+    await restriction.sync();
 
     // 데이터 스크래핑
     const numPages = 10;
