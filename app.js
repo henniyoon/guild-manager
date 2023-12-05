@@ -28,22 +28,6 @@ async function startServer() {
   app.use(routes);
   app.use('/input', inputRoutes);
 
-  // '/data' 엔드포인트에 데이터 조회 및 EJS 템플릿을 사용하여 렌더링
-  app.get('/nobleLimit', async (req, res) => {
-    try {
-      const results = await findNobleLimit();
-
-      // main_name만 추출
-      const mainNames = results.map((result) => result.main_name);
-
-      // EJS 템플릿 렌더링
-      res.render('nobleLimit', { mainNames });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: '내부 서버 오류' });
-    }
-  });
-
   // 서버 시작
   const port = process.env.PORT || 3030;
   app.listen(port, () => {
