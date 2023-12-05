@@ -11,7 +11,7 @@ const SubMember = sequelize.define('SubMember', {
     main_name: {
         // 본캐릭 이름 (main_member 외래키 설정)
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'main_member',
             key: 'name',
