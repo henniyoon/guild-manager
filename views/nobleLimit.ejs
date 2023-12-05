@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Table</title>
+</head>
+
+<body>
+  <h1>Data Table</h1>
+  <table border="1">
+    <tr>
+      <th>Main Name</th>
+    </tr>
+    <% for (let i = 0; i < mainNames.length; i++) { %>
+      <tr>
+        <td><%= mainNames[i] %></td>
+      </tr>
+    <% } %>
+  </table>
+</body>
+
+</html>
