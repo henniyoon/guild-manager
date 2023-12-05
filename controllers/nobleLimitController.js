@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { findNobleLimit } = require('../findNobleLimit');
+const { findNobleLimit } = require('../services/findNobleLimit');
 
 async function NobleLimitController(req, res) {
   try {
