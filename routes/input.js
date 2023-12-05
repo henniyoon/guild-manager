@@ -1,5 +1,5 @@
 const express = require('express');
-const restrictionModel = require('../models/restriction');
+const restrictionModel = require('../models/nobleLimit');
 
 const router = express.Router();
 

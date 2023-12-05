@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 
-const restriction = sequelize.define('restriction', {
+const nobleLimit = sequelize.define('nobleLimit', {
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -12,9 +12,9 @@ const restriction = sequelize.define('restriction', {
         allowNull: true,
     },
 }, {
-    tableName: 'restriction', // 실제 테이블 이름
+    tableName: 'nobleLimit', // 실제 테이블 이름
     freezeTableName: true, // 테이블 이름 고정
     timestamps: true,
 });
 
-module.exports = restriction;
+module.exports = nobleLimit;

@@ -1,6 +1,6 @@
 const sequelize = require('./db');
 
-async function findCharacter() {
+async function findNobleLimit() {
   try {
     const result = await sequelize.query(
       'SELECT * FROM sub_member WHERE name IN (SELECT name FROM restriction)',
@@ -13,5 +13,4 @@ async function findCharacter() {
   }
 }
 
-// Sequelize 객체와 fetchDataFromDatabase 함수를 함께 내보내기
-module.exports = { sequelize, findCharacter };
+module.exports = { sequelize, findNobleLimit };
