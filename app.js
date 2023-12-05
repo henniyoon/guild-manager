@@ -1,44 +1,42 @@
 const express = require('express');
 const path = require('path');
-const sequelize = require('./db.js');
-const routes = require('./routes/routes.js');
-const inputRoutes = require('./routes/input');
+const { sequelize, findNobleLimit } = require('./services/findNobleLimit');
+const routes = require('./routes/routes');
 
-const app = express();
+async function startServer() {
+  const app = express();
 
-// View Engine 설정
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+  // 뷰 엔진 및 퍼블릭 폴더 구성
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
+  app.use(express.static(path.join(__dirname, 'public')));
 
-// Public 폴더 내의 정적 파일 (index.html)을 제공
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Express 미들웨어 설정
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-// 라우트 설정
-app.use('/', routes);
-app.use('/input', inputRoutes); // 추후 routes.js에 합칠 것
-
-// Sequelize 모델 동기화
-(async () => {
+  // Sequelize 모델 동기화
   try {
-    await sequelize.sync({ force: false }); // 기존 DB를 보존하고 변경 사항만 적용
-    console.log('Sequelize models synchronized.');
+    await sequelize.sync();
+    console.log('Sequelize 모델이 동기화되었습니다.');
   } catch (error) {
-    console.error('Sequelize synchronization error:', error);
+    console.error('Sequelize 동기화 오류:', error);
   }
-})();
 
-// 서버 시작
-const port = process.env.PORT || 3030; // 사용할 포트 번호
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+  // Express 미들웨어
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
 
-// 에러 핸들링 미들웨어
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('문제가 발생했습니다!');
-});
+  // 라우트
+  app.use(routes);
+
+  // 서버 시작
+  const port = process.env.PORT || 3030;
+  app.listen(port, () => {
+    console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
+  });
+
+  // 에러 처리 미들웨어
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('문제가 발생했습니다!');
+  });
+}
+
+startServer();
