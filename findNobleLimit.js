@@ -3,7 +3,7 @@ const sequelize = require('./db');
 async function findNobleLimit() {
   try {
     const result = await sequelize.query(
-      'SELECT * FROM sub_member WHERE name IN (SELECT name FROM restriction)',
+      'SELECT * FROM sub_member WHERE name IN (SELECT name FROM NobleLimit)',
       { type: sequelize.QueryTypes.SELECT }
     );
 
