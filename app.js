@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const { sequelize, findNobleLimit } = require('./findNobleLimit');
 const routes = require('./routes/routes');
-const inputRoutes = require('./routes/input');
 
 async function startServer() {
   const app = express();
@@ -26,7 +25,6 @@ async function startServer() {
 
   // 라우트
   app.use(routes);
-  app.use('/input', inputRoutes);
 
   // 서버 시작
   const port = process.env.PORT || 3030;
