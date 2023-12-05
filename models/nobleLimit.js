@@ -15,6 +15,7 @@ const nobleLimit = sequelize.define('nobleLimit', {
     tableName: 'nobleLimit', // 실제 테이블 이름
     freezeTableName: true, // 테이블 이름 고정
     timestamps: true,
+    timezone: '+09:00', // 한국 시간대로 설정 (GMT+9)
 });
 
 module.exports = nobleLimit;
