@@ -8,7 +8,7 @@ const restriction = sequelize.define('restriction', {
         unique: false,
     },
     createdAt: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: true,
     },
 }, {
