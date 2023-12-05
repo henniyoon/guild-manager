@@ -24,13 +24,18 @@ GUILD-MANAGER
 │   └── config.json (MariaDB 연결 정보)  
 │  
 ├── controllers   
-│   └── guildListController.js (데이터 조회 및 템플릿 렌더링) 
+│   └── memberListController.js (데이터 조회 및 템플릿 렌더링) 
 │   
 ├── models  
-│   ├── mainMember.js (main_member 테이블 정의하는 모듈)  
-│   └── subMember.js (sub_member 테이블 정의하는 모듈)  
-│  
+│   ├── mainMemberModel.js (main_member 테이블 정의 모듈)  
+│   ├── subMemberModel.js (sub_member 테이블 정의 모듈)   
+│   └── restriction.js (restriction 테이블 정의 모듈)  
+│   
+├── public
+│   └── js
+│       └── memberListActions.js (클라이언트 부분 스크립트)   
 ├── routes   
+│   ├── input.js (노블 제한 로직 라우팅 파일 추후 routes.js로 병합)
 │   └── routes.js (특정 URL 경로에 대한 요청을 컨트롤러로 전달) 
 │   
 ├── services  
@@ -41,16 +46,15 @@ GUILD-MANAGER
 │   └── scraping.js (axios, cheerio 라이브러리를 사용하여 특정 url에서 table의 특정 정보를 스크래핑 해오는 모듈)  
 │  
 ├── views 
-│   └── mainMemberList.ejs (main_member 테이블에서 name 필드를 조회하여 테이블 형식으로 표시하는 동적 페이지)
+│   └── mainMemberList.ejs (main_member, sub_member 테이블을 표 형식으로 표시하는 동적 페이지)
 │  
-├── app.js (서버 관련)  
+├── app.js (서버)  
 │  
 ├── db.js (Sequelize를 사용하여 config.json 파일 정보를 불러와 sequelize 객체를 생성하여 내보내는 모듈)  
 │  
-└── main.js (다양한 로직을 조합하여 실행)  
+└── main.js (다양한 로직을 조합하여 실행 테스트용)  
 
 ---
 
 ## TODO
-- 부캐 길드원 추가 로직
 - 노블 제한 로직

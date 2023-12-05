@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db.js');
+const sequelize = require('../db');
 
 // 부캐릭 길드 테이블 정의
 const SubMember = sequelize.define('SubMember', {
@@ -11,7 +11,7 @@ const SubMember = sequelize.define('SubMember', {
     main_name: {
         // 본캐릭 이름 (main_member 외래키 설정)
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'main_member',
             key: 'name',
