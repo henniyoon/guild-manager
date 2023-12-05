@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { sequelize, findNobleLimit } = require('./findNobleLimit');
+const { sequelize, findNobleLimit } = require('./services/findNobleLimit');
 const routes = require('./routes/routes');
 
 async function startServer() {
