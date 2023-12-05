@@ -1,5 +1,5 @@
 const express = require('express');
-const restrictionModel = require('../models/nobleLimit');
+const nobleLimit = require('../models/nobleLimit');
 
 const router = express.Router();
 
@@ -53,7 +53,7 @@ router.post('/addMembers', async (req, res) => {
     const namesArray = JSON.parse(names);
 
     for (const name of namesArray) {
-      await restrictionModel.create({ name: name.trim() });
+      await nobleLimit.create({ name: name.trim() });
     }
 
     res.status(200).json({ message: '멤버가 성공적으로 추가되었습니다.' });
