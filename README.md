@@ -1,6 +1,5 @@
 # guild-manager
 
-=======
 ## 모듈 관련해서 오류가 발생하면
 1. node_modules 폴더 삭제
 2. package-lock.json 파일 삭제
