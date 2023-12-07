@@ -6,6 +6,10 @@ const nobleLimit = sequelize.define('nobleLimit', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: false,
+        references: {
+            model: 'main_member',
+            key: 'name',
+        },
     },
     createdAt: {
         type: DataTypes.DATEONLY,
