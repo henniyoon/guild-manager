@@ -1,3 +1,7 @@
+function goToGuildSetting() {
+  window.location.href = '/guildSetting';
+}
+
 function toggleEditable(cell, subMemberName) {
   const input = cell.querySelector('input');
   const displayValue = cell.querySelector('.display-value');
@@ -12,8 +16,6 @@ function toggleEditable(cell, subMemberName) {
     displayValue.style.display = 'block';
 
     const newValue = input.value;
-    console.log('Received subMemberName:', subMemberName);
-    console.log('newValue:', newValue);
     // 여기서 서버에 업데이트 요청을 보내고 DB 값을 업데이트할 수 있습니다.
     await requestUpdateSubMember(subMemberName, newValue);
   });
