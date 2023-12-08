@@ -8,9 +8,10 @@ const SubMember = require('../models/subMemberModel');
 async function getMemberList(req, res) {
     try {
         const mainMembers = await getAllMembers(MainMember);
-        const subMembers = await getAllSubMembers(SubMember);
+        const subMembers = await getAllMembers(SubMember);
+        const subMemberMainNames = await getAllSubMembers(SubMember);
 
-        res.render('memberList', { mainMembers, subMembers });
+        res.render('memberList', { mainMembers, subMembers, subMemberMainNames });
     } catch (error) {
         console.error('데이터 조회 에러:', error);
         res.status(500).send('Internal Server Error');
