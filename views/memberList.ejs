@@ -36,13 +36,15 @@
 </head>
 
 <body>
+    <button>길드 명부 설정</button>
+    
     <div class="guild-tables">
         <!-- 본캐릭 길드원 테이블 -->
         <div class="guild-table">
             <table id="mainMemberList">
                 <thead>
                     <tr>
-                        <th>별빛</th>
+                        <th>별빛 <%= mainMembers.length %>명</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,7 +59,27 @@
             </table>
         </div>
 
-        <!-- 부캐릭 길드원 테이블 -->
+        <!-- 본캐릭 길드원 테이블 -->
+        <div class="guild-table">
+            <table id="subMemberList">
+                <thead>
+                    <tr>
+                        <th>새벽 <%= subMembers.length %>명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% subMembers.forEach(subMember=> { %>
+                        <tr>
+                            <td>
+                                <%= subMember.name %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 부캐릭 길드원 본캐 확인, 추가 테이블 -->
         <div class="guild-table">
             <table id="subMemberList">
                 <thead>
@@ -67,7 +89,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% subMembers.forEach(subMember=> { %>
+                    <% subMemberMainNames.forEach(subMember=> { %>
                         <tr>
                             <td class="editable-cell" onclick="toggleEditable(this, '<%= subMember.name %>')">
                                 <span class="display-value"><%= subMember.main_name %></span>
