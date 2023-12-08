@@ -13,7 +13,7 @@ async function updateGuildInfo(req, res) {
           { main_guild_id: mainGuildId, sub_guild_id: subGuildId },
           { where: { id: 1 } }
           );
-        res.status(200).json({ success: true, message: '길드 정보 업데이트 성공'});
+        res.redirect('/memberList');
   } catch (error) {
     console.error('길드 정보 업데이트 중 에러:', error);
     res.status(500).json({ success: false, message: '길드 정보 업데이트 실패' });
