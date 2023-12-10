@@ -3,7 +3,7 @@ const {
   saveMembersIfNotExist, 
   deleteMembersNotInList, 
   getAllMembers 
-}= require('../services/memberService');
+}= require('./memberService.js');
 
 // 비즈니스 로직: 길드 데이터 스크래핑
 async function fetchGuildData(guildId) {
