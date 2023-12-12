@@ -16,29 +16,41 @@ GUILD-MANAGER
 │   └── config.json (MariaDB 연결 정보)  
 │  
 ├── controllers   
-│   └── memberListController.js (데이터 조회 및 템플릿 렌더링) 
-│   
+│   ├── memberListController.js (데이터 조회 및 템플릿 렌더링) 
+│   ├── addMemberController.js
+│   ├── findLimitController.js
+│   ├── guildSettingController.js
+│   ├── inputController.js
+│   ├── memberSyncController.js
+│   └── nobleLimitController.js
+│
 ├── models  
 │   ├── mainMemberModel.js (main_member 테이블 정의 모듈)  
 │   ├── subMemberModel.js (sub_member 테이블 정의 모듈)   
-│   └── restriction.js (restriction 테이블 정의 모듈)  
-│   
+│   ├── nobleLimit.js (nobleLimit 테이블 정의 모듈)  
+│   └── guildInfoModel.js
+│
 ├── public
+│   ├── index.html
 │   └── js
 │       └── memberListActions.js (클라이언트 부분 스크립트)   
+│
 ├── routes   
-│   ├── input.js (노블 제한 로직 라우팅 파일 추후 routes.js로 병합)
 │   └── routes.js (특정 URL 경로에 대한 요청을 컨트롤러로 전달) 
 │   
 ├── services  
 │   ├── dataService.js (메이플 랭킹 페이지에서 guild id를 통해 해당 길드의 길드원 목록을 스크래핑하여 characterNames 배열에 저장하는 모듈)  
-│   └── memberService.js (스크래핑 한 길드원 배열을 DB에 저장, 조회하는 모듈)  
+│   ├── memberService.js (스크래핑 한 길드원 배열을 DB에 저장, 조회하는 모듈)  
+│   └── findNobleLimit.js
 │  
 ├── utils  
 │   └── scraping.js (axios, cheerio 라이브러리를 사용하여 특정 url에서 table의 특정 정보를 스크래핑 해오는 모듈)  
 │  
 ├── views 
-│   └── mainMemberList.ejs (main_member, sub_member 테이블을 표 형식으로 표시하는 동적 페이지)
+│   ├── mainMemberList.ejs (main_member, sub_member 테이블을 표 형식으로 표시하는 동적 페이지)
+│   ├── nobleLimit.ejs
+│   ├── inputForm.html
+│   └── guildSettingForm.ejs
 │  
 ├── app.js (서버)  
 │  
