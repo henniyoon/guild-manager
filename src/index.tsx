@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './style/index.css';
 import Header from './component/Header';
 import reportWebVitals from './reportWebVitals';
+import Content from './component/Content';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -10,6 +11,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Header />
+    <Content />
   </React.StrictMode>
 );
 
