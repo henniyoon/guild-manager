@@ -1,4 +1,3 @@
-// ResultPage.js 또는 ResultPage.tsx
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
