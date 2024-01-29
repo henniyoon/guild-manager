@@ -3,7 +3,7 @@ import '../style/SelectServer.css'
 
 const SelectServer = () => {
   const [selectedOption, setSelectedOption] = useState('');
-  const options = ['옵션 1', '옵션 2', '옵션 3']; // 옵션 목록
+  const options = ['스카니아', '루나', '엘리시움'];
 
   const handleChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
     setSelectedOption(e.target.value);
