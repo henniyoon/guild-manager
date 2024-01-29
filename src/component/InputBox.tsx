@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import '../style/InputBox.css'
+import React from 'react';
+import '../style/InputBox.css';
 
-const InputBox = () => {
-  const [inputText, setInputText] = useState('');
+interface InputBoxProps {
+  value: string;
+  onChange: (value: string) => void;
+}
 
-  const handleInputChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
-    setInputText(e.target.value);
+const InputBox = ({ value, onChange }: InputBoxProps) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
   };
 
   return (
@@ -13,7 +16,7 @@ const InputBox = () => {
       type="text"
       className="content-input"
       placeholder="텍스트를 입력하세요"
-      value={inputText}
+      value={value}
       onChange={handleInputChange}
     />
   );
