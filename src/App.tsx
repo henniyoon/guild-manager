@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Mainpage from './component/Mainpage';
 import ResultPage from './component/ResultPage';
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <Router>
       <Routes>
