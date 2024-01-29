@@ -17,7 +17,9 @@ const App = () => {
 
   const handleButtonClick = async () => {
     try {
-      const response = await fetch(`https://your-api-url.com?server=${selectedServer}&input=${inputValue}`);
+      const serverParam = encodeURIComponent(selectedServer);
+      const inputParam = encodeURIComponent(inputValue);
+      const response = await fetch(`/guild?server=${serverParam}&input=${inputParam}`);
       const data = await response.json();
       console.log(data);
     } catch (error) {
