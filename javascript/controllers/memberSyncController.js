@@ -1,8 +1,8 @@
-const { fetchAndSaveMembers } = require('../services/dataService');
+const { fetchAndSaveMembers } = require('../../services/dataService');
 
-const MainMember = require('../models/mainMemberModel');
-const SubMember = require('../models/subMemberModel');
-const GuildInfo = require('../models/guildInfoModel');
+const MainMember = require('../../models/mainMemberModel');
+const SubMember = require('../../models/subMemberModel');
+const GuildInfo = require('../../models/guildInfoModel');
 
 async function syncMemberList(req, res) {
     try {

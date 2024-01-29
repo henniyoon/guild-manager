@@ -1,63 +1,46 @@
-# guild-manager
+# Getting Started with Create React App
 
-## 모듈 관련해서 오류가 발생하면
-1. node_modules 폴더 삭제
-2. package-lock.json 파일 삭제
-3. 터미널 > npm install 
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## 사용 예정 모듈
-tesseract.js  
-debug
+## Available Scripts
 
-## 파일 구조
-GUILD-MANAGER  
-│  
-├── config  
-│   └── config.json (MariaDB 연결 정보)  
-│  
-├── controllers   
-│   └── memberListController.js (데이터 조회 및 템플릿 렌더링) 
-│   
-├── models  
-│   ├── mainMemberModel.js (main_member 테이블 정의 모듈)  
-│   ├── subMemberModel.js (sub_member 테이블 정의 모듈)   
-│   └── restriction.js (restriction 테이블 정의 모듈)  
-│   
-├── public
-│   └── js
-│       └── memberListActions.js (클라이언트 부분 스크립트)   
-├── routes   
-│   ├── input.js (노블 제한 로직 라우팅 파일 추후 routes.js로 병합)
-│   └── routes.js (특정 URL 경로에 대한 요청을 컨트롤러로 전달) 
-│   
-├── services  
-│   ├── dataService.js (메이플 랭킹 페이지에서 guild id를 통해 해당 길드의 길드원 목록을 스크래핑하여 characterNames 배열에 저장하는 모듈)  
-│   └── memberService.js (스크래핑 한 길드원 배열을 DB에 저장, 조회하는 모듈)  
-│  
-├── utils  
-│   └── scraping.js (axios, cheerio 라이브러리를 사용하여 특정 url에서 table의 특정 정보를 스크래핑 해오는 모듈)  
-│  
-├── views 
-│   └── mainMemberList.ejs (main_member, sub_member 테이블을 표 형식으로 표시하는 동적 페이지)
-│  
-├── app.js (서버)  
-│  
-├── db.js (Sequelize를 사용하여 config.json 파일 정보를 불러와 sequelize 객체를 생성하여 내보내는 모듈)  
-│  
-└── main.js (다양한 로직을 조합하여 실행 테스트용)  
+In the project directory, you can run:
 
----
+### `npm start`
 
-## TODO
-- 노블 제한 로직 / 데이터 조회는 완료, 브라우저에 어떻게 출력할지 고민해보기
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-- DB > nobleLimit 에서 타임스탬프가 현재시각-09:00 으로 찍힘
-  time_zone 설정 서울로 되어 있는데 왜 이러는지 모르겠음
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-- OCR 정확도가 떨어지는데 어떻게 적용할 것인지 연구해보기
+### `npm test`
 
-- 인터페이스 템플릿 정하기
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-- TypeScript나 React로 바꿀 예정
+### `npm run build`
 
-- AWS로 배포해보기
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
