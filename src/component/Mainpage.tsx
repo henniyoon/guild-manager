@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../style/Mainpage.css'
 import SelectServer from './SelectServer';
 import InputBox from './InputBox';
 import Button from './Button';
