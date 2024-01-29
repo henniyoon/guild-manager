@@ -1,14 +1,17 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Guild from './component/Guild.js';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import Mainpage from './component/Mainpage';
+import ResultPage from './component/ResultPage';
 
-function App() {
+const App = () => {
   return (
     <Router>
-      <Switch>
-        <Route path="/guild" component={Guild} />
-      </Switch>
+      <Routes>
+        <Route path="/" element={<Mainpage />} />
+        <Route path="/result" element={<ResultPage />} />
+      </Routes>
     </Router>
   );
-}
+};
 
 export default App;
