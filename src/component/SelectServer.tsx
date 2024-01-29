@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
-import '../style/SelectServer.css'
+import React from 'react';
+import '../style/SelectServer.css';
 
-const SelectServer = () => {
-  const [selectedOption, setSelectedOption] = useState('');
+interface SelectServerProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const SelectServer = ({ value, onChange }: SelectServerProps) => {
   const options = ['스카니아', '루나', '엘리시움'];
 
-  const handleChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
-    setSelectedOption(e.target.value);
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(e.target.value);
   };
 
   return (
-    <select title="SelectServer" className="content-select" value={selectedOption} onChange={handleChange}>
+    <select title="SelectServer" className="content-select" value={value} onChange={handleChange}>
       {options.map((option, index) => (
         <option key={index} value={option}>{option}</option>
       ))}
     </select>
   );
 };
+
 export default SelectServer;
