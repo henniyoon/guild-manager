@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/Mainpage.css'
 import SelectServer from './SelectServer';
@@ -10,16 +10,17 @@ const Mainpage = () => {
   const [selectedServer, setSelectedServer] = useState('스카니아');
   const [inputValue, setInputValue] = useState('');
 
-  const handleButtonClick = () => {
-    navigate(`/result?server=${encodeURIComponent(selectedServer)}&input=${encodeURIComponent(inputValue)}`);
+  const handleButtonClick = (e: FormEvent) => {
+    e.preventDefault(); // 폼의 기본 제출 이벤트를 방지
+    navigate(`/Guildpage?server=${encodeURIComponent(selectedServer)}&input=${encodeURIComponent(inputValue)}`);
   };
 
   return (
-    <div className="MainPage-Contents">
+    <form onSubmit={handleButtonClick} className="MainPage-Contents">
       <SelectServer value={selectedServer} onChange={setSelectedServer} />
       <InputBox value={inputValue} onChange={setInputValue} />
-      <Button onClick={handleButtonClick}>Enter</Button>
-    </div>
+      <Button type="submit">Enter</Button>
+    </form>
   );
 };
 
