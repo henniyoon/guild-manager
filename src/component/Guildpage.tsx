@@ -16,6 +16,8 @@ const GuildPage: React.FC = () => {
   const input = queryParams.get("input");
   const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [guildDetails, setGuildDetails] = useState<GuildDetails | null>(null);
+
+  // ! API 키는 숨겨야 됨 -> 환경변수나 서버에서 관리하도록 수정
   const API_KEY =
   "test_30c434a462a6ed7731bdbb00b7c646320cf57614f257e894ce568d5c72be6f033161d2fa1c52df2064e46e36e91f101c";
 
