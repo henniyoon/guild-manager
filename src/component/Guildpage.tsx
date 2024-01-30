@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-const ResultPage = () => {
+const GuildPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const server = queryParams.get('server');
@@ -17,4 +17,4 @@ const ResultPage = () => {
   );
 };
 
-export default ResultPage;
+export default GuildPage;
