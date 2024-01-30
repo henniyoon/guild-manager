@@ -7,7 +7,7 @@
 2. Adminpage : DB에서 길드 코드와 n주차 조회해서 데이터 불러오기
 
 
-# Hennie TDOO
+# Hennie TODO
 
 ## 작업 편의성
     - 디렉토리 구조 정리
