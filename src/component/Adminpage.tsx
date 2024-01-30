@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../style/Adminpage.module.css'
 
 // 예시 데이터 타입
@@ -11,12 +11,21 @@ interface TableRowData {
 }
 
 const Adminpage: React.FC = () => {
-  // 테이블 데이터를 상태로 관리
-  const [tableData, setTableData] = useState<TableRowData[]>([
-    // 여기에 초기 데이터를 넣거나, API 호출을 통해 데이터를 가져올 수 있습니다.
-    { id: 1, column1: 'Data1', column2: 'Data2', column3: 'Data3', column4: 'Data4' },
-    // 추가 행 데이터...
-  ]);
+  const [tableData, setTableData] = useState<TableRowData[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('여기에_API_URL_입력');
+        const data = await response.json();
+        setTableData(data);
+      } catch (error) {
+        console.error('데이터를 불러오는 데 실패했습니다.', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div>
