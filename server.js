@@ -5,7 +5,7 @@ const mariadb  = require('mariadb');
 const cors = require('cors');
 
 app.use(cors());
-
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'build')));
 
 const pool = mariadb.createPool({
@@ -35,10 +35,30 @@ app.get('/api/records', async (req, res) => {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query('SELECT * FROM Record');
-    console.log(rows)
     res.json(rows);
   } catch (err) {
     console.error("데이터베이스 쿼리 실행 실패:", err.message);
+    res.status(500).send('서버 오류 발생');
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
+app.post('/api/updateRecords', async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const records = req.body;
+
+    for (let record of records) {
+      const query = 'UPDATE Record SET name = ?, score = ?, suro = ?, flag = ? WHERE id = ?';
+      console.log("실행 쿼리:", query, record);
+      await conn.query(query, [record.name, record.score, record.suro, record.flag, record.id]);
+    }
+
+    res.json({ message: '업데이트 성공' });
+  } catch (err) {
+    console.error("데이터베이스 업데이트 실패:", err.message);
     res.status(500).send('서버 오류 발생');
   } finally {
     if (conn) conn.release();
