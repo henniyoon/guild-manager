@@ -11,7 +11,7 @@ const Mainpage = () => {
   const [inputValue, setInputValue] = useState('');
 
   const handleButtonClick = () => {
-    navigate(`/result?server=${encodeURIComponent(selectedServer)}&input=${encodeURIComponent(inputValue)}`);
+    navigate(`/Guildpage?server=${encodeURIComponent(selectedServer)}&input=${encodeURIComponent(inputValue)}`);
   };
 
   return (

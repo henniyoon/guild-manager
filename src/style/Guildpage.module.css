@@ -1,0 +1,13 @@
+.memberUl{
+    width: 70vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px; 
+}
+
+.memberLi{
+    width: 35vw;
+    height: 20vh;
+    list-style-type: none;
+    background-color: yellow;
+}
