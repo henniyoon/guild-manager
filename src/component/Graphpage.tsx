@@ -1,19 +1,7 @@
-import React from 'react';
-import '../style/Header.css';
+import React from "react";
 
-const Header = () => {
-  return (
-    <header className="header">
-      <div className="logo">LOGO</div>
-      <h1 className="title">Guild Page</h1>
-      <nav className="nav">
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/services">Services</a>
-        <a href="/contact">Contact</a>
-      </nav>
-    </header>
-  );
+const Graphpage = () => {
+  return <div>ㅎㅇ</div>;
 };
 
-export default Header;
+export default Graphpage;
