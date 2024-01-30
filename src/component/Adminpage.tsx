@@ -16,7 +16,7 @@ const Adminpage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('여기에_API_URL_입력');
+        const response = await fetch('/api/records');
         const data = await response.json();
         setTableData(data);
       } catch (error) {
