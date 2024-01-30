@@ -13,9 +13,9 @@ app.get('*', (req, res) => {
 });
 
 const pool = mariadb.createPool({
-  host: 'localhost',
+  host: 'database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com',
   user: 'root',
-  password: '0000',
+  password: '123123123',
   database: 'guild_manager',
   connectionLimit: 5
 });
