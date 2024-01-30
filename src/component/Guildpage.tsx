@@ -6,7 +6,7 @@ interface GuildData {
 }
 
 interface GuildDetails {
-  guild_member: string;
+  guild_member: string[]  ;
 }
 
 const GuildPage: React.FC = () => {
@@ -46,9 +46,7 @@ const GuildPage: React.FC = () => {
         },
       })
         .then((response) => response.json())
-        .then((data) =>{ 
-        console.log(data)
-        setGuildDetails(data)})
+        .then((data) => setGuildDetails(data))
         .catch((error) =>
           console.error("Error fetching guild details:", error)
         );
@@ -66,8 +64,12 @@ const GuildPage: React.FC = () => {
       <p>입력된 값: {input}</p>
         <div>
           <p>Guild ID: {guildData?.oguild_id}</p>
-          <p>{guildDetails?.guild_member}</p>
-        </div>
+          <ul>
+            {guildDetails?.guild_member.map((member, index) => (
+              <li key={index}>{member}</li>
+            ))}
+          </ul>       
+          </div>
     </div>
   );
 };
