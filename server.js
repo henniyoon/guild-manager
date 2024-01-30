@@ -34,6 +34,20 @@ async function connectDB() {
 
 connectDB();
 
+app.get('/api/records', async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query('SELECT * FROM Record');
+    res.json(rows);
+  } catch (err) {
+    console.error("데이터베이스 쿼리 실행 실패:", err.message);
+    res.status(500).send('서버 오류 발생');
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
