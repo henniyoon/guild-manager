@@ -43,7 +43,16 @@ const GuildPage: React.FC = () => {
 
   useEffect(() => {
     if (guildData && guildData.oguild_id) {
-      const guildDetailsUrl = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${guildData.oguild_id}&date=2024-01-28`;
+      // 현재 날짜 객체 생성
+      const currentDate = new Date();
+      // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
+      currentDate.setDate(currentDate.getDate() - 1);
+  
+      // 날짜를 YYYY-MM-DD 형식으로 포매팅
+      const formattedDate = currentDate.toISOString().split('T')[0];
+  
+      // URL에 포매팅된 날짜 포함
+      const guildDetailsUrl = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${guildData.oguild_id}&date=${formattedDate}`;
       
       fetch(guildDetailsUrl, {
         headers: {
@@ -58,7 +67,7 @@ const GuildPage: React.FC = () => {
     }
   }, [guildData]);
 
-  if (!guildData) {
+  if (!guildData) { 
     return <p>로딩 중...</p>;
   }
 
