@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
+import styles from '../style/Guildpage.module.css';
 
 interface GuildData {
   oguild_id: string;
@@ -11,6 +12,7 @@ interface GuildDetails {
 
 const GuildPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const server = queryParams.get("server");
   const input = queryParams.get("input");
@@ -59,6 +61,11 @@ const GuildPage: React.FC = () => {
     return <p>로딩 중...</p>;
   }
 
+  const MemberClick = (memberName: string) => {
+    // 여기에서 memberName을 사용하여 이동할 경로를 결정
+    navigate(`/Graphpage/${memberName}`);
+  };
+
   return (
     <div>
       <h1>결과 페이지</h1>
@@ -66,9 +73,11 @@ const GuildPage: React.FC = () => {
       <p>입력된 값: {input}</p>
         <div>
           <p>Guild ID: {guildData?.oguild_id}</p>
-          <ul>
+          <ul className={styles.memberUl}>
             {guildDetails?.guild_member.map((member, index) => (
-              <li key={index}>{member}</li>
+              <li key={index} className={styles.memberLi} onClick={() => MemberClick(member)}>
+                {member}
+                </li>
             ))}
           </ul>       
           </div>
