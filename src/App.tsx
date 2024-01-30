@@ -10,7 +10,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Mainpage />} />
         <Route path="/Guildpage" element={<Guildpage />} />
-        <Route path="/Graph" element={<Graphpage />} />
+        <Route path="/Graphpage" element={<Graphpage />} />
       </Routes>
     </Router>
   );

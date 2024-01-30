@@ -62,8 +62,7 @@ const GuildPage: React.FC = () => {
   }
 
   const MemberClick = (memberName: string) => {
-    // 여기에서 memberName을 사용하여 이동할 경로를 결정
-    navigate(`/Graphpage/${memberName}`);
+    navigate(`/Graphpage?${memberName}`);
   };
 
   return (
