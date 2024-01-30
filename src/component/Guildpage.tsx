@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '../style/Guildpage.module.css';
+import Button from './Button';
 
 interface GuildData {
   oguild_id: string;
@@ -65,11 +66,16 @@ const GuildPage: React.FC = () => {
     navigate(`/Graphpage?${memberName}`);
   };
 
+  const AdminButtonClick = () => {
+    navigate(`/Adminpage`);
+  };
+
   return (
     <div>
       <h1>결과 페이지</h1>
       <p>선택된 서버: {server}</p>
       <p>입력된 값: {input}</p>
+      <Button onClick={AdminButtonClick}>Admin</Button>
         <div>
           <p>Guild ID: {guildData?.oguild_id}</p>
           <ul className={styles.memberUl}>
