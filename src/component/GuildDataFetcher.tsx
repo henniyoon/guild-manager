@@ -67,17 +67,12 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, input }) =>
     }
   }, [guildData]);
 
-  if (!guildData) { 
-    return <p>로딩 중...</p>;
-  }
-
   const MemberClick = (memberName: string) => {
     navigate(`/Graphpage?${memberName}`);
   };
 
   return (
     <div>
-      <p>Guild ID: {guildData.oguild_id}</p>
       {guildDetails && (
         <ul className={styles.memberUl}>
           {guildDetails?.guild_member.map((member, index) => (
