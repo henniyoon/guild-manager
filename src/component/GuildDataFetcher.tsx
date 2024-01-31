@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from '../style/Guildpage.module.css'
 
 interface GuildDataFetcherProps {
-  server: string | null;
-  input: string | null;
+  server: string | undefined;
+  guild: string | undefined;
 }
 
 interface GuildData {
@@ -15,7 +15,7 @@ interface GuildDetails {
   guild_member: string[]  ;
 }
 
-const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, input }) => {
+const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) => {
   const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [guildDetails, setGuildDetails] = useState<GuildDetails | null>(null);
   const navigate = useNavigate();
@@ -25,9 +25,9 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, input }) =>
   "test_30c434a462a6ed7731bdbb00b7c646320cf57614f257e894ce568d5c72be6f033161d2fa1c52df2064e46e36e91f101c";
 
   useEffect(() => {
-    if (server && input) {
+    if (server && guild) {
       const url = `https://open.api.nexon.com/maplestory/v1/guild/id?guild_name=${encodeURIComponent(
-        input
+        guild
       )}&world_name=${encodeURIComponent(server)}`;
 
       fetch(url, {
@@ -39,7 +39,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, input }) =>
         .then((data) => setGuildData(data))
         .catch((error) => console.error("Error fetching guild data:", error));
     }
-  }, [server, input]);
+  }, [server, guild]);
 
   useEffect(() => {
     if (guildData && guildData.oguild_id) {
@@ -47,7 +47,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, input }) =>
       const currentDate = new Date();
       // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
       currentDate.setDate(currentDate.getDate() - 1);
-  
+
       // 날짜를 YYYY-MM-DD 형식으로 포매팅
       const formattedDate = currentDate.toISOString().split('T')[0];
   
@@ -68,7 +68,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, input }) =>
   }, [guildData]);
 
   const MemberClick = (memberName: string) => {
-    navigate(`/Graphpage?${memberName}`);
+    navigate(`/Graphpage/${memberName}`);
   };
 
   return (

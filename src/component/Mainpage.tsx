@@ -12,7 +12,7 @@ const Mainpage = () => {
 
   const handleButtonClick = (e: FormEvent) => {
     e.preventDefault(); // 폼의 기본 제출 이벤트를 방지
-    navigate(`/Guildpage?server=${encodeURIComponent(selectedServer)}&input=${encodeURIComponent(inputValue)}`);
+    navigate(`/Guildpage/${encodeURIComponent(selectedServer)}/${encodeURIComponent(inputValue)}`);
   };
 
   return (
