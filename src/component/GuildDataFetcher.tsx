@@ -24,6 +24,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
   const API_KEY =
   "test_30c434a462a6ed7731bdbb00b7c646320cf57614f257e894ce568d5c72be6f033161d2fa1c52df2064e46e36e91f101c";
 
+  // 서버, 길드명으로 oguild_id 조회
   useEffect(() => {
     if (server && guild) {
       const url = `https://open.api.nexon.com/maplestory/v1/guild/id?guild_name=${encodeURIComponent(
@@ -35,22 +36,20 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
           "x-nxopen-api-key": API_KEY,
         },
       })
-        .then((response) => response.json())
-        .then((data) => setGuildData(data))
-        .catch((error) => console.error("Error fetching guild data:", error));
+      .then((response) => response.json())  // API 응답이 성공하면 JSON 형식으로 데이터 변환
+      .then((data) => setGuildData(data))   // JSON 형식으로 변환한 데이터를 상태 guildData에 저장
+      .catch((error) => 
+        console.error("Error fetching guild data:", error)
+      );
     }
   }, [server, guild]);
 
+  // oguild_id로 나머지 길드 정보 조회
   useEffect(() => {
     if (guildData && guildData.oguild_id) {
-      // 현재 날짜 객체 생성
-      const currentDate = new Date();
-      // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
-      currentDate.setDate(currentDate.getDate() - 1);
-
-      // 날짜를 YYYY-MM-DD 형식으로 포매팅
-      const formattedDate = currentDate.toISOString().split('T')[0];
-  
+      const currentDate = new Date();                 // 현재 날짜 객체 생성
+      currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
+      const formattedDate = currentDate.toISOString().split('T')[0];  // 날짜를 YYYY-MM-DD 형식으로 포매팅
       // URL에 포매팅된 날짜 포함
       const guildDetailsUrl = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${guildData.oguild_id}&date=${formattedDate}`;
       
@@ -59,11 +58,11 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
           "x-nxopen-api-key": API_KEY,
         },
       })
-        .then((response) => response.json())
-        .then((data) => setGuildDetails(data))
-        .catch((error) =>
-          console.error("Error fetching guild details:", error)
-        );
+      .then((response) => response.json())
+      .then((data) => setGuildDetails(data))
+      .catch((error) =>
+        console.error("Error fetching guild details:", error)
+      );
     }
   }, [guildData]);
 
