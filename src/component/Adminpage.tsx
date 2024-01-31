@@ -3,9 +3,9 @@ import '../style/Adminpage.module.css'
 interface TableRowData {
   id: number;
   name: string;
-  score: number;
-  suro: number;
-  flag: number;
+  weekly_score: number;
+  suro_score: number;
+  flag_score: number;
 }
 
 const Adminpage: React.FC = () => {
@@ -29,7 +29,7 @@ const Adminpage: React.FC = () => {
   };
 
   const handleInputChange = (id: number, field: string, value: string) => {
-    const parsedValue = field === 'score' || field === 'suro' || field === 'flag' ? parseInt(value, 10) : value;
+    const parsedValue = field === 'weekly_score' || field === 'suro_score' || field === 'flag_score' ? parseInt(value, 10) : value;
     setEditedData(editedData => editedData.map(row =>
       row.id === id ? { ...row, [field]: parsedValue } : row
     ));
@@ -71,16 +71,16 @@ const Adminpage: React.FC = () => {
 isEditMode ? (
   <>
     <input type="text" defaultValue={row.name} onChange={(e) => handleInputChange(row.id, 'name', e.target.value)} />
-    <input type="number" defaultValue={row.score} onChange={(e) => handleInputChange(row.id, 'score', e.target.value)} />
-    <input type="number" defaultValue={row.suro} onChange={(e) => handleInputChange(row.id, 'suro', e.target.value)} />
-    <input type="number" defaultValue={row.flag} onChange={(e) => handleInputChange(row.id, 'flag', e.target.value)} />
+    <input type="number" defaultValue={row.weekly_score} onChange={(e) => handleInputChange(row.id, 'weekly_score', e.target.value)} />
+    <input type="number" defaultValue={row.suro_score} onChange={(e) => handleInputChange(row.id, 'suro_score', e.target.value)} />
+    <input type="number" defaultValue={row.flag_score} onChange={(e) => handleInputChange(row.id, 'flag_score', e.target.value)} />
   </>
 ) : (
     <>
       <td>{row.name}</td>
-      <td>{row.score}</td>
-      <td>{row.suro}</td>
-      <td>{row.flag}</td>
+      <td>{row.weekly_score}</td>
+      <td>{row.suro_score}</td>
+      <td>{row.flag_score}</td>
     </>
   )
 }
