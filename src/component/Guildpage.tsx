@@ -11,7 +11,7 @@ interface GuildDetails {
   guild_member: string[]  ;
 }
 
-const GuildPage: React.FC = () => {
+const Guildpage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
@@ -99,4 +99,4 @@ const GuildPage: React.FC = () => {
   );
 };
 
-export default GuildPage;
+export default Guildpage;
