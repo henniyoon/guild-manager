@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import '../style/Adminpage.module.css'
 interface TableRowData {
   id: number;
   name: string;
@@ -17,7 +17,8 @@ const Adminpage: React.FC = () => {
     fetch('/api/records')
       .then(response => response.json())
       .then(data => {
-        setTableData(data); // 받은 데이터를 tableData 상태에 저장
+        setTableData(data); // 원본 데이터 상태 설정
+        setEditedData(data); // 편집될 데이터 상태도 초기화
       })
       .catch(error => console.error('데이터를 불러오는 데 실패했습니다:', error));
   }, []);
@@ -27,11 +28,11 @@ const Adminpage: React.FC = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleInputChange = (id: number, field: string, value: string) => {
-    setEditedData(editedData => editedData.map(row =>
-      row.id === id ? { ...row, [field]: value } : row
-    ));
-  };
+const handleInputChange = (id: number, field: string, value: string) => {
+  setEditedData(editedData => editedData.map(row =>
+    row.id === id ? { ...row, [field]: value } : row
+  ));
+};
   
   const handleSaveClick = () => {
     console.log('전송할 데이터:', editedData); // 전송할 데이터 로깅  
