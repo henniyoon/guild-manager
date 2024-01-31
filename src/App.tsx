@@ -9,8 +9,8 @@ const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Mainpage />} />
-      <Route path="/Guildpage" element={<Guildpage />} />
-      <Route path="/Graphpage" element={<Graphpage />} />
+      <Route path="/Guildpage/:server/:guild" element={<Guildpage />} />
+      <Route path="/Graphpage/:memberName" element={<Graphpage />} />
       <Route path="/Adminpage" element={<Adminpage />} />
     </Routes>
   );
