@@ -28,11 +28,12 @@ const Adminpage: React.FC = () => {
     setIsEditMode(!isEditMode);
   };
 
-const handleInputChange = (id: number, field: string, value: string) => {
-  setEditedData(editedData => editedData.map(row =>
-    row.id === id ? { ...row, [field]: value } : row
-  ));
-};
+  const handleInputChange = (id: number, field: string, value: string) => {
+    const parsedValue = field === 'score' || field === 'suro' || field === 'flag' ? parseInt(value, 10) : value;
+    setEditedData(editedData => editedData.map(row =>
+      row.id === id ? { ...row, [field]: parsedValue } : row
+    ));
+  };
   
   const handleSaveClick = () => {
     console.log('전송할 데이터:', editedData); // 전송할 데이터 로깅  
@@ -67,14 +68,14 @@ const handleInputChange = (id: number, field: string, value: string) => {
           {tableData.map((row) => (
             <tr key={row.id}>
 {
-  isEditMode ? (
-    <>
-      <input type="text" defaultValue={row.name} onChange={(e) => handleInputChange(row.id, 'name', e.target.value)} />
-      <input type="text" defaultValue={row.score} onChange={(e) => handleInputChange(row.id, 'score', e.target.value)} />
-      <input type="text" defaultValue={row.suro} onChange={(e) => handleInputChange(row.id, 'suro', e.target.value)} />
-      <input type="text" defaultValue={row.flag} onChange={(e) => handleInputChange(row.id, 'flag', e.target.value)} />
-    </>
-  ) : (
+isEditMode ? (
+  <>
+    <input type="text" defaultValue={row.name} onChange={(e) => handleInputChange(row.id, 'name', e.target.value)} />
+    <input type="number" defaultValue={row.score} onChange={(e) => handleInputChange(row.id, 'score', e.target.value)} />
+    <input type="number" defaultValue={row.suro} onChange={(e) => handleInputChange(row.id, 'suro', e.target.value)} />
+    <input type="number" defaultValue={row.flag} onChange={(e) => handleInputChange(row.id, 'flag', e.target.value)} />
+  </>
+) : (
     <>
       <td>{row.name}</td>
       <td>{row.score}</td>

@@ -51,9 +51,9 @@ app.post('/api/updateRecords', async (req, res) => {
     const records = req.body;
 
     for (let record of records) {
-      const query = 'UPDATE Record SET name = ?, score = ?, suro = ?, flag = ? WHERE id = ?';
+      const query = 'UPDATE Record SET score = ?, suro = ?, flag = ? WHERE name = ?';
       console.log("실행 쿼리:", query, record);
-      await conn.query(query, [record.name, record.score, record.suro, record.flag, record.id]);
+      await conn.query(query, [record.score, record.suro, record.flag, record.name]);
     }
 
     res.json({ message: '업데이트 성공' });
