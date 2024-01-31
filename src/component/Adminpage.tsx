@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../style/Adminpage.module.css";
+
 interface TableRowData {
   id: number;
   name: string;
@@ -77,6 +78,7 @@ const Adminpage: React.FC = () => {
               {isEditMode ? (
                 <>
                   <input
+                    title="insert-name"
                     type="text"
                     defaultValue={row.name}
                     onChange={(e) =>
@@ -84,6 +86,7 @@ const Adminpage: React.FC = () => {
                     }
                   />
                   <input
+                    title="insert-weekly_score"
                     type="number"
                     defaultValue={row.weekly_score}
                     onChange={(e) =>
@@ -91,6 +94,7 @@ const Adminpage: React.FC = () => {
                     }
                   />
                   <input
+                    title="insert-suro_score"
                     type="number"
                     defaultValue={row.suro_score}
                     onChange={(e) =>
@@ -98,6 +102,7 @@ const Adminpage: React.FC = () => {
                     }
                   />
                   <input
+                    title="insert-flag_score"
                     type="number"
                     defaultValue={row.flag_score}
                     onChange={(e) =>
