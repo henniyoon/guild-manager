@@ -11,19 +11,24 @@ interface TableRowData {
 
 const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false); // 편집 모드 상태
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
 
-  useEffect(() => {
+  // 데이터를 불러오는 함수
+  const fetchTableData = () => {
     fetch("/api/records")
       .then((response) => response.json())
       .then((data) => {
-        setTableData(data); // 원본 데이터 상태 설정
-        setEditedData(data); // 편집될 데이터 상태도 초기화
+        setTableData(data);
+        setEditedData(data);
       })
       .catch((error) =>
         console.error("데이터를 불러오는 데 실패했습니다:", error)
       );
+  };
+
+  useEffect(() => {
+    fetchTableData();
   }, []);
 
   // 편집 모드 전환 함수
@@ -58,7 +63,7 @@ const Adminpage: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("저장 결과:", data);
-        // 저장 후 필요한 로직 처리
+        fetchTableData();
       })
       .catch((error) => console.error("데이터 저장 실패:", error));
 
