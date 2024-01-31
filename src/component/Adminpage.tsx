@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../style/Adminpage.module.css";
-
+import SelectWeek from '../component/SelectWeek';
 interface TableRowData {
   id: number;
   name: string;
@@ -13,6 +13,7 @@ const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -29,7 +30,7 @@ const Adminpage: React.FC = () => {
 
   useEffect(() => {
     fetchTableData();
-  }, []);
+  }, [selectedDate]);
 
   // 편집 모드 전환 함수
   const toggleEditMode = () => {
@@ -73,6 +74,7 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <h1>관리자 페이지</h1>
+      <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
       <table>
