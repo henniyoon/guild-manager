@@ -16,10 +16,27 @@ const Login: React.FC<LoginProps> = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('로그인 시도:', email, password);
-    // 여기서 로그인 로직 구현 (예: API 호출)
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log('로그인 성공:', data);
+        // 로그인 성공 후 로직 (예: 토큰 저장, 페이지 이동 등)
+      } else {
+        console.error('로그인 실패:', data.message);
+        // 에러 처리 로직
+      }
+    } catch (error) {
+      console.error('로그인 요청 실패:', error);
+    }
   };
 
   return (

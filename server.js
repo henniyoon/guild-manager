@@ -3,6 +3,7 @@ const path = require('path');
 const app = express();
 const mariadb  = require('mariadb');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 app.use(cors());
 app.use(express.json());
@@ -62,6 +63,34 @@ app.post('/api/updateRecords', async (req, res) => {
     res.status(500).send('서버 오류 발생');
   } finally {
     if (conn) conn.release();
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const conn = await pool.getConnection();
+    const rows = await conn.query('SELECT * FROM users WHERE email = ?', [email]);
+
+    if (rows.length === 0) {
+      res.status(401).send('사용자를 찾을 수 없습니다.');
+      return;
+    }
+
+    const user = rows[0];
+    // 비밀번호 검증 (여기서는 bcrypt를 사용하여 해시된 비밀번호를 검증합니다)
+    const passwordIsValid = await bcrypt.compare(password, user.password);
+
+    if (passwordIsValid) {
+      res.json({ message: '로그인 성공!', userId: user.id });
+      // JWT 발급 등의 추가적인 인증 처리를 여기에 구현할 수 있습니다.
+    } else {
+      res.status(401).send('비밀번호가 잘못되었습니다.');
+    }
+  } catch (err) {
+    console.error('데이터베이스 에러:', err);
+    res.status(500).send('서버 에러');
   }
 });
 
