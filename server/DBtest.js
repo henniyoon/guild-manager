@@ -36,7 +36,7 @@ const fetch = require("node-fetch");
 const API_KEY =
   "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
 
-  const fetchDelay = 1000; // 200 밀리초 (0.2초) 간격으로 API 호출
+  const fetchDelay = 3000; // 지연시간 설정 
 
   async function fetchGuildDetails(oguild_id) {
     const currentDate = new Date();
@@ -89,9 +89,6 @@ async function fetchGuildMember(server, guild) {
     console.error("Error fetching guild ID:", error);
   }
 }
-
-// 함수 사용 예시
-fetchGuildMember("스카니아", "별빛");
 
 async function insertCharacter(nickname, level, imageURL, guildName) {
     try {
@@ -147,6 +144,8 @@ async function fetchCharacterDetails(ocid) {
     console.error("Error fetching character details:", error);
   }
 }
+
+fetchGuildMember("스카니아", "별빛");
 
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
