@@ -8,7 +8,7 @@ const { User } = require('./models');
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 const pool = mariadb.createPool({
   host: 'database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com',
