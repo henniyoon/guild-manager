@@ -34,6 +34,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
   const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [guildDetails, setGuildDetails] = useState<GuildDetails | null>(null);
   const [characterData, setCharacterData] = useState<CharacterData | null>(null);
+  const [characterDetails, setCharacterDetails] = useState<ChacterDetails | null>(null);
   const navigate = useNavigate();
 
   const API_KEY = process.env.REACT_APP_API_KEY;
@@ -95,6 +96,27 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
       );
     }
   }, [guildDetails?.guild_member[0]]);
+
+  // ocid로 길드원 정보 조회
+  useEffect(() => {
+    if(characterData && characterData.ocid) {
+      const currentDate = new Date();                 // 현재 날짜 객체 생성
+      currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
+      const formattedDate = currentDate.toISOString().split('T')[0];  // 날짜를 YYYY-MM-DD 형식으로 포매팅
+      const url = `${API_BASE_URL}${CHARACTER_BASIC_ENDPOINT}?ocid=${encodeURIComponent(characterData.ocid)}&date=${formattedDate}`
+    
+      fetch(url, {
+        headers: {
+          "x-nxopen-api-key": API_KEY || '',
+        },
+      })
+      .then((response) => response.json())
+      .then((data) => setCharacterDetails(data))
+      .catch((error) =>
+        console.error("Error fetching character details:", error)
+      );
+    }
+  }, [characterData]);
 
   const MemberClick = (memberName: string) => {
     navigate(`/Graphpage/${memberName}`);
