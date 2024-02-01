@@ -1,3 +1,10 @@
+// * 서버+길드를 입력하면 모든 길드원의 정보를 DB에 저장하는 코드
+// * 1. 서버 + 길드 이름 -> 고유 식별자
+// * 2. 식별자 -> 길드정보
+// * 3. 길드원 1의 세부정보
+// * 4. 이 과정을 길드원 수만큼 반복
+// * API 호출 수를 획기적으로 줄여야 됨 ㅠㅠ
+
 const express = require("express");
 const mariadb = require("mariadb");
 const app = express();
