@@ -4,6 +4,7 @@ const app = express();
 const mariadb  = require('mariadb');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const { User } = require('./models');
 
 app.use(cors());
 app.use(express.json());
@@ -69,16 +70,18 @@ app.post('/api/updateRecords', async (req, res) => {
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const conn = await pool.getConnection();
-    const hashedPassword = await bcrypt.hash(password, 10); // 비밀번호 해시
-    await conn.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword]);
-    res.status(201).json({ message: '회원가입 성공' });
-  } catch (err) {
-    // username 또는 email의 중복으로 인한 에러 처리
-    if (err.code === 'ER_DUP_ENTRY' || err.sqlState === '23000') {
-      res.status(409).json({ message: '이미 사용중인 사용자 이름 또는 이메일입니다.' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword
+    });
+    res.status(201).json({ message: '회원가입 성공', userId: newUser.id });
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      res.status(409).json({ message: '이미 사용중인 이메일 또는 사용자 이름입니다.' });
     } else {
-      console.error('회원가입 처리 에러:', err.message);
+      console.error('회원가입 처리 에러:', error);
       res.status(500).json({ message: '서버 에러' });
     }
   }
@@ -87,22 +90,18 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const conn = await pool.getConnection();
-    const rows = await conn.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (rows.length === 0) {
-      res.status(401).json({ message: '사용자를 찾을 수 없습니다.' });
-      return;
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ message: '사용자를 찾을 수 없습니다.' });
     }
-    const user = rows[0];
     const passwordIsValid = await bcrypt.compare(password, user.password);
-    if (passwordIsValid) {
-      res.json({ message: '로그인 성공', userId: user.id });
-      // 추가 로직: JWT 생성 및 반환 등
-    } else {
-      res.status(401).json({ message: '비밀번호가 잘못되었습니다.' });
+    if (!passwordIsValid) {
+      return res.status(401).json({ message: '비밀번호가 잘못되었습니다.' });
     }
-  } catch (err) {
-    console.error('로그인 처리 에러:', err.message);
+    res.json({ message: '로그인 성공', userId: user.id });
+    // JWT 발급 등 추가 로직
+  } catch (error) {
+    console.error('로그인 처리 에러:', error);
     res.status(500).json({ message: '서버 에러' });
   }
 });
