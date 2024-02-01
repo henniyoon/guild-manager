@@ -19,7 +19,7 @@ interface CharacterData {
   ocid: string;
 }
 
-interface ChacterDetails {
+interface CharacterDetails {
   character_level: number;
   character_class: string;
 }
@@ -33,7 +33,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
   const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [guildDetails, setGuildDetails] = useState<GuildDetails | null>(null);
   const [characterData, setCharacterData] = useState<CharacterData | null>(null);
-  const [characterDetails, setCharacterDetails] = useState<ChacterDetails | null>(null);
+  const [characterDetails, setCharacterDetails] = useState<CharacterDetails | null>(null);
   const navigate = useNavigate();
 
   const API_KEY = process.env.REACT_APP_API_KEY;
