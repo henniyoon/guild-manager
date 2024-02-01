@@ -4,11 +4,11 @@
 
 
 ## 개발 전달사항
-    `concurrently`라는 node.js 패키지를 설치해서 `guild-manager 경로에서 npm start`를 했을 때,
-    기본적으로 client와 server가 동시에 실행되도록 설정해 둠
-    
-    리액트만 실행하고 싶을 경우 `npm run client`
-    노브 서버만 실행하고 싶을 경우 `npm run server`
+`concurrently`라는 node.js 패키지를 설치해서 `guild-manager 경로에서 npm start`를 했을 때, 기본적으로 client와 server가 동시에 실행되도록 설정해 둠
+   
+리액트만 실행하고 싶을 경우 `npm run client`
+
+노드 서버만 실행하고 싶을 경우 `npm run server`
 
 # 해야 할 일!
 1. GuildPage 에 검색, 정렬이 있어야 할 듯
