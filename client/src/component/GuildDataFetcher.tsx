@@ -22,7 +22,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
 
   // ! API 키는 숨겨야 됨 -> 환경변수나 서버에서 관리하도록 수정
   const API_KEY =
-  "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
+  process.env.REACT_APP_API_KEY;
 
   // 서버, 길드명으로 oguild_id 조회
   useEffect(() => {
@@ -33,7 +33,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
 
       fetch(url, {
         headers: {
-          "x-nxopen-api-key": API_KEY,
+          "x-nxopen-api-key": API_KEY || '',
         },
       })
       .then((response) => response.json())  // API 응답이 성공하면 JSON 형식으로 데이터 변환
@@ -55,7 +55,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
       
       fetch(guildDetailsUrl, {
         headers: {
-          "x-nxopen-api-key": API_KEY,
+          "x-nxopen-api-key": API_KEY || '',
         },
       })
       .then((response) => response.json())
