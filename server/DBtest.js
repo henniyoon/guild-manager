@@ -1,11 +1,7 @@
 const express = require("express");
 const mariadb = require("mariadb");
-const fetch = require("node-fetch");
 const app = express();
 const db = require("./models");
-
-const API_KEY =
-  "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
 
 const pool = mariadb.createPool({
   host: "database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com",
@@ -29,37 +25,34 @@ async function connectDB() {
 
 connectDB();
 
-async function fetchApiData(url) {
+const fetch = require("node-fetch");
+const API_KEY =
+  "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
+
+async function fetchGuildDetails(oguild_id) {
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정
+  const formattedDate = currentDate.toISOString().split("T")[0]; // 날짜를 YYYY-MM-DD 형식으로 포매팅
+
+  const url = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${oguild_id}&date=${formattedDate}`;
+
   try {
     const response = await fetch(url, {
       headers: {
         "x-nxopen-api-key": API_KEY,
       },
     });
-    return await response.json();
+    const data = await response.json();
+    console.log("Guild Details:", data.guild_member);
+  
+    for (const memberNickname of data.guild_member) {
+      await fetchOcid(memberNickname);
+    }
+  
+    return data; // 필요한 경우 길드 상세 정보를 반환
   } catch (error) {
-    console.error("API 요청 중 오류 발생:", error);
-    return null;
+    console.error("Error fetching guild details:", error);
   }
-}
-
-async function fetchGuildDetails(oguild_id) {
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() - 1);
-  const formattedDate = currentDate.toISOString().split("T")[0];
-
-  const url = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${oguild_id}&date=${formattedDate}`;
-  const data = await fetchApiData(url);
-
-  if (!data) return;
-
-  console.log("Guild Details:", data.guild_member);
-
-  for (const memberNickname of data.guild_member) {
-    await fetchOcid(memberNickname);
-  }
-
-  return data;
 }
 
 async function fetchGuildMember(server, guild) {
@@ -67,54 +60,78 @@ async function fetchGuildMember(server, guild) {
     guild
   )}&world_name=${encodeURIComponent(server)}`;
 
-  const data = await fetchApiData(url);
-
-  if (!data) return;
-
-  fetchGuildDetails(data.oguild_id);
-  console.log("Guild ID:", data.oguild_id);
-
-  return data.oguild_id;
-}
-
-async function insertCharacter(nickname, level, imageURL, guildName) {
   try {
-    const newCharacter = await db.CharacterInfo.create({
-      nickname: nickname || 'Unknown',
-      level: level || 1,
-      URL: imageURL,
-      guild: guildName || 'No Guild',
-      updated_at: new Date(),
+    const response = await fetch(url, {
+      headers: {
+        "x-nxopen-api-key": API_KEY,
+      },
     });
-    console.log("New character added:", newCharacter);
+    const data = await response.json();
+    fetchGuildDetails(data.oguild_id);
+
+    console.log("Guild ID:", data.oguild_id);
+    return data.oguild_id; // 필요한 경우 oguild_id를 반환
   } catch (error) {
-    console.error("Error inserting new character:", error);
+    console.error("Error fetching guild ID:", error);
   }
 }
+
+// 함수 사용 예시
+fetchGuildMember("스카니아", "별빛");
+
+async function insertCharacter(nickname, level, imageURL, guildName) {
+    try {
+      const newCharacter = await db.CharacterInfo.create({
+        nickname: nickname || 'Unknown', // 닉네임이 없는 경우 "Unknown"으로 설정
+        level: level || 1, // 레벨이 없는 경우 1로 설정
+        URL: imageURL,
+        guild: guildName || 'No Guild', // 길드가 없는 경우 "No Guild"으로 설정
+        updated_at: new Date(),
+      });
+      console.log("New character added:", newCharacter);
+    } catch (error) {
+      console.error("Error inserting new character:", error);
+    }
+  }
 
 async function fetchOcid(nickname) {
   const url = `https://open.api.nexon.com/maplestory/v1/id?character_name=${encodeURIComponent(
     nickname
   )}`;
-  const data = await fetchApiData(url);
 
-  if (!data) return;
-
-  const ocid = data.ocid;
-  await fetchCharacterDetails(ocid);
-  return data;
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "x-nxopen-api-key": API_KEY,
+      },
+    });
+    const data = await response.json();
+    const ocid = data.ocid;
+    fetchCharacterDetails(ocid);
+    return data; // 필요한 경우 캐릭터 세부 정보를 반환
+  } catch (error) {
+    console.error("Error fetching character details:", error);
+  }
 }
 
 async function fetchCharacterDetails(ocid) {
   const url = `https://open.api.nexon.com/maplestory/v1/character/basic?ocid=${encodeURIComponent(
     ocid
   )}&date=2024-01-31`;
-  const data = await fetchApiData(url);
 
-  if (!data) return;
-
-  console.log("Character Details:", data);
-  insertCharacter(data.character_name, data.character_level, data.character_image, data.character_guild_name);
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "x-nxopen-api-key": API_KEY,
+      },
+    });
+    const data = await response.json();
+    console.log("Character Details:", data);
+    insertCharacter(data.character_name, data.character_level, data.character_image, data.character_guild_name)
+    return data; // 필요한 경우 캐릭터 세부 정보를 반환
+  } catch (error) {
+    console.error("Error fetching character details:", error);
+  }
 }
 
 const PORT = process.env.PORT || 3002;
