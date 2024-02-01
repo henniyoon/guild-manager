@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+, "client/src/component/Header.tsx", "client/src/App.tsx", "client/src/index.tsx", "client/src/react-app-env.d.ts", "client/src/reportWebVitals.ts", "client/src/setupTests.ts", "client/src/component/Adminpage.tsx", "client/src/component/Button.tsx", "client/src/component/Graphpage.tsx", "client/src/component/GuildDataFetcher.tsx", "client/src/component/Guildpage.tsx", "client/src/component/SelectWeek.tsx", "client/src/component/SignUp.tsx", "client/src/component/SignUppage.tsx", "client/src/component/InputBox.tsx", "client/src/component/Login.tsx", "client/src/component/Loginpage.tsx", "client/src/component/Mainpage.tsx", "client/src/component/SelectServer.tsx"  ]
+}

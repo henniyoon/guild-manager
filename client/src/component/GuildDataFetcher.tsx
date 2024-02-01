@@ -22,7 +22,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
 
   // ! API 키는 숨겨야 됨 -> 환경변수나 서버에서 관리하도록 수정
   const API_KEY =
-  "test_30c434a462a6ed7731bdbb00b7c646320cf57614f257e894ce568d5c72be6f033161d2fa1c52df2064e46e36e91f101c";
+  "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
 
   // 서버, 길드명으로 oguild_id 조회
   useEffect(() => {
