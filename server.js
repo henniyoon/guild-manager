@@ -3,6 +3,8 @@ const path = require('path');
 const app = express();
 const mariadb  = require('mariadb');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const { User } = require('./models');
 
 app.use(cors());
 app.use(express.json());
@@ -62,6 +64,45 @@ app.post('/api/updateRecords', async (req, res) => {
     res.status(500).send('서버 오류 발생');
   } finally {
     if (conn) conn.release();
+  }
+});
+
+app.post('/signup', async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword
+    });
+    res.status(201).json({ message: '회원가입 성공', userId: newUser.id });
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      res.status(409).json({ message: '이미 사용중인 이메일 또는 사용자 이름입니다.' });
+    } else {
+      console.error('회원가입 처리 에러:', error);
+      res.status(500).json({ message: '서버 에러' });
+    }
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ message: '사용자를 찾을 수 없습니다.' });
+    }
+    const passwordIsValid = await bcrypt.compare(password, user.password);
+    if (!passwordIsValid) {
+      return res.status(401).json({ message: '비밀번호가 잘못되었습니다.' });
+    }
+    res.json({ message: '로그인 성공', userId: user.id });
+    // JWT 발급 등 추가 로직
+  } catch (error) {
+    console.error('로그인 처리 에러:', error);
+    res.status(500).json({ message: '서버 에러' });
   }
 });
 

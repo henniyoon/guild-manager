@@ -10,9 +10,8 @@ const Header = () => {
       </h1>
       <nav className="nav">
         <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/services">Services</a>
-        <a href="/contact">Contact</a>
+        <a href="/SignUp">회원가입</a>
+        <a href="/Login">로그인</a>
       </nav>
     </header>
   );
