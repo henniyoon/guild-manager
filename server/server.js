@@ -108,7 +108,7 @@ app.post('/login', async (req, res) => {
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', '../client/index.html'));
 });
 // ! 조심해주세요!
 

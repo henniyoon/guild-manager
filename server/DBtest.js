@@ -29,32 +29,39 @@ const fetch = require("node-fetch");
 const API_KEY =
   "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
 
-async function fetchGuildDetails(oguild_id) {
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정
-  const formattedDate = currentDate.toISOString().split("T")[0]; // 날짜를 YYYY-MM-DD 형식으로 포매팅
+  const fetchDelay = 1000; // 200 밀리초 (0.2초) 간격으로 API 호출
 
-  const url = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${oguild_id}&date=${formattedDate}`;
-
-  try {
-    const response = await fetch(url, {
-      headers: {
-        "x-nxopen-api-key": API_KEY,
-      },
-    });
-    const data = await response.json();
-    console.log("Guild Details:", data.guild_member);
+  async function fetchGuildDetails(oguild_id) {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정
+    const formattedDate = currentDate.toISOString().split("T")[0]; // 날짜를 YYYY-MM-DD 형식으로 포매팅
   
-    for (const memberNickname of data.guild_member) {
-      await fetchOcid(memberNickname);
+    const url = `https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${oguild_id}&date=${formattedDate}`;
+  
+    try {
+      const response = await fetch(url, {
+        headers: {
+          "x-nxopen-api-key": API_KEY,
+        },
+      });
+      const data = await response.json();
+      console.log("Guild Details:", data.guild_member);
+  
+      for (const memberNickname of data.guild_member) {
+        await fetchOcid(memberNickname);
+        // 초당 5건의 호출 제한을 준수하기 위해 일정한 간격으로 대기
+        await sleep(fetchDelay);
+      }
+  
+      return data; // 필요한 경우 길드 상세 정보를 반환
+    } catch (error) {
+      console.error("Error fetching guild details:", error);
     }
-  
-    return data; // 필요한 경우 길드 상세 정보를 반환
-  } catch (error) {
-    console.error("Error fetching guild details:", error);
   }
-}
-
+  
+  async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 async function fetchGuildMember(server, guild) {
   const url = `https://open.api.nexon.com/maplestory/v1/guild/id?guild_name=${encodeURIComponent(
     guild
