@@ -32,8 +32,8 @@ const CHARACTER_BASIC_ENDPOINT = "/character/basic";
 const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) => {
   const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [guildDetails, setGuildDetails] = useState<GuildDetails | null>(null);
-  const [characterData, setCharacterData] = useState<CharacterData | null>(null);
-  const [characterDetails, setCharacterDetails] = useState<CharacterDetails | null>(null);
+  const [characterData, setCharacterData] = useState<CharacterData[] | null>(null);
+  const [characterDetails, setCharacterDetails] = useState<CharacterDetails[] | null>(null);
   const navigate = useNavigate();
 
   const API_KEY = process.env.REACT_APP_API_KEY;
@@ -54,7 +54,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
           console.error("Error fetching guild data:", error)
         );
     }
-  }, [server, guild]);
+  }, [server, guild, API_KEY]);
 
   // oguild_id로 길드 정보 조회
   useEffect(() => {
@@ -76,49 +76,58 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
           console.error("Error fetching guild details:", error)
         );
     }
-  }, [guildData]);
+  }, [guildData, API_KEY]);
 
   // 길드원 이름으로 길드원 ocid 조회
   useEffect(() => {
     if (guildDetails && guildDetails.guild_member.length > 0) {
-      const url = `${API_BASE_URL}/id?character_name=${encodeURIComponent(guildDetails.guild_member[0])}`;
+      const memberNames = guildDetails.guild_member;
 
-      fetch(url, {
-        headers: {
-          "x-nxopen-api-key": API_KEY || '',
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => setCharacterData(data))
+      Promise.all(
+        memberNames.map((memberName) => {
+          const url = `${API_BASE_URL}/id?character_name=${encodeURIComponent(memberName)}`;
+
+          return fetch(url, {
+            headers: {
+              "x-nxopen-api-key": API_KEY || '',
+            },
+          })
+            .then((response) => response.json());
+        })
+      )
+        .then((dataList) => setCharacterData(dataList))
         .catch((error) =>
           console.error("Error fetching character data:", error)
         );
     }
-  }, [guildDetails?.guild_member[0]]);
+  }, [guildDetails?.guild_member, API_KEY]);
+
 
   // ocid로 길드원 정보 조회
   useEffect(() => {
-    if (characterData && characterData.ocid) {
-      const currentDate = new Date();                 // 현재 날짜 객체 생성
-      currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
-      const formattedDate = currentDate.toISOString().split('T')[0];  // 날짜를 YYYY-MM-DD 형식으로 포매팅
-      const url = `${API_BASE_URL}${CHARACTER_BASIC_ENDPOINT}?ocid=${encodeURIComponent(characterData.ocid)}&date=${formattedDate}`
+    if (characterData && characterData.length > 0) {
+      const currentDate = new Date();
+      currentDate.setDate(currentDate.getDate() - 1);
+      const formattedDate = currentDate.toISOString().split('T')[0];
 
-      fetch(url, {
-        headers: {
-          "x-nxopen-api-key": API_KEY || '',
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log(data.character_level);
-          setCharacterDetails(data)
+      Promise.all(
+        characterData.map((character) => {
+          const url = `${API_BASE_URL}${CHARACTER_BASIC_ENDPOINT}?ocid=${encodeURIComponent(character.ocid)}&date=${formattedDate}`;
+
+          return fetch(url, {
+            headers: {
+              "x-nxopen-api-key": API_KEY || '',
+            },
+          })
+            .then((response) => response.json());
         })
+      )
+        .then((detailsList) => setCharacterDetails(detailsList))
         .catch((error) =>
           console.error("Error fetching character details:", error)
         );
     }
-  }, [characterData]);
+  }, [characterData, API_KEY]);
 
   const MemberClick = (memberName: string) => {
     navigate(`/Graphpage/${memberName}`);
@@ -127,24 +136,25 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
   return (
     <div>
       {guildDetails && guildDetails.guild_member.length > 0 && (
-        <ul className={styles.memberUl}>
-          <li
-            key={0} // 또는 어떤 유니크한 값 사용
-            className={styles.memberLi}
-            onClick={() => MemberClick(guildDetails.guild_member[0])}
-          >
-            {guildDetails.guild_member[0]}
-            {/* {characterData && (
-              <p>ocid: {characterData.ocid}</p>
-            )} */}
-            {characterDetails && (
-              <>
-                <p>Lv. {characterDetails.character_level}</p>
-                <p>{characterDetails.character_class}</p>
-              </>
-            )}
-          </li>
-        </ul>
+        <div className={styles.memberUl}>
+          {guildDetails.guild_member.map((member, index) => (
+            <div
+              key={index}
+              className={styles.memberLi}
+              onClick={() => MemberClick(member)}
+            >
+              <div className={`${styles.padding15} ${styles.card}`}>
+                <h4>{member}</h4>
+                {characterDetails && characterDetails[index] && (
+                  <>
+                    <p>Lv.{characterDetails[index].character_level}</p>
+                    <p>{characterDetails[index].character_class}</p>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
