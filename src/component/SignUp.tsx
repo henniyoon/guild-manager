@@ -17,10 +17,27 @@ const Signup: React.FC = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('회원가입 정보:', { username, email, password });
-    // 여기에 회원가입 정보를 서버로 전송하는 로직을 추가
+    try {
+      const response = await fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log('회원가입 성공:', data);
+        // 회원가입 성공 후 처리 로직 (예: 로그인 페이지로 리다이렉트)
+      } else {
+        console.error('회원가입 실패:', data.message);
+        // 회원가입 실패 처리 로직
+      }
+    } catch (error) {
+      console.error('회원가입 요청 실패:', error);
+    }
   };
 
   return (

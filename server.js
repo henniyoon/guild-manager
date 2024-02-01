@@ -66,31 +66,44 @@ app.post('/api/updateRecords', async (req, res) => {
   }
 });
 
+app.post('/signup', async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    const conn = await pool.getConnection();
+    const hashedPassword = await bcrypt.hash(password, 10); // 비밀번호 해시
+    await conn.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword]);
+    res.status(201).json({ message: '회원가입 성공' });
+  } catch (err) {
+    // username 또는 email의 중복으로 인한 에러 처리
+    if (err.code === 'ER_DUP_ENTRY' || err.sqlState === '23000') {
+      res.status(409).json({ message: '이미 사용중인 사용자 이름 또는 이메일입니다.' });
+    } else {
+      console.error('회원가입 처리 에러:', err.message);
+      res.status(500).json({ message: '서버 에러' });
+    }
+  }
+});
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const conn = await pool.getConnection();
     const rows = await conn.query('SELECT * FROM users WHERE email = ?', [email]);
-
     if (rows.length === 0) {
-      res.status(401).send('사용자를 찾을 수 없습니다.');
+      res.status(401).json({ message: '사용자를 찾을 수 없습니다.' });
       return;
     }
-
     const user = rows[0];
-    // 비밀번호 검증 (여기서는 bcrypt를 사용하여 해시된 비밀번호를 검증합니다)
     const passwordIsValid = await bcrypt.compare(password, user.password);
-
     if (passwordIsValid) {
-      res.json({ message: '로그인 성공!', userId: user.id });
-      // JWT 발급 등의 추가적인 인증 처리를 여기에 구현할 수 있습니다.
+      res.json({ message: '로그인 성공', userId: user.id });
+      // 추가 로직: JWT 생성 및 반환 등
     } else {
-      res.status(401).send('비밀번호가 잘못되었습니다.');
+      res.status(401).json({ message: '비밀번호가 잘못되었습니다.' });
     }
   } catch (err) {
-    console.error('데이터베이스 에러:', err);
-    res.status(500).send('서버 에러');
+    console.error('로그인 처리 에러:', err.message);
+    res.status(500).json({ message: '서버 에러' });
   }
 });
 
