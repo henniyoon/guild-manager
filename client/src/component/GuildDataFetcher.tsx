@@ -28,7 +28,7 @@ interface ChacterDetails {
 const API_BASE_URL = "https://open.api.nexon.com/maplestory/v1";
 const GUILD_ID_ENDPOINT = "/guild/id"
 const GUILD_BASIC_ENDPOINT ="/guild/basic";
-const CHARACTER_BASIC_ENDPOINT = "/character/baisc";
+const CHARACTER_BASIC_ENDPOINT = "/character/basic";
 
 const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) => {
   const [guildData, setGuildData] = useState<GuildData | null>(null);
@@ -104,14 +104,16 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
       currentDate.setDate(currentDate.getDate() - 1); // 어제 날짜로 설정 (하루를 밀리초 단위로 계산하여 뺌)
       const formattedDate = currentDate.toISOString().split('T')[0];  // 날짜를 YYYY-MM-DD 형식으로 포매팅
       const url = `${API_BASE_URL}${CHARACTER_BASIC_ENDPOINT}?ocid=${encodeURIComponent(characterData.ocid)}&date=${formattedDate}`
-    
+      
       fetch(url, {
         headers: {
           "x-nxopen-api-key": API_KEY || '',
         },
       })
       .then((response) => response.json())
-      .then((data) => setCharacterDetails(data))
+      .then((data) => {
+        console.log(data.character_level);
+        setCharacterDetails(data)})
       .catch((error) =>
         console.error("Error fetching character details:", error)
       );
