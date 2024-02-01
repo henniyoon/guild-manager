@@ -20,8 +20,10 @@ interface CharacterData {
 }
 
 interface CharacterDetails {
+  character_name: string;
   character_level: number;
   character_class: string;
+  character_image: string;
 }
 
 const API_BASE_URL = "https://open.api.nexon.com/maplestory/v1";
@@ -147,6 +149,12 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
                 <h4>{member}</h4>
                 {characterDetails && characterDetails[index] && (
                   <>
+                    <img
+                      src={characterDetails[index].character_image}
+                      alt="Character Image"
+                      className={styles.characterImage}
+                    />
+                    {/* <h4>{characterDetails[index].character_name}</h4> */}
                     <p>Lv.{characterDetails[index].character_level}</p>
                     <p>{characterDetails[index].character_class}</p>
                   </>
