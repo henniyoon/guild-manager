@@ -36,7 +36,7 @@ app.get('/api/records', async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    const rows = await conn.query('SELECT * FROM Record');
+    const rows = await conn.query('SELECT * FROM record');
     res.json(rows);
   } catch (err) {
     console.error("데이터베이스 쿼리 실행 실패:", err.message);
