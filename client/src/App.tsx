@@ -1,11 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Mainpage from './component/Mainpage';
-import Guildpage from './component/Guildpage';
-import Graphpage from './component/Graphpage';
-import Adminpage from './component/Adminpage'
-import Loginpage from './component/Loginpage';
-import SignUppage from './component/SignUppage';
+import Mainpage from '../src/component/Mainpage';
+import Guildpage from '../src/component/Guildpage';
+import Graphpage from '../src/component/Graphpage';
+import Adminpage from '../src/component/Adminpage'
+import Loginpage from '../src/component/Loginpage';
+import SignUppage from '../src/component/SignUppage';
 
 const App: React.FC = () => {
   return (
