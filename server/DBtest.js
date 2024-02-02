@@ -34,9 +34,9 @@ connectDB();
 
 const fetch = require("node-fetch");
 const API_KEY =
-  "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
+  "live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3";
 
-  const fetchDelay = 3000; // 지연시간 설정 
+  const fetchDelay = 100; // 지연시간 설정 
 
   async function fetchGuildDetails(oguild_id) {
     const currentDate = new Date();
@@ -125,10 +125,10 @@ async function fetchOcid(nickname) {
   }
 }
 
-async function fetchCharacterDetails(ocid) {
+async function fetchCharacterDetails(ocid, retryCount = 10) {
   const url = `https://open.api.nexon.com/maplestory/v1/character/basic?ocid=${encodeURIComponent(
     ocid
-  )}&date=2024-01-31`;
+  )}&date=2024-02-01`;
 
   try {
     const response = await fetch(url, {
@@ -142,6 +142,13 @@ async function fetchCharacterDetails(ocid) {
     return data; // 필요한 경우 캐릭터 세부 정보를 반환
   } catch (error) {
     console.error("Error fetching character details:", error);
+    if (retryCount > 0) {
+      console.log(`Retrying in 1 second (Retry Count: ${retryCount})`);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1초 대기 후 재시도
+      return fetchCharacterDetails(ocid, retryCount - 1); // 재시도
+    } else {
+      console.error("Max retry count reached. Cannot fetch character details.");
+    }
   }
 }
 

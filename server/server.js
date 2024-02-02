@@ -106,13 +106,43 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.get('/api/check-username', async (req, res) => {
+  const { username } = req.query;
+  try {
+    const user = await User.findOne({ where: { username } });
+    if (user) {
+      res.json({ isDuplicate: true });
+    } else {
+      res.json({ isDuplicate: false });
+    }
+  } catch (error) {
+    console.error('사용자 이름 중복 확인 에러:', error);
+    res.status(500).json({ message: '서버 에러' });
+  }
+});
+
+app.get('/api/check-email', async (req, res) => {
+  const { email } = req.query;
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (user) {
+      res.json({ isDuplicate: true });
+    } else {
+      res.json({ isDuplicate: false });
+    }
+  } catch (error) {
+    console.error('이메일 중복 확인 에러:', error);
+    res.status(500).json({ message: '서버 에러' });
+  }
+});
+
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', '../client/index.html'));
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 // ! 조심해주세요!
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
 }); 
