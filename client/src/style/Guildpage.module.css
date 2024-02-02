@@ -1,13 +1,29 @@
-.memberUl{
-    width: 70vw;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 10px; 
+.memberUl {
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.memberLi{
-    width: 35vw;
-    height: 20vh;
-    list-style-type: none;
-    background-color: yellow;
+.memberLi {
+    width: 25%;
+    /* 4개씩 나오게 하려면 100% / 4 = 25%로 지정합니다. */
+    padding: 10px;
+    /* 각 카드의 padding 값, 원하는 값으로 설정하세요 */
+    box-sizing: border-box;
+    /* padding 값이 width에 포함되도록 box-sizing 속성을 지정합니다. */
+}
+
+.padding15 {
+    padding: 15px;
+}
+
+.padding30 {
+    padding: 30px;
+}
+
+.padding300 {
+    padding-left: 300px;
+    padding-right: 300;
+}
+.card {
+    background-color: #d8d8d8;
 }
