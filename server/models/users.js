@@ -7,11 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       guild_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'guilds', // 다른 모델 이름을 참조. 실제 모델 이름이나 테이블 이름에 따라 다를 수 있음
-          key: 'id'
-        }
+        allowNull: true
       },
       username: {
         type: DataTypes.STRING,

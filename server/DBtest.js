@@ -96,7 +96,7 @@ async function insertCharacter(nickname, level, imageURL, guildName) {
         nickname: nickname || 'Unknown', // 닉네임이 없는 경우 "Unknown"으로 설정
         level: level || 1, // 레벨이 없는 경우 1로 설정
         URL: imageURL,
-        guild: guildName || 'No Guild', // 길드가 없는 경우 "No Guild"으로 설정
+        guildId: guildName || 'No Guild', // 길드가 없는 경우 "No Guild"으로 설정
         updated_at: new Date(),
       });
       console.log("New character added:", newCharacter);
