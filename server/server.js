@@ -109,14 +109,16 @@ app.post("/login", async (req, res) => {
     if (!passwordIsValid) {
       return res.status(401).json({ message: "비밀번호가 잘못되었습니다." });
     }
+    const payload = {
+      id: user.id,
+      username: user.username,
+      // 다른 필요한 정보도 추가할 수 있습니다.
+    };
+  
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+    console.log(token)
 
-    const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "1h" });
-
-    res.json({
-      message: "로그인 성공", 
-      userId: user.id, token 
-      // 토큰에 추가하고 싶은 내용 적기
-    });
+    res.json({ message: '로그인 성공', token });
     } catch (error) {
     console.error("로그인 처리 에러:", error);
     res.status(500).json({ message: "서버 에러" });
