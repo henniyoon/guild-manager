@@ -96,6 +96,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// ! 현재 토큰을 localstorage에 저장하는 방식인데 XSS공격에 취약함 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
