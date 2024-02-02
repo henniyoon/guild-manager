@@ -8,7 +8,7 @@ const { User } = require('./models');
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 const pool = mariadb.createPool({
   host: 'database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com',
@@ -36,7 +36,7 @@ app.get('/api/records', async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    const rows = await conn.query('SELECT * FROM Record');
+    const rows = await conn.query('SELECT * FROM record');
     res.json(rows);
   } catch (err) {
     console.error("데이터베이스 쿼리 실행 실패:", err.message);
@@ -108,7 +108,7 @@ app.post('/login', async (req, res) => {
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', '../client/index.html'));
 });
 // ! 조심해주세요!
 
