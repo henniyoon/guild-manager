@@ -38,7 +38,21 @@ app.get("/api/records", async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    const rows = await conn.query("SELECT * FROM record");
+    // 클라이언트에서 전달된 주 정보 (예: "2024-W01")
+    const weekParam = req.query.week; // "yyyy-Www" 형식
+
+    // 주 정보에서 연도와 주 번호 추출
+    const [year, week] = weekParam.split('-W');
+    
+    // 주의 시작 날짜와 끝 날짜 계산
+    // MySQL의 WEEK() 함수를 사용하여 주 내의 날짜를 조회
+    // 이 예시는 주의 시작을 일요일로 가정합니다. 설정에 따라 달라질 수 있습니다.
+    const query = `
+      SELECT * FROM record
+      WHERE YEAR(date) = ? AND WEEK(date, 1) -1  = ?
+    `;
+
+    const rows = await conn.query(query, [year, week - 1]); // MySQL에서 주는 0부터 시작하므로 1을 빼줍니다.
     res.json(rows);
   } catch (err) {
     console.error("데이터베이스 쿼리 실행 실패:", err.message);
