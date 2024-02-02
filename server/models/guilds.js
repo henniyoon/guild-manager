@@ -7,11 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       server_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'servers', // `servers` 모델을 참조합니다. 실제 모델 이름이나 테이블 이름에 따라 다를 수 있습니다.
-          key: 'id'
-        }
+        allowNull: false
       },
       guild_name: {
         type: DataTypes.STRING(20),
