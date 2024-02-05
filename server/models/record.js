@@ -1,64 +1,50 @@
-// record.js
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('./database'); // 데이터베이스 연결 설정을 포함한 sequelize 인스턴스를 불러옵니다.
-const Character = require('./character'); // character 모델을 불러옵니다.
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db.js');
+const Characters = require('./Characters.js');
 
-class Record extends Model {}
-
-Record.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull: false
-  },
-  character_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: null,
-    references: {
-      model: Character, // 참조하는 모델
-      key: 'id', // 참조하는 모델의 컬럼
+const Record = sequelize.define('Record', {
+    id: {               // index
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
     },
-    onUpdate: 'CASCADE',
-    onDelete: 'SET NULL'
-  },
-  weekly_score: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: null
-  },
-  suro_score: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: null
-  },
-  flag_score: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: null
-  },
-  noble_limit: {
-    type: DataTypes.TINYINT.UNSIGNED,
-    allowNull: true,
-    defaultValue: null
-  },
-  date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW
-  }
+    character_id: {     // 캐릭터 번호 (characters 테이블의 id)
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        unique: true,
+        references: {
+            model: Characters,
+            key: 'id',
+        },
+    },
+    weekly_score: {     // 주간 점수
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    suro_score: {       // 수로 점수
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },  
+    flag_score: {       // 플래그 점수
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    noble_limit: {      // 노블 제한 여부
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    created_at: {       // 작성일
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
 }, {
-  sequelize,
-  modelName: 'Record',
-  tableName: 'record',
-  timestamps: false, // createdAt과 updatedAt 타임스탬프를 사용하지 않음
-  charset: 'utf8mb4',
-  collate: 'utf8mb4_unicode_ci'
+    tableName: 'records',
+    timestamps: false,
+    collate: 'utf8mb4_unicode_ci',
+    engine: 'InnoDB',
 });
-
-// 외래 키 관계 설정
-Character.hasMany(Record, { foreignKey: 'character_id' });
-Record.belongsTo(Character, { foreignKey: 'character_id' });
 
 module.exports = Record;
