@@ -1,72 +1,79 @@
 const express = require('express');
 const path = require('path');
-const app = express();
-const mariadb  = require('mariadb');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const { User } = require('./models');
+const sequelize = require('./db.js');
 
+const Characters = require('./models/Characters.js');
+const Guild = require('./models/Guild.js');
+const Record = require('./models/Record.js');
+const Server = require('./models/Server.js');
+const User = require('./models/User.js');
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// 미들웨어 등록
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-const pool = mariadb.createPool({
-  host: 'database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com',
-  user: 'root',
-  password: '123123123',
-  database: 'database_for_guild',
-  connectionLimit: 5
+// DB 연결 확인
+sequelize.authenticate()
+  .then(() => {
+    console.log('데이터베이스 연결 성공');
+  })
+  .catch((err) => {
+    console.error('데이터베이스 연결 실패:', err.message);
+  });
+
+// 테이블 생성
+sequelize.sync()
+.then(() => {
+  console.log('테이블이 성공적으로 생성되었습니다.');
+})
+.catch((err) => {
+  console.error('테이블 생성 실패:', err.message);
 });
 
-async function connectDB() {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    console.log("데이터베이스 연결 성공");
-  } catch (err) {
-    console.error("데이터베이스 연결 실패:", err.message);
-  } finally {
-    if (conn) conn.release();
-  }
-}
 
-connectDB();
-
+// 노블 제한 기록 조회 API
 app.get('/api/records', async (req, res) => {
-  let conn;
   try {
-    conn = await pool.getConnection();
-    const rows = await conn.query('SELECT * FROM record');
+    const rows = await Record.findAll();
     res.json(rows);
   } catch (err) {
     console.error("데이터베이스 쿼리 실행 실패:", err.message);
     res.status(500).send('서버 오류 발생');
-  } finally {
-    if (conn) conn.release();
-  }
+  } 
 });
 
+// 노블 제한 기록 업데이트 API
 app.post('/api/updateRecords', async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    const records = req.body;
+  const records = req.body;
 
+  try {
     for (let record of records) {
-      const query = 'UPDATE Record SET weekly_score = ?, suro_score = ?, flag_score = ?';
-      console.log("실행 쿼리:", query, record);
-      await conn.query(query, [record.weekly_score, record.suro_score, record.flag_score]);
+      await Record.update(
+        {
+          weekly_score: record.weekly_score,
+          suro_score: record.suro_score,
+          flag_score: record.flag_score
+        },
+        {
+          where: { id: record.id }
+        }
+      );
     }
 
     res.json({ message: '업데이트 성공' });
   } catch (err) {
     console.error("데이터베이스 업데이트 실패:", err.message);
     res.status(500).send('서버 오류 발생');
-  } finally {
-    if (conn) conn.release();
-  }
+  } 
 });
-
+  
+// 회원가입 API
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -87,6 +94,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
+// 로그인 API
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -107,12 +115,13 @@ app.post('/login', async (req, res) => {
 });
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
+// 클라이언트 리액트 앱 라우팅 처리
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', '../client/index.html'));
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 // ! 조심해주세요!
 
-const PORT = process.env.PORT || 3001;
+// 서버 시작
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
-}); 
+});
