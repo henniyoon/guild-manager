@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001;
 // 미들웨어 등록
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../client/build')));
+app.use(express.static(path.join(__dirname, "../client/build")));
 
 // DB 연결 확인
 sequelize.authenticate()
@@ -66,7 +66,7 @@ app.post('/api/updateRecords', async (req, res) => {
       );
     }
 
-    res.json({ message: '업데이트 성공' });
+    res.json({ message: "업데이트 성공" });
   } catch (err) {
     console.error("데이터베이스 업데이트 실패:", err.message);
     res.status(500).send('서버 오류 발생');
@@ -81,15 +81,17 @@ app.post('/signup', async (req, res) => {
     const newUser = await User.create({
       username,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
-    res.status(201).json({ message: '회원가입 성공', userId: newUser.id });
+    res.status(201).json({ message: "회원가입 성공", userId: newUser.id });
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      res.status(409).json({ message: '이미 사용중인 이메일 또는 사용자 이름입니다.' });
+    if (error.name === "SequelizeUniqueConstraintError") {
+      res
+        .status(409)
+        .json({ message: "이미 사용중인 이메일 또는 사용자 이름입니다." });
     } else {
-      console.error('회원가입 처리 에러:', error);
-      res.status(500).json({ message: '서버 에러' });
+      console.error("회원가입 처리 에러:", error);
+      res.status(500).json({ message: "서버 에러" });
     }
   }
 });
@@ -100,17 +102,56 @@ app.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ message: '사용자를 찾을 수 없습니다.' });
+      return res.status(401).json({ message: "사용자를 찾을 수 없습니다." });
     }
+
     const passwordIsValid = await bcrypt.compare(password, user.password);
     if (!passwordIsValid) {
-      return res.status(401).json({ message: '비밀번호가 잘못되었습니다.' });
+      return res.status(401).json({ message: "비밀번호가 잘못되었습니다." });
     }
-    res.json({ message: '로그인 성공', userId: user.id });
-    // JWT 발급 등 추가 로직
+    const payload = {
+      id: user.id,
+      username: user.username,
+      // 다른 필요한 정보도 추가할 수 있습니다.
+    };
+  
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+    console.log(token)
+
+    res.json({ message: '로그인 성공', token });
+    } catch (error) {
+    console.error("로그인 처리 에러:", error);
+    res.status(500).json({ message: "서버 에러" });
+  }
+});
+
+app.get("/api/check-username", async (req, res) => {
+  const { username } = req.query;
+  try {
+    const user = await User.findOne({ where: { username } });
+    if (user) {
+      res.json({ isDuplicate: true });
+    } else {
+      res.json({ isDuplicate: false });
+    }
   } catch (error) {
-    console.error('로그인 처리 에러:', error);
-    res.status(500).json({ message: '서버 에러' });
+    console.error("사용자 이름 중복 확인 에러:", error);
+    res.status(500).json({ message: "서버 에러" });
+  }
+});
+
+app.get("/api/check-email", async (req, res) => {
+  const { email } = req.query;
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (user) {
+      res.json({ isDuplicate: true });
+    } else {
+      res.json({ isDuplicate: false });
+    }
+  } catch (error) {
+    console.error("이메일 중복 확인 에러:", error);
+    res.status(500).json({ message: "서버 에러" });
   }
 });
 
