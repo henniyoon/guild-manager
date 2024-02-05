@@ -1,11 +1,11 @@
-const fetch = require('node-fetch');
+const serverFetch = require('node-fetch');
 
 async function fetchGuildId(server, guild) {
   const API_KEY = "test_30c434a462a6ed7731bdbb00b7c64632a5c42df61ef8c7dd18a3ee80b7b10621bac3c0a66033cf6ec0e22af447b80734";
   const url = `https://open.api.nexon.com/maplestory/v1/guild/id?guild_name=${encodeURIComponent(guild)}&world_name=${encodeURIComponent(server)}`;
 
   try {
-    const response = await fetch(url, {
+    const response = await serverFetch(url, {
       headers: {
         "x-nxopen-api-key": API_KEY,
       },
