@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const Signup: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -20,23 +20,51 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch('/signup', {
-        method: 'POST',
+      const response = await fetch("/signup", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, email, password }),
       });
       const data = await response.json();
       if (response.ok) {
-        console.log('회원가입 성공:', data);
-        // 회원가입 성공 후 처리 로직 (예: 로그인 페이지로 리다이렉트)
+        console.log("회원가입 성공:", data);
+        window.location.href = "/login";
       } else {
-        console.error('회원가입 실패:', data.message);
+        console.error("회원가입 실패:", data.message);
         // 회원가입 실패 처리 로직
       }
     } catch (error) {
-      console.error('회원가입 요청 실패:', error);
+      console.error("회원가입 요청 실패:", error);
+    }
+  };
+
+  const checkDuplicateUsername = async () => {
+    try {
+      const response = await fetch(`/api/check-username?username=${username}`);
+      const data = await response.json();
+      if (data.isDuplicate) {
+        alert("이미 사용중인 사용자 이름입니다.");
+      } else {
+        alert("사용 가능한 사용자 이름입니다.");
+      }
+    } catch (error) {
+      console.error("사용자 이름 중복 확인 실패:", error);
+    }
+  };
+
+  const checkDuplicateEmail = async () => {
+    try {
+      const response = await fetch(`/api/check-email?email=${email}`);
+      const data = await response.json();
+      if (data.isDuplicate) {
+        alert("이미 사용중인 이메일입니다.");
+      } else {
+        alert("사용 가능한 이메일입니다.");
+      }
+    } catch (error) {
+      console.error("이메일 중복 확인 실패:", error);
     }
   };
 
@@ -51,6 +79,9 @@ const Signup: React.FC = () => {
           onChange={handleUsernameChange}
           required
         />
+        <button type="button" onClick={checkDuplicateUsername}>
+          중복 확인
+        </button>
       </div>
       <div>
         <label htmlFor="email">Email:</label>
@@ -61,6 +92,9 @@ const Signup: React.FC = () => {
           onChange={handleEmailChange}
           required
         />
+        <button type="button" onClick={checkDuplicateEmail}>
+          중복 확인
+        </button>
       </div>
       <div>
         <label htmlFor="password">Password:</label>
