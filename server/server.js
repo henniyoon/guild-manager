@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001;
 // 미들웨어 등록
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../client/build")));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // DB 연결 확인
 sequelize.authenticate()
@@ -28,24 +28,42 @@ sequelize.authenticate()
   });
 
 // 테이블 생성
-sequelize.sync()
-.then(() => {
-  console.log('테이블이 성공적으로 생성되었습니다.');
-})
-.catch((err) => {
-  console.error('테이블 생성 실패:', err.message);
-});
+// sequelize.sync()
+// .then(() => {
+//   console.log('테이블이 성공적으로 생성되었습니다.');
+// })
+// .catch((err) => {
+//   console.error('테이블 생성 실패:', err.message);
+// });
 
 
 // 노블 제한 기록 조회 API
-app.get('/api/records', async (req, res) => {
+app.get("/api/records", async (req, res) => {
+  let conn;
   try {
-    const rows = await Record.findAll();
+    conn = await pool.getConnection();
+    // 클라이언트에서 전달된 주 정보 (예: "2024-W01")
+    const weekParam = req.query.week; // "yyyy-Www" 형식
+
+    // 주 정보에서 연도와 주 번호 추출
+    const [year, week] = weekParam.split('-W');
+    
+    // 주의 시작 날짜와 끝 날짜 계산
+    // MySQL의 WEEK() 함수를 사용하여 주 내의 날짜를 조회
+    // 이 예시는 주의 시작을 일요일로 가정합니다. 설정에 따라 달라질 수 있습니다.
+    const query = `
+      SELECT * FROM record
+      WHERE YEAR(date) = ? AND WEEK(date, 1) -1  = ?
+    `;
+
+    const rows = await conn.query(query, [year, week - 1]); // MySQL에서 주는 0부터 시작하므로 1을 빼줍니다.
     res.json(rows);
   } catch (err) {
     console.error("데이터베이스 쿼리 실행 실패:", err.message);
-    res.status(500).send('서버 오류 발생');
-  } 
+    res.status(500).send("서버 오류 발생");
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
 // 노블 제한 기록 업데이트 API
@@ -66,7 +84,7 @@ app.post('/api/updateRecords', async (req, res) => {
       );
     }
 
-    res.json({ message: "업데이트 성공" });
+    res.json({ message: '업데이트 성공' });
   } catch (err) {
     console.error("데이터베이스 업데이트 실패:", err.message);
     res.status(500).send('서버 오류 발생');
@@ -81,23 +99,21 @@ app.post('/signup', async (req, res) => {
     const newUser = await User.create({
       username,
       email,
-      password: hashedPassword,
+      password: hashedPassword
     });
-    res.status(201).json({ message: "회원가입 성공", userId: newUser.id });
+    res.status(201).json({ message: '회원가입 성공', userId: newUser.id });
   } catch (error) {
-    if (error.name === "SequelizeUniqueConstraintError") {
-      res
-        .status(409)
-        .json({ message: "이미 사용중인 이메일 또는 사용자 이름입니다." });
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      res.status(409).json({ message: '이미 사용중인 이메일 또는 사용자 이름입니다.' });
     } else {
-      console.error("회원가입 처리 에러:", error);
-      res.status(500).json({ message: "서버 에러" });
+      console.error('회원가입 처리 에러:', error);
+      res.status(500).json({ message: '서버 에러' });
     }
   }
 });
 
-// 로그인 API
-app.post('/login', async (req, res) => {
+// ! 현재 토큰을 localstorage에 저장하는 방식인데 XSS공격에 취약함 
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ where: { email } });
