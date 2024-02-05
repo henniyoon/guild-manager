@@ -131,6 +131,10 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
     }
   }, [characterData, API_KEY]);
 
+  const handleMemberClick = (memberName: string) => {
+    navigate(`/Graphpage/${memberName}`);
+  };
+
   return (
     <div>
       {guildDetails && guildDetails.guild_member.length > 0 && (
@@ -139,6 +143,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
             <div
               key={index}
               className={styles.memberLi}
+              onClick={() => handleMemberClick(member)}
             >
               <div className={`${styles.padding15} ${styles.card}`}>
                 <h4>{member}</h4>
