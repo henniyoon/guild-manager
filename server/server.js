@@ -28,13 +28,13 @@ sequelize.authenticate()
   });
 
 // 테이블 생성
-sequelize.sync()
-.then(() => {
-  console.log('테이블이 성공적으로 생성되었습니다.');
-})
-.catch((err) => {
-  console.error('테이블 생성 실패:', err.message);
-});
+// sequelize.sync()
+// .then(() => {
+//   console.log('테이블이 성공적으로 생성되었습니다.');
+// })
+// .catch((err) => {
+//   console.error('테이블 생성 실패:', err.message);
+// });
 
 
 // 노블 제한 기록 조회 API
