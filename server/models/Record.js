@@ -19,15 +19,15 @@ const Record = sequelize.define('Record', {
         },
     },
     weekly_score: {     // 주간 점수
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: true,
     },
     suro_score: {       // 수로 점수
-        type: DataTypes.INTEGER,
+        type: DataTypes.MEDIUMINT,
         allowNull: true,
     },  
     flag_score: {       // 플래그 점수
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: true,
     },
     noble_limit: {      // 노블 제한 여부
@@ -35,8 +35,8 @@ const Record = sequelize.define('Record', {
         allowNull: false,
         defaultValue: false,
     },
-    created_at: {       // 작성일
-        type: DataTypes.DATE,
+    week: {       // 작성일
+        type: DataTypes.TINYINT,
         allowNull: false,
         defaultValue: DataTypes.NOW,
     },

@@ -23,11 +23,11 @@ const Characters = sequelize.define('Characters', {
     unique: true
   },
   name: {           // 캐릭터명  
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(12),
     allowNull: true,
   },
   class: {          // 직업
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(18),
     allowNull: true,
   },
   level: {          // 캐릭터 레벨
