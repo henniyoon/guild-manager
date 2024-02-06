@@ -42,7 +42,7 @@ const Signup: React.FC = () => {
 
   const checkDuplicateUsername = async () => {
     try {
-      const response = await fetch(`/api/check-username?username=${username}`);
+      const response = await fetch(`/checkUsername?username=${username}`);
       const data = await response.json();
       if (data.isDuplicate) {
         alert("이미 사용중인 사용자 이름입니다.");
@@ -56,7 +56,7 @@ const Signup: React.FC = () => {
 
   const checkDuplicateEmail = async () => {
     try {
-      const response = await fetch(`/api/check-email?email=${email}`);
+      const response = await fetch(`/checkEmail?email=${email}`);
       const data = await response.json();
       if (data.isDuplicate) {
         alert("이미 사용중인 이메일입니다.");

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
-const Characters = require('./Characters.js');
+const Characters = require('./Character.js');
 
 const Record = sequelize.define('Record', {
     id: {               // index
