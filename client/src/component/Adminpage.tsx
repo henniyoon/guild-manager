@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "../style/Adminpage.module.css";
-import SelectWeek from '../component/SelectWeek';
+import styles from "../style/AdminPage.module.css";
+import SelectWeek from "../component/SelectWeek";
 interface TableRowData {
   id: number;
   character_id: number;
@@ -15,16 +15,20 @@ function getCurrentWeek() {
   const currentDate = new Date();
   const firstDayOfYear = new Date(currentDate.getFullYear(), 0, 1);
   // .getTime()을 사용하여 Date 객체를 밀리초 단위의 숫자로 변환
-  const pastDaysOfYear = (currentDate.getTime() - firstDayOfYear.getTime()) / 86400000;
+  const pastDaysOfYear =
+    (currentDate.getTime() - firstDayOfYear.getTime()) / 86400000;
   // 첫째 날이 일요일이 아니라면 +1을 하지 않고, 대신 첫째 날의 getDay() 값을 빼줍니다.
   const currentWeek = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay()) / 7);
-  return `${currentDate.getFullYear()}-W${currentWeek.toString().padStart(2, '0')}`;
+  return `${currentDate.getFullYear()}-W${currentWeek
+    .toString()
+    .padStart(2, "0")}`;
 }
 const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(getCurrentWeek());
+  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -85,6 +89,11 @@ const Adminpage: React.FC = () => {
     setIsEditMode(false); // 편집 모드 종료
   };
 
+  const handleRowClick = (id: number) => {
+    setSelectedRowId(id);
+    console.log("선택된 행 : ", id);
+  };
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -95,13 +104,17 @@ const Adminpage: React.FC = () => {
         <thead>{/* ... */}</thead>
         <tbody>
           {tableData.map((row) => (
-            <tr key={row.id}>
+            <tr
+              key={row.id}
+              onClick={() => handleRowClick(row.id)}
+              className={`${styles.rowClickable} ${selectedRowId === row.id ? styles.rowSelected : ''}`}
+              >
               {isEditMode ? (
                 <>
                   <input
                     title="insert-name"
                     type="text"
-                    defaultValue={row.name}
+                    defaultValue={row.character_name}
                     onChange={(e) =>
                       handleInputChange(row.id, "name", e.target.value)
                     }
