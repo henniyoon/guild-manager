@@ -40,7 +40,7 @@ const Adminpage: React.FC = () => {
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
     // selectedDate를 사용하여 서버에 요청 보내기
-    const url = `/api/records?week=${encodeURIComponent(selectedDate)}`;
+    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -79,7 +79,7 @@ const Adminpage: React.FC = () => {
   const handleSaveClick = () => {
     console.log("전송할 데이터:", editedData); // 전송할 데이터 로깅
     // 서버에 데이터 전송
-    fetch("/api/updateRecords", {
+    fetch("/updateRecords", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -122,7 +122,7 @@ const Adminpage: React.FC = () => {
   const handleAddNewRow = async () => {
     // 서버에 새로운 행 데이터를 전송하는 로직을 구현
     // 예: fetch API를 사용하여 서버에 POST 요청
-    const response = await fetch("/api/record", {
+    const response = await fetch("/records", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
