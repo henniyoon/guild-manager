@@ -96,7 +96,7 @@ const Adminpage: React.FC = () => {
 
   // 새로운 행을 추가하기 위한 상태 정의
   const [newRowData, setNewRowData] = useState({
-    character_id: "",
+    character_name: "",
     weekly_score: "",
     suro_score: "",
     flag_score: "",
@@ -132,7 +132,7 @@ const Adminpage: React.FC = () => {
       fetchTableData();
       // 입력 필드 초기화
       setNewRowData({
-        character_id: "",
+        character_name: "",
         weekly_score: "",
         suro_score: "",
         flag_score: "",
@@ -146,10 +146,10 @@ const Adminpage: React.FC = () => {
     <div>
       <h1>관리자 페이지</h1>
       <input
-        name="character_id"
-        value={newRowData.character_id}
+        name="character_name"
+        value={newRowData.character_name}
         onChange={handleNewRowDataChange}
-        placeholder="Character ID"
+        placeholder="Character Name"
       />
       <input
         name="weekly_score"

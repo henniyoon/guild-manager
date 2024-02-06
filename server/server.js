@@ -41,22 +41,31 @@ sequelize.authenticate()
 // 행 추가 엔드포인트
 app.post('/api/record', async (req, res) => {
   try {
-    const { character_id, weekly_score, suro_score, flag_score, noble_limit, week } = req.body;
+    const { character_name, weekly_score, suro_score, flag_score, week } = req.body;
+    
+    // Characters 모델을 사용하여 데이터베이스에서 캐릭터 조회
+    const character = await Characters.findOne({ where: { name: character_name } });
+    // ! characters 테이블에 일치하는 닉네임이 없을 때 로직 생각해보기
+    if (!character) {
+      return res.status(404).send('Character not found');
+    }
+
+    // 조회한 character의 id를 사용하여 새로운 record 생성
     const newRecord = await Record.create({
-      character_id,
+      character_id: character.id,
       weekly_score,
       suro_score,
       flag_score,
-      noble_limit: noble_limit || 0, // noble_limit이 제공되지 않으면 기본값으로 0 사용
+      noble_limit: 0, // noble_limit는 기본적으로 0으로 설정
       week
     });
-    res.json(newRecord);
+
+    res.json(newRecord); // 생성된 레코드의 데이터를 응답으로 반환
   } catch (error) {
     console.error('레코드 추가 실패:', error);
     res.status(500).send('서버 에러');
   }
 });
-
 
 // 노블 제한 기록 조회 API
 app.get('/api/records', async (req, res) => {
