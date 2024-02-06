@@ -9,7 +9,7 @@ const Server = sequelize.define('Server', {
         allowNull: false,
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(12),
         allowNull: false,
         unique: true
     },
