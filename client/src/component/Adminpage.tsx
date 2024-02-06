@@ -16,7 +16,7 @@ function getCurrentWeek() {
   const pastDaysOfYear = (currentDate.getTime() - firstDayOfYear.getTime()) / 86400000;
   // 첫째 날이 일요일이 아니라면 +1을 하지 않고, 대신 첫째 날의 getDay() 값을 빼줍니다.
   const currentWeek = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay()) / 7);
-  return `${currentDate.getFullYear()}-${currentWeek.toString().padStart(2, '0')}`;
+  return `${currentDate.getFullYear()}-W${currentWeek.toString().padStart(2, '0')}`;
 }
 const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);

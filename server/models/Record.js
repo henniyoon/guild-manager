@@ -35,9 +35,8 @@ const Record = sequelize.define('Record', {
         defaultValue: false,
     },
     week: {       // 작성일
-        type: DataTypes.TINYINT,
+        type: DataTypes.STRING(8),
         allowNull: false,
-        defaultValue: DataTypes.NOW,
     },
 }, {
     tableName: 'records',
