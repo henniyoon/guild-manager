@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "../style/AdminPage.module.css";
 import SelectWeek from "../component/SelectWeek";
+
 interface TableRowData {
   id: number;
   character_id: number;
@@ -9,6 +10,11 @@ interface TableRowData {
   weekly_score: number;
   suro_score: number;
   flag_score: number;
+}
+
+interface SortConfig {
+  key: keyof TableRowData | null;
+  direction: 'ascending' | 'descending';
 }
 
 function getCurrentWeek() {
@@ -29,6 +35,7 @@ const Adminpage: React.FC = () => {
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(getCurrentWeek());
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' });
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -142,6 +149,20 @@ const Adminpage: React.FC = () => {
     }
   };
 
+  const sortData = (key: keyof TableRowData) => {
+    setSortConfig((currentSortConfig) => {
+      const newDirection = currentSortConfig.key === key && currentSortConfig.direction === 'ascending' ? 'descending' : 'ascending';
+      const sortedData = [...tableData].sort((a, b) => {
+        // 아래 조건에서 a[key] 및 b[key]의 타입이 'any'가 될 수 있으므로, 타입 단언을 사용하여 오류를 회피합니다.
+        if (a[key] < b[key]) return newDirection === 'ascending' ? -1 : 1;
+        if (a[key] > b[key]) return newDirection === 'ascending' ? 1 : -1;
+        return 0;
+      });
+      setTableData(sortedData);
+      return { key, direction: newDirection };
+    });
+  };
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -174,7 +195,19 @@ const Adminpage: React.FC = () => {
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
       <table>
-        <thead>{/* ... */}</thead>
+        <thead>
+          <th onClick={() => sortData("character_name")}>
+            닉네임{" "}
+            {sortConfig.key === "character_name"
+              ? sortConfig.direction === "ascending"
+                ? "↑"
+                : "↓"
+              : ""}
+          </th>
+          <th onClick={() => sortData("weekly_score")}>주간점수</th>
+          <th onClick={() => sortData("suro_score")}>수로</th>
+          <th onClick={() => sortData("flag_score")}>플래그</th>
+        </thead>
         <tbody>
           {tableData.map((row) => (
             <tr
