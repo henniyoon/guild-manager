@@ -94,9 +94,62 @@ const Adminpage: React.FC = () => {
     console.log("선택된 행 : ", id);
   };
 
+  // 새로운 행을 추가하기 위한 상태 정의
+const [newRowData, setNewRowData] = useState({
+  character_id: '',
+  weekly_score: '',
+  suro_score: '',
+  flag_score: '',
+});
+
+// 새로운 행 데이터 입력을 처리하는 핸들러
+const handleNewRowDataChange = (e: { target: { name: any; value: any; }; }) => {
+  const { name, value } = e.target;
+  setNewRowData(prev => ({
+    ...prev,
+    [name]: value
+  }));
+};
+
+// 새로운 행을 추가하는 로직
+const handleAddNewRow = async () => {
+  // 서버에 새로운 행 데이터를 전송하는 로직을 구현
+  // 예: fetch API를 사용하여 서버에 POST 요청
+  const response = await fetch('/api/record', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...newRowData,
+      noble_limit: 0, // noble_limit는 항상 0으로 설정
+      week: selectedDate, // SelectWeek에서 선택된 주
+    }),
+  });
+
+  if (response.ok) {
+    // 데이터 추가 후 테이블 데이터 새로고침
+    fetchTableData();
+    // 입력 필드 초기화
+    setNewRowData({
+      character_id: '',
+      weekly_score: '',
+      suro_score: '',
+      flag_score: '',
+    });
+  } else {
+    console.error('데이터 추가 실패');
+  }
+};
+
   return (
     <div>
       <h1>관리자 페이지</h1>
+      <input name="character_id" value={newRowData.character_id} onChange={handleNewRowDataChange} placeholder="Character ID" />
+    <input name="weekly_score" value={newRowData.weekly_score} onChange={handleNewRowDataChange} placeholder="Weekly Score" />
+    <input name="suro_score" value={newRowData.suro_score} onChange={handleNewRowDataChange} placeholder="Suro Score" />
+    <input name="flag_score" value={newRowData.flag_score} onChange={handleNewRowDataChange} placeholder="Flag Score" />
+    <button onClick={handleAddNewRow}>추가</button>
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>

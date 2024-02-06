@@ -38,6 +38,25 @@ sequelize.authenticate()
 //   console.error('테이블 생성 실패:', err.message);
 // });
 
+// 행 추가 엔드포인트
+app.post('/api/record', async (req, res) => {
+  try {
+    const { character_id, weekly_score, suro_score, flag_score, noble_limit, week } = req.body;
+    const newRecord = await Record.create({
+      character_id,
+      weekly_score,
+      suro_score,
+      flag_score,
+      noble_limit: noble_limit || 0, // noble_limit이 제공되지 않으면 기본값으로 0 사용
+      week
+    });
+    res.json(newRecord);
+  } catch (error) {
+    console.error('레코드 추가 실패:', error);
+    res.status(500).send('서버 에러');
+  }
+});
+
 
 // 노블 제한 기록 조회 API
 app.get('/api/records', async (req, res) => {
