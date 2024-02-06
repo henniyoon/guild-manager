@@ -3,6 +3,8 @@ import "../style/Adminpage.module.css";
 import SelectWeek from '../component/SelectWeek';
 interface TableRowData {
   id: number;
+  character_id: number;
+  character_name: string;
   name: string;
   weekly_score: number;
   suro_score: number;
@@ -50,6 +52,7 @@ const Adminpage: React.FC = () => {
 
   const handleInputChange = (id: number, field: string, value: string) => {
     const parsedValue =
+      field === "character_id" ||
       field === "weekly_score" ||
       field === "suro_score" ||
       field === "flag_score"
@@ -130,7 +133,7 @@ const Adminpage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <td>{row.name}</td>
+                  <td>{row.character_name}</td>
                   <td>{row.weekly_score}</td>
                   <td>{row.suro_score}</td>
                   <td>{row.flag_score}</td>
