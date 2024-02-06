@@ -41,22 +41,29 @@ sequelize.authenticate()
 
 // 노블 제한 기록 조회 API
 app.get('/api/records', async (req, res) => {
-  // 쿼리스트링에서 'week' 파라미터 값을 가져옴
   const week = req.query.week;
-  console.log(week)
 
   try {
-    // 'week' 필드가 쿼리스트링에서 받은 'week' 값과 일치하는 Record 데이터를 조회
     const records = await Record.findAll({
+      attributes: ['id', 'weekly_score', 'suro_score', 'flag_score'],
+      include: [{
+        model: Characters, // 또는 Characters, 모델 이름에 따라 다름
+        as: 'character', // 관계 정의 시 사용한 별칭을 여기에 명시
+        attributes: ['name'],
+      }],
       where: {
         week: week
       }
     });
 
-    // 조회된 데이터를 JSON 형태로 응답
-    res.json(records);
+    // `records.map` 사용 시 정의되지 않은 `records` 변수에 접근하는 오류가 발생할 수 있음
+    const response = records.map(record => ({
+      ...record.toJSON(),
+      character_name: record.character?.name // 옵셔널 체이닝 사용
+    }));
+
+    res.json(response);
   } catch (error) {
-    // 에러 처리
     console.error("데이터를 불러오는 데 실패했습니다:", error);
     res.status(500).send("서버 에러 발생");
   }

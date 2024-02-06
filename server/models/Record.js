@@ -45,4 +45,6 @@ const Record = sequelize.define('Record', {
     engine: 'InnoDB',
 });
 
+Record.belongsTo(Characters, {foreignKey: 'character_id', as: 'character'});
+
 module.exports = Record;
