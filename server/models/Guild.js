@@ -18,7 +18,7 @@ const Guild = sequelize.define('Guild', {
         },
     },
     name: {             // 길드명
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(12),
         allowNull: false,
     },
     oguild_id: {        // nexon api 사용을 위한 oguild_id

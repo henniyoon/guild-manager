@@ -3,13 +3,13 @@ const sequelize = require('../db.js');
 
 const Server = sequelize.define('Server', {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(12),
         allowNull: false,
         unique: true
     },

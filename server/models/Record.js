@@ -12,22 +12,21 @@ const Record = sequelize.define('Record', {
     character_id: {     // 캐릭터 번호 (characters 테이블의 id)
         type: DataTypes.INTEGER,
         allowNull: true,
-        unique: true,
         references: {
             model: Characters,
             key: 'id',
         },
     },
     weekly_score: {     // 주간 점수
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: true,
     },
     suro_score: {       // 수로 점수
-        type: DataTypes.INTEGER,
+        type: DataTypes.MEDIUMINT,
         allowNull: true,
     },  
     flag_score: {       // 플래그 점수
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: true,
     },
     noble_limit: {      // 노블 제한 여부
@@ -35,10 +34,9 @@ const Record = sequelize.define('Record', {
         allowNull: false,
         defaultValue: false,
     },
-    created_at: {       // 작성일
-        type: DataTypes.DATE,
+    week: {       // 작성일
+        type: DataTypes.STRING(8),
         allowNull: false,
-        defaultValue: DataTypes.NOW,
     },
 }, {
     tableName: 'records',
@@ -46,5 +44,7 @@ const Record = sequelize.define('Record', {
     collate: 'utf8mb4_unicode_ci',
     engine: 'InnoDB',
 });
+
+Record.belongsTo(Characters, {foreignKey: 'character_id', as: 'character'});
 
 module.exports = Record;

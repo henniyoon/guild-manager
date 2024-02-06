@@ -9,3 +9,10 @@ table {
     text-align: left;
   }
   
+  .rowClickable {
+    cursor: pointer;
+  }
+  
+  .rowSelected {
+    background-color: #f0f0f0; /* 선택된 행의 배경색 */
+  }

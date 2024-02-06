@@ -17,17 +17,17 @@ const Characters = sequelize.define('Characters', {
       key: 'id',
     },
   },
+  name: {           // 캐릭터명  
+    type: DataTypes.STRING(12),
+    allowNull: true,
+  },
   ocid: {           // nexon api 사용을 위한 ocid 
     type: DataTypes.STRING,
     allowNull: true,
     unique: true
   },
-  name: {           // 캐릭터명  
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   class: {          // 직업
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(18),
     allowNull: true,
   },
   level: {          // 캐릭터 레벨
