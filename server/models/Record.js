@@ -12,7 +12,6 @@ const Record = sequelize.define('Record', {
     character_id: {     // 캐릭터 번호 (characters 테이블의 id)
         type: DataTypes.INTEGER,
         allowNull: true,
-        unique: true,
         references: {
             model: Characters,
             key: 'id',
