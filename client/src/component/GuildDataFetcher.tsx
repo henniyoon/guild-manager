@@ -146,7 +146,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
               onClick={() => handleMemberClick(member)}
             >
               <div className={`${styles.padding15} ${styles.card}`}>
-                <h4>{member}</h4>
+                
                 {characterDetails && characterDetails[index] && (
                   <>
                     <img
@@ -154,7 +154,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
                       alt="Character Image"
                       className={styles.characterImage}
                     />
-                    {/* <h4>{characterDetails[index].character_name}</h4> */}
+                    <h4>{member}</h4>
                     <p>Lv.{characterDetails[index].character_level}</p>
                     <p>{characterDetails[index].character_class}</p>
                   </>
