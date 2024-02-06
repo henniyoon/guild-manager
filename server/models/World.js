@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
 
-const Server = sequelize.define('Server', {
+const World = sequelize.define('World', {
     id: {
         type: DataTypes.TINYINT,
         primaryKey: true,
@@ -14,10 +14,10 @@ const Server = sequelize.define('Server', {
         unique: true
     },
 }, {
-    tableName: 'servers',
+    tableName: 'worlds',
     timestamps: false,
     collate: 'utf8mb4_unicode_ci',
     engine: 'InnoDB',
 });
 
-module.exports = Server;
+module.exports = World;

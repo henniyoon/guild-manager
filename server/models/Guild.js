@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
-const Server = require('./Server.js');
+const World = require('./World.js');
 
 const Guild = sequelize.define('Guild', {
     id: {               // index
@@ -9,11 +9,11 @@ const Guild = sequelize.define('Guild', {
         autoIncrement: true,
         allowNull: false,
     },
-    server_id: {        // 서버 번호 (servers 테이블의 id를 외래키로 사용)
-        type: DataTypes.INTEGER,
+    world_id: {        // 월드 번호 (worlds 테이블의 id를 외래키로 사용)
+        type: DataTypes.TINYINT,
         allowNull: false,
         references: {
-            model: Server,
+            model: World,
             key: 'id',
         },
     },
@@ -35,6 +35,12 @@ const Guild = sequelize.define('Guild', {
     timestamps: false,
     collate: 'utf8mb4_unicode_ci',
     engine: 'InnoDB',
+    // hooks: {
+    //     // 모델이 저장될 때마다 호출되는 hook
+    //     beforeSave: (instance, options) => {
+    //         // last_updated를 현재 한국 시간으로 업데이트
+    //         instance.last_updated = new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' });
+    //     },
+    // },
 });
-
 module.exports = Guild;
