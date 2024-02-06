@@ -8,7 +8,7 @@ import Button from './Button';
 const Mainpage = () => {
   const navigate = useNavigate();
   const [selectedServer, setSelectedServer] = useState('스카니아');
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState('별빛');
 
   const handleButtonClick = (e: FormEvent) => {
     e.preventDefault(); // 폼의 기본 제출 이벤트를 방지
