@@ -149,6 +149,25 @@ const Adminpage: React.FC = () => {
     }
   };
 
+  const handleDeleteSelectedRow = () => {
+    if (selectedRowId === null) {
+      alert("삭제할 행을 선택해주세요.");
+      return;
+    }
+    // 서버에 선택된 행 삭제 요청을 보내는 로직 구현
+    fetch(`/deleteRecord/${selectedRowId}`, {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("삭제 결과:", data);
+        setSelectedRowId(null); // 삭제 후 선택된 행 ID 초기화
+        fetchTableData(); // 삭제 후 테이블 데이터 새로고침
+      })
+      .catch((error) => console.error("데이터 삭제 실패:", error));
+  };
+
+
   const sortData = (key: keyof TableRowData) => {
     setSortConfig((currentSortConfig) => {
       const newDirection = currentSortConfig.key === key && currentSortConfig.direction === 'ascending' ? 'descending' : 'ascending';
@@ -194,6 +213,8 @@ const Adminpage: React.FC = () => {
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
+      <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
+
       <table>
         <thead>
           <th onClick={() => sortData("character_name")}>
