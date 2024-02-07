@@ -19,5 +19,6 @@
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
-  }
+  },
+  "apiKey": "live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3"
 }
