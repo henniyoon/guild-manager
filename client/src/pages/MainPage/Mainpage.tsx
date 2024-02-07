@@ -1,9 +1,9 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../style/Mainpage.css'
-import SelectServer from './SelectServer';
-import InputBox from './InputBox';
-import Button from './Button';
+import './styles/Mainpage.css'
+import SelectServer from './components/SelectServer';
+import InputBox from './components/InputBox';
+import Button from '../../components/Button';
 
 const Mainpage = () => {
   const navigate = useNavigate();

@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
-import Button from './Button';
-import GuildDataFetcher from "./GuildDataFetcher";
-import styles from '../style/Guildpage.module.css'
+import Button from '../../components/Button';
+import GuildDataFetcher from "./components/GuildDataFetcher";
 
 const Guildpage: React.FC = () => {
   const { server, guild } = useParams();

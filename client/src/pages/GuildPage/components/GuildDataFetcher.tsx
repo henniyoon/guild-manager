@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import styles from '../style/Guildpage.module.css'
+import styles from '../styles/Guildpage.module.css'
 
 interface GuildDataFetcherProps {
   server: string | undefined;

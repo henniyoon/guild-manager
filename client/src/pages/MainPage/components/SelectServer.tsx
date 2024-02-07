@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/SelectServer.css';
+import '../styles/SelectServer.css';
 
 interface SelectServerProps {
   value: string;
