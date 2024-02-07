@@ -1,4 +1,4 @@
-import SingUp from "./SignUp";
+import SingUp from "./components/SignUp";
 
 const SingUppage = () => {
   return <SingUp />;

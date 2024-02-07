@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styles from "../style/AdminPage.module.css";
-import SelectWeek from "../component/SelectWeek";
+import styles from "./styles/Adminpage.module.css";
+import SelectWeek from "./components/SelectWeek";
 
 interface TableRowData {
   id: number;

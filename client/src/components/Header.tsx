@@ -1,7 +1,7 @@
 import React from 'react';
 import '../style/Header.css';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../Context/AuthContext';
+import { useAuth } from './AuthContext';
 
 const Header: React.FC = () => {
   const { isLoggedIn, userInfo, logout } = useAuth();
