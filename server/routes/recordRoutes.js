@@ -12,4 +12,7 @@ recordRouter.post('/records', RecordController.addRecordController);
 // 노블 제한 기록 수정
 recordRouter.post('/updateRecords', RecordController.updateRecordsController);
 
+// 노블 제한 기록 삭제
+recordRouter.delete('/deleteRecord/:id', RecordController.deleteRecordsController)
+
 module.exports = recordRouter;

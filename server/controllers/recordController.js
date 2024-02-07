@@ -1,4 +1,5 @@
 const RecordService = require('../services/recordService.js');
+const Record = require('../models/Record.js');
 
 const addRecordController = async (req, res) => {
     try {
@@ -41,8 +42,24 @@ const updateRecordsController = async (req, res) => {
     }
 };
 
+const deleteRecordsController = async (req, res) => {
+    const id = req.params.id;
+    try {
+      await Record.destroy({
+        where: {
+          id: id
+        }
+      });
+      res.status(200).json({ message: "레코드 삭제 성공" });
+    } catch (error) {
+      console.error("레코드 삭제 중 오류:", error);
+      res.status(500).json({ message: "레코드 삭제 실패" });
+    }
+  };
+
 module.exports = {
     addRecordController,
     getRecordsController,
-    updateRecordsController
+    updateRecordsController,
+    deleteRecordsController
 };
