@@ -61,7 +61,8 @@ const login = async (email, password) => {
             username: user.username,
             guild_world_id: user.guild ? user.guild.world_id : null,
             guild_name: user.guild ? user.guild.name : null,
-            world_name: worldName // World 이름을 페이로드에 추가
+            world_name: worldName ,
+            guild_World_Id: guildWorldId,
         };
         const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
         return { message: '로그인 성공', token };
