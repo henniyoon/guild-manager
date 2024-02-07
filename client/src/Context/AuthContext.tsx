@@ -1,3 +1,5 @@
+// * useContext 훅과 AuthProvider를 사용하여 로그인 정보(인증상태)를 전역으로 공유할 수 있도록 해주는 컴포넌트
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
