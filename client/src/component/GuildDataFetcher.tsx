@@ -44,7 +44,7 @@ const GuildDataFetcher: React.FC<GuildDataFetcherProps> = ({ server, guild }) =>
   useEffect(() => {
     if (server && guild) {
       const url = `${API_BASE_URL}${GUILD_ID_ENDPOINT}?guild_name=${encodeURIComponent(guild)}&world_name=${encodeURIComponent(server)}`;
-
+      
       fetch(url, {
         headers: {
           "x-nxopen-api-key": API_KEY || '',
