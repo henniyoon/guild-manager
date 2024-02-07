@@ -31,7 +31,7 @@ const Guild = sequelize.define('Guild', {
         allowNull: true,    
     },
     member_count: {     // 길드원 수
-        type: DataTypes.TINYINT,
+        type: DataTypes.INTEGER,
         allowNull: true,
     },
     level: {            // 길드 레벨
@@ -47,7 +47,7 @@ const Guild = sequelize.define('Guild', {
        allowNull: true, 
     },
     guild_mark_custom: {        // 커스텀 길드 마크
-        type: DataTypes.STRING,
+        type: DataTypes.BLOB,
         allowNull: true, 
     },
     last_updated: {     // 최근 갱신일
