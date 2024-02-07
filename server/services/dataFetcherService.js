@@ -101,33 +101,78 @@ async function guildData(guild, world_name) {
         );
         // console.log("Entering for loop");
         for (const characterName of apiData.guild_member) {
-            const characterExists = await Character.findOne({ where: { name: characterName } });
-
-            if (characterExists) {
-                // 이미 존재하는 경우 업데이트
-                await characterExists.update(
-                    {
-                        guild_id: guildData.id,
+            const ocid_url = `${API_BASE_URL}/id?character_name=${encodeURIComponent(characterName)}`;
+            try {
+                // API 조회
+                const apiOcidResponse = await axios.get(ocid_url, {
+                    headers: {
+                        "x-nxopen-api-key": API_KEY,
                     },
-                    {
-                        where: { name: characterName },
-                    }
-                );
-                // console.log(`${characterName} 업데이트 완료`);
-            } else {
-                await Character.create({
-                    guild_id: guildData.id,
-                    name: characterName,
-                    // class: ,
-                    // level:,
-                    // image:,
-                    // last_updated:,
                 });
+                let apiCharacterData = apiOcidResponse.data;
+                console.log("apiCharacterData:", apiCharacterData);
+
+                const character_data_url = `${API_BASE_URL}${CHARACTER_BASIC_ENDPOINT}?ocid=${encodeURIComponent(apiCharacterData.ocid)}&date=${formattedDate}`;
+                try {
+                     // API 조회
+                const apiCharacterDataResponse = await axios.get(character_data_url, {
+                    headers: {
+                        "x-nxopen-api-key": API_KEY,
+                    },
+                });
+                const apiCharacterDatas = apiCharacterDataResponse.data;
+                apiCharacterData = {
+                    ...apiCharacterData,
+                    ...apiCharacterDataResponse.data,
+                };
+                console.log("apiCharacterData:", apiCharacterData);
+                const characterExists = await Character.findOne({ where: { ocid: apiCharacterData.ocid } });
+                if (characterExists) {
+                    // 이미 존재하는 경우 업데이트
+                    await characterExists.update(
+                        {
+                            guild_id: guildData.id,
+                            name: characterName,
+                            class: apiCharacterData.character_class,
+                            level: apiCharacterData.character_level,
+                            image: apiCharacterData.character_image,
+                            last_updated: new Date(),
+                        },
+                        {
+                            where: { ocid: apiCharacterData.ocid },
+                        }
+                    );
+                    // console.log(`${characterName} 업데이트 완료`);
+                } else {
+                    await Character.create({
+                        guild_id: guildData.id,
+                        name: characterName,
+                        ocid: apiCharacterData.ocid,
+                        class: apiCharacterData.character_class,
+                        level: apiCharacterData.character_level,
+                        image: apiCharacterData.character_image,
+                        last_updated: new Date(),
+                    });
+                };
+
+
+
+                } catch (error) {
+                    console.error('api 조회 db 저장 에러:', error);
+                    throw new Error('서버 에러');
+                };
+
+
+            } catch (error) {
+                console.error('api 조회 db 저장 에러:', error);
+                throw new Error('서버 에러');
             };
+
+
         };
         console.log("업데이트 완료");
 
-        
+
 
 
         // console.log("apiData:", apiData);
