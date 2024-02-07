@@ -24,7 +24,31 @@ const Guild = sequelize.define('Guild', {
     oguild_id: {        // nexon api 사용을 위한 oguild_id
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true
+        unique: true,
+    },
+    master_name: {      // 길드 마스터 닉네임
+        type: DataTypes.STRING(12),
+        allowNull: true,    
+    },
+    member_count: {     // 길드원 수
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    level: {            // 길드 레벨
+        type: DataTypes.TINYINT,
+        allowNull: true,
+    },
+    noblesse_skill_level: {     // 길드 노블 포인트
+        type: DataTypes.TINYINT,
+        allowNull: true,
+    },
+    guild_mark: {               // 기본 길드 마크
+       type: DataTypes.STRING,
+       allowNull: true, 
+    },
+    guild_mark_custom: {        // 커스텀 길드 마크
+        type: DataTypes.BLOB,
+        allowNull: true, 
     },
     last_updated: {     // 최근 갱신일
         type: DataTypes.DATE,
