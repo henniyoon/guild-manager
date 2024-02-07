@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-// import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 interface LoginProps {
   // 필요한 경우 추가 props 정의
@@ -39,9 +39,9 @@ const Login: React.FC<LoginProps> = () => {
       const data = await response.json();
       if (response.ok) {
         console.log('로그인 성공:', data);
-        // const decodedToken:decodedToken = jwtDecode(data.token);
-        // console.log(decodedToken)
-        // login({ username: decodedToken.username }); // 로그인 상태 업데이트
+        const decodedToken:decodedToken = jwtDecode(data.token);
+        console.log(decodedToken)
+        login({ username: decodedToken.username }); // 로그인 상태 업데이트
         localStorage.setItem('token', data.token); // 토큰 저장
         navigate('/'); // 홈페이지로 리다이렉트
       } else {
