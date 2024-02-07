@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const sequelize = require('./db.js');
+require('./models/modelAssociations.js');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -24,13 +25,13 @@ sequelize.authenticate()
   });
 
 // 테이블 생성
-// sequelize.sync()
-// .then(() => {
-//   console.log('테이블이 성공적으로 생성되었습니다.');
-// })
-// .catch((err) => {
-//   console.error('테이블 생성 실패:', err.message);
-// });
+sequelize.sync()
+.then(() => {
+  console.log('테이블이 성공적으로 생성되었습니다.');
+})
+.catch((err) => {
+  console.error('테이블 생성 실패:', err.message);
+});
 
 // API 라우터 등록
 app.use(recordRoutes);
