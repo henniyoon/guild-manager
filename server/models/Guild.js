@@ -67,4 +67,5 @@ const Guild = sequelize.define('Guild', {
     //     },
     // },
 });
+
 module.exports = Guild;
