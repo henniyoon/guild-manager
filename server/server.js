@@ -4,7 +4,7 @@ const cors = require('cors');
 const sequelize = require('./db.js');
 require('./models/modelAssociations.js');
 const jwt = require('jsonwebtoken');
-const { Guild } = require('./models/Guild.js');
+const Guild = require('./models/Guild.js');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -49,14 +49,34 @@ app.get('/test', (req, res) => {
   }
 
   // 토큰을 해독하여 사용자 정보를 추출합니다.
-  jwt.verify(token, 'WE_MUST_HIDE_THIS_KEY', (err, decodedToken) => {
-    if (err) return res.sendStatus(403); // 토큰이 유효하지 않은 경우 403 Forbidden 응답을 보냅니다.
-
+  jwt.verify(token, 'WE_MUST_HIDE_THIS_KEY', async (err, decodedToken) => {
+    if (err) return res.sendStatus(403); // 토큰이 유효하지 않은 경우 처리
+  
     // 추출한 사용자 정보를 이용하여 DB를 조회합니다.
     const guildWorldId = decodedToken.guild_world_id;
     const guildName = decodedToken.guild_name;
-    // 여기서는 예시로 단순히 guildWorldId와 guildName을 응답합니다.
-    res.json({ guildWorldId, guildName });
+  
+    try {
+      // Guild 모델을 사용하여 조건에 맞는 길드를 조회합니다.
+      const guild = await Guild.findOne({
+        where: {
+          world_id: guildWorldId,
+          name: guildName,
+        },
+        attributes: ['id'], // 조회할 필드 지정, 여기서는 id만 필요합니다.
+      });
+  
+      if (guild) {
+        // 조회된 길드의 id를 응답합니다.
+        res.json({ guildId: guild.id });
+      } else {
+        // 해당 조건에 맞는 길드가 없는 경우
+        res.status(404).send('Guild not found');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
   });
 });
 
