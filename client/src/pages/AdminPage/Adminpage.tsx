@@ -192,14 +192,16 @@ const Adminpage: React.FC = () => {
   // ? 길드원 채워넣는 로직
   const testclick = () => {
     const token = localStorage.token;
-
+    console.log(selectedDate)
+    
     fetch("/test", {
-      method: "GET", // 또는 'POST', 'PUT', 'DELETE' 등 요청 메소드를 선택합니다.
+      method: "POST", // 또는 'POST', 'PUT', 'DELETE' 등 요청 메소드를 선택합니다.
       headers: {
         "Content-Type": "application/json",
         // Bearer 토큰 형식을 사용하여 Authorization 헤더에 토큰을 포함시킵니다.
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ selectedDate: selectedDate }),
     })
       .then((response) => {
         // 서버로부터 받은 응답을 JSON 형식으로 파싱합니다.

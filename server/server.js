@@ -5,6 +5,9 @@ const sequelize = require('./db.js');
 require('./models/modelAssociations.js');
 const jwt = require('jsonwebtoken');
 const Guild = require('./models/Guild.js');
+const Character = require('./models/Character.js')
+const Record = require('./models/Record.js')
+const { Op } = require('sequelize');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -39,10 +42,11 @@ sequelize.authenticate()
 app.use(recordRoutes);
 app.use(authRoutes);
 
-app.get('/test', (req, res) => {
+app.post('/test', (req, res) => {
   // Authorization 헤더에서 토큰 추출
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Bearer 키워드를 제거합니다.
+  const week = req.body.selectedDate;
 
   if (token == null) {
     return res.sendStatus(401); // 토큰이 없는 경우 401 Unauthorized 응답을 보냅니다.
@@ -67,8 +71,27 @@ app.get('/test', (req, res) => {
       });
   
       if (guild) {
-        // 조회된 길드의 id를 응답합니다.
-        res.json({ guildId: guild.id });
+        // 해당 길드 ID에 속한 모든 길드원을 조회합니다.
+        const characters = await Character.findAll({
+          where: {
+            guild_id: guild.id,
+          },
+          attributes: ['id'], // 길드원의 id만 필요합니다.
+        });
+      
+        const characterIds = characters.map(character => character.id);
+      
+        // 여기에서 records 테이블을 조회합니다.
+        const records = await Record.findAll({
+          where: {
+            character_id: { [Op.in]: characterIds }, // characterIds 배열에 있는 ID들을 포함하는 레코드 검색
+            week: week, // 주 정보도 검색 조건에 포함
+          },
+          // 필요한 경우 attributes를 설정하여 특정 필드만 조회할 수 있습니다.
+        });
+      
+        // 조회된 레코드를 응답합니다.
+        res.json({ records: records });
       } else {
         // 해당 조건에 맞는 길드가 없는 경우
         res.status(404).send('Guild not found');
