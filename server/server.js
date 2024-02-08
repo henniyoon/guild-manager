@@ -40,15 +40,24 @@ app.use(recordRoutes);
 app.use(authRoutes);
 
 app.get('/test', (req, res) => {
-  // 클라이언트로부터 전달받은 토큰을 req.headers.authorization에서 추출합니다.
-  const token = req.headers.authorization.split(' ')[1];
+  // Authorization 헤더에서 토큰 추출
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer 키워드를 제거합니다.
+
+  if (token == null) {
+    return res.sendStatus(401); // 토큰이 없는 경우 401 Unauthorized 응답을 보냅니다.
+  }
+
   // 토큰을 해독하여 사용자 정보를 추출합니다.
-  const decodedToken = jwt.verify(token, 'WE_MUST_HIDE_THIS_KEY');
-  // 추출한 사용자 정보를 이용하여 DB를 조회합니다.
-  const guildWorldId = decodedToken.guild_world_id;
-  const guildName = decodedToken.guild_name;
-  // 여기서는 예시로 단순히 guildWorldId와 guildName을 응답합니다.
-  res.json({ guildWorldId, guildName });
+  jwt.verify(token, 'WE_MUST_HIDE_THIS_KEY', (err, decodedToken) => {
+    if (err) return res.sendStatus(403); // 토큰이 유효하지 않은 경우 403 Forbidden 응답을 보냅니다.
+
+    // 추출한 사용자 정보를 이용하여 DB를 조회합니다.
+    const guildWorldId = decodedToken.guild_world_id;
+    const guildName = decodedToken.guild_name;
+    // 여기서는 예시로 단순히 guildWorldId와 guildName을 응답합니다.
+    res.json({ guildWorldId, guildName });
+  });
 });
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
