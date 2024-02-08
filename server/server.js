@@ -3,6 +3,8 @@ const path = require('path');
 const cors = require('cors');
 const sequelize = require('./db.js');
 require('./models/modelAssociations.js');
+const jwt = require('jsonwebtoken');
+const { Guild } = require('./models/Guild.js');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -36,6 +38,18 @@ sequelize.authenticate()
 // API 라우터 등록
 app.use(recordRoutes);
 app.use(authRoutes);
+
+app.get('/test', (req, res) => {
+  // 클라이언트로부터 전달받은 토큰을 req.headers.authorization에서 추출합니다.
+  const token = req.headers.authorization.split(' ')[1];
+  // 토큰을 해독하여 사용자 정보를 추출합니다.
+  const decodedToken = jwt.verify(token, 'WE_MUST_HIDE_THIS_KEY');
+  // 추출한 사용자 정보를 이용하여 DB를 조회합니다.
+  const guildWorldId = decodedToken.guild_world_id;
+  const guildName = decodedToken.guild_name;
+  // 여기서는 예시로 단순히 guildWorldId와 guildName을 응답합니다.
+  res.json({ guildWorldId, guildName });
+});
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 // 클라이언트 리액트 앱 라우팅 처리

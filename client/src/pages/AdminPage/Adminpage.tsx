@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
+import { jwtDecode } from "jwt-decode";
 
 interface TableRowData {
   id: number;
@@ -167,7 +168,6 @@ const Adminpage: React.FC = () => {
       .catch((error) => console.error("데이터 삭제 실패:", error));
   };
 
-
   const sortData = (key: keyof TableRowData) => {
     setSortConfig((currentSortConfig) => {
       const newDirection = currentSortConfig.key === key && currentSortConfig.direction === 'ascending' ? 'descending' : 'ascending';
@@ -182,9 +182,37 @@ const Adminpage: React.FC = () => {
     });
   };
 
+  // ? 길드원 채워넣는 로직
+  const testclick = () => {
+    // 서버로 요청을 보낼 때는 Authorization 헤더에 토큰을 포함하여 보냅니다.
+    fetch('/test', {
+      method: 'GET', // 또는 'POST', 'PUT', 'DELETE' 등 요청 메소드를 선택합니다.
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+    .then(response => {
+      // 서버로부터 받은 응답을 JSON 형식으로 파싱합니다.
+      return response.json();
+    })
+    .then(data => {
+      // 서버로부터 받은 데이터를 콘솔에 출력합니다.
+      console.log(data);
+      // 받은 데이터를 원하는 방식으로 활용할 수 있습니다.
+      // 예를 들어 UI에 표시하거나 다른 작업을 수행할 수 있습니다.
+    })
+    .catch(error => {
+      // 오류가 발생한 경우 콘솔에 오류 메시지를 출력합니다.
+      console.error('Error:', error);
+      // 사용자에게 오류를 알리거나 다른 처리를 수행할 수 있습니다.
+    });
+  };
+
+  // ? 길드원 채워넣는 로직 끝
   return (
     <div>
       <h1>관리자 페이지</h1>
+      <button onClick={testclick}>test</button>
       <input
         name="character_name"
         value={newRowData.character_name}
