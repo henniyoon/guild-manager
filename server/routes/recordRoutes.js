@@ -4,7 +4,7 @@ const recordRouter = express.Router();
 const RecordController = require('../controllers/recordController.js');
 
 // 주간 점수 기록 조회
-recordRouter.get('/records', RecordController.test);
+recordRouter.get('/records', RecordController.getRecordsController);
 
 // 주간 점수 기록 추가
 recordRouter.post('/records', RecordController.addRecordController);
