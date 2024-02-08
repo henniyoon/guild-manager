@@ -80,18 +80,29 @@ app.post('/test', (req, res) => {
         });
       
         const characterIds = characters.map(character => character.id);
-      
-        // 여기에서 records 테이블을 조회합니다.
-        const records = await Record.findAll({
-          where: {
-            character_id: { [Op.in]: characterIds }, // characterIds 배열에 있는 ID들을 포함하는 레코드 검색
-            week: week, // 주 정보도 검색 조건에 포함
-          },
-          // 필요한 경우 attributes를 설정하여 특정 필드만 조회할 수 있습니다.
+
+        // records 테이블에서 각 character_id와 week에 대해 조회 또는 생성
+        const recordsPromises = characterIds.map(characterId => {
+          return Record.findOrCreate({
+            where: {
+              character_id: characterId,
+              week: week,
+            },
+            defaults: {
+              // findOrCreate에서 레코드를 생성할 때 사용될 기본값을 설정할 수 있습니다.
+              // 여기에 필요한 모든 기본값을 추가하세요.
+              weekly_score: 0, // 예시: 기본값으로 0을 설정
+              suro_score: 0,
+              flag_score: 0,
+              noble_limit: false,
+            }
+          });
         });
-      
-        // 조회된 레코드를 응답합니다.
-        res.json({ records: records });
+  
+        const records = await Promise.all(recordsPromises);
+  
+        // 생성되거나 찾아진 레코드의 정보를 응답으로 보냅니다.
+        res.json(records.map(record => record[0])); // findOrCreate는 [instance, created] 배열을 반환합니다.
       } else {
         // 해당 조건에 맞는 길드가 없는 경우
         res.status(404).send('Guild not found');
