@@ -3,13 +3,15 @@ const Character = require('../models/Character.js');
 const WorldService = require('./worldService.js');
 const GuildAPIService = require('./guildApiService.js');
 
-async function getGuild(guild, worldId) {
-    return await Guild.findOne({ where: { name: guild, world_id: worldId } });
+async function getGuildId(guildName, worldId) {
+    const guild = await Guild.findOne({ where: { name: guildName, world_id: worldId } });
+    return guild.id;
 }
 
-async function createGuildData(guild, worldName) {
+async function createGuild(guild, worldName) {
     // 해당 월드의 월드 번호 조회
     const worldId = await WorldService.getWordId(worldName);
+    console.log("worldId: ", worldId);
     try {
         let apiData = await GuildAPIService.getOguildId(guild, worldName);
         apiData = {
@@ -39,7 +41,7 @@ async function createGuildData(guild, worldName) {
     }
 }
 
-async function updateGuildData(guild, worldName) {
+async function updateGuild(guild, worldName) {
     // 해당 월드의 월드 번호 조회
     const worldId = await WorldService.getWordId(worldName);
     try {
@@ -73,7 +75,7 @@ async function updateGuildData(guild, worldName) {
 }
 
 module.exports = {
-    getGuild,
-    createGuildData,
-    updateGuildData,
+    getGuildId,
+    createGuild,
+    updateGuild,
 };
