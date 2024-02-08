@@ -39,6 +39,7 @@ const Login: React.FC<LoginProps> = () => {
       const data = await response.json();
       if (response.ok) {
         const decodedToken: decodedToken = jwtDecode(data.token);
+        console.log("decodedToken : ", decodedToken)
         login({ username: decodedToken.username }); // 로그인 상태 업데이트
         localStorage.setItem("token", data.token); // 토큰 저장
         navigate("/"); // 홈페이지로 리다이렉트
