@@ -42,6 +42,7 @@ sequelize.authenticate()
 app.use(recordRoutes);
 app.use(authRoutes);
 
+// admin 페이지 캐릭터 채우는 로직
 app.post('/test', (req, res) => {
   // Authorization 헤더에서 토큰 추출
   const authHeader = req.headers.authorization;
