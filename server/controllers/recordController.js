@@ -1,17 +1,6 @@
 const RecordService = require('../services/recordService.js');
 const Record = require('../models/Record.js');
 
-const addRecordController = async (req, res) => {
-    try {
-        const { character_name, weekly_score, suro_score, flag_score, week } = req.body;
-        const newRecord = await RecordService.addRecord(character_name, weekly_score, suro_score, flag_score, week);
-        res.json(newRecord);
-    } catch (error) {
-        console.error("Record 추가 실패:", error);
-        res.status(500).send("서버 에러");
-    }
-};
-
 const getRecordsController = async (req, res) => {
     const week = req.query.week;
 
@@ -29,6 +18,17 @@ const getRecordsController = async (req, res) => {
         res.status(500).send("서버 에러");
     }
 }
+
+const addRecordController = async (req, res) => {
+    try {
+        const { character_name, weekly_score, suro_score, flag_score, week } = req.body;
+        const newRecord = await RecordService.addRecord(character_name, weekly_score, suro_score, flag_score, week);
+        res.json(newRecord);
+    } catch (error) {
+        console.error("Record 추가 실패:", error);
+        res.status(500).send("서버 에러");
+    }
+};
 
 const updateRecordsController = async (req, res) => {
     const updatedRecords = req.body;
