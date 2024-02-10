@@ -1,6 +1,8 @@
 const RecordService = require('../services/recordService.js');
 const Record = require('../models/Record.js');
 const Guild = require('../models/Guild.js');
+const Characters = require('../models/Character.js'); // Characters 모델 경로에 맞게 조정해야 합니다.
+
 const jwt = require('jsonwebtoken');
 
 const getRecordsController = async (req, res) => {
@@ -27,19 +29,28 @@ const getRecordsController = async (req, res) => {
             return res.status(404).send("해당하는 길드를 찾을 수 없습니다.");
         }
 
-        // 길드 정보를 사용하여 더 많은 로직을 처리할 수 있습니다.
-        // 예: decoded의 정보를 바탕으로 records 조회
+        // 길드에 속한 캐릭터들 조회
+        const characters = await Characters.findAll({
+            where: {
+                guild_id: guildInfo.id, // 길드 ID를 사용하여 길드에 속한 캐릭터들 조회
+            },
+        });
+        console.log('characters : ',characters.id)
+        // 여기에서 characters 정보를 사용할 수 있습니다.
+        // 예를 들어, characters 정보를 response에 추가하거나, 특정 로직을 처리할 수 있습니다.
+
+        // records와 characters 정보를 결합하여 응답 생성
         const records = await RecordService.getRecords(week);
-console.log(`11111111111 : `,guildInfo)
         const response = records.map(record => ({
             ...record.toJSON(),
             character_name: record.character?.name,
-            guild_info: guildInfo // 길드 정보 추가
+            guild_info: guildInfo, // 길드 정보 추가
+            characters: characters // 길드에 속한 캐릭터들의 정보 추가
         }));
 
         res.json(response);
     } catch (error) {
-        // 토큰 만료 오류 처리
+        // 오류 처리 부분은 이전과 동일
         if (error.name === 'TokenExpiredError') {
             console.error("토큰이 만료되었습니다:", error);
             return res.status(401).send("토큰이 만료되었습니다. 다시 로그인해주세요.");
