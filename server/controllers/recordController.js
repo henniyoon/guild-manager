@@ -2,8 +2,9 @@ const RecordService = require('../services/recordService.js');
 const Record = require('../models/Record.js');
 const Guild = require('../models/Guild.js');
 const Characters = require('../models/Character.js'); // Characters 모델 경로에 맞게 조정해야 합니다.
-
 const jwt = require('jsonwebtoken');
+
+const secret = "WE_MUST_HIDE_THIS_KEY"
 
 const getRecordsController = async (req, res) => {
     const week = req.query.week;
@@ -15,7 +16,7 @@ const getRecordsController = async (req, res) => {
 
     try {
         // 토큰 검증 및 디코딩
-        const decoded = jwt.verify(token, "WE_MUST_HIDE_THIS_KEY");
+        const decoded = jwt.verify(token, secret);
 
         // 길드 정보 조회
         const guildInfo = await Guild.findOne({
@@ -31,26 +32,23 @@ const getRecordsController = async (req, res) => {
 
         // 길드에 속한 캐릭터들 조회
         const characters = await Characters.findAll({
-            where: {
-                guild_id: guildInfo.id, // 길드 ID를 사용하여 길드에 속한 캐릭터들 조회
-            },
+            where: { guild_id: guildInfo.id },
         });
-        console.log('characters : ',characters.id)
-        // 여기에서 characters 정보를 사용할 수 있습니다.
-        // 예를 들어, characters 정보를 response에 추가하거나, 특정 로직을 처리할 수 있습니다.
 
-        // records와 characters 정보를 결합하여 응답 생성
-        const records = await RecordService.getRecords(week);
-        const response = records.map(record => ({
-            ...record.toJSON(),
-            character_name: record.character?.name,
-            guild_info: guildInfo, // 길드 정보 추가
-            characters: characters // 길드에 속한 캐릭터들의 정보 추가
+        // 각 캐릭터에 대한 records 데이터 조회
+        const charactersRecords = await Promise.all(characters.map(async (character) => {
+            const records = await Record.findAll({
+                where: {
+                    character_id: character.id,
+                    week: week,
+                },
+            });
+            return { records };
         }));
 
-        res.json(response);
+        // 최종 응답 데이터 구성
+        res.json(charactersRecords);
     } catch (error) {
-        // 오류 처리 부분은 이전과 동일
         if (error.name === 'TokenExpiredError') {
             console.error("토큰이 만료되었습니다:", error);
             return res.status(401).send("토큰이 만료되었습니다. 다시 로그인해주세요.");
