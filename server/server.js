@@ -11,6 +11,7 @@ const { Op } = require('sequelize');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
+const dataFetcherRoutes = require('./routes/dataFetcherRoutes.js');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -41,6 +42,7 @@ sequelize.authenticate()
 // API 라우터 등록
 app.use(recordRoutes);
 app.use(authRoutes);
+app.use(dataFetcherRoutes);
 
 app.post('/test', (req, res) => {
   // Authorization 헤더에서 토큰 추출
