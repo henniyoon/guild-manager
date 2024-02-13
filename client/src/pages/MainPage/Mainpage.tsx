@@ -28,7 +28,7 @@ const Mainpage = () => {
       });
 
       // 성공적으로 요청이 완료되면 페이지 이동
-      navigate(`/Guildpage/${encodeURIComponent(worldName)}/${encodeURIComponent(guildName)}`);
+      navigate(`/GuildPage/${encodeURIComponent(worldName)}/${encodeURIComponent(guildName)}`);
     } catch (error) {
       // 에러 처리
       console.error('Error submitting data:', error);
