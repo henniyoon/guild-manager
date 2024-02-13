@@ -234,7 +234,7 @@ const fetchTableData = () => {
   return (
     <div>
       <h1>관리자 페이지</h1>
-      <button onClick={testclick}>test</button>
+      <button onClick={testclick}>목록 불러오기</button>
       <input
         name="character_name"
         value={newRowData.character_name}
