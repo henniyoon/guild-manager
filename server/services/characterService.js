@@ -9,6 +9,12 @@ async function getCharacter(characterName) {
     return character;
 }
 
+async function getCharactersByGuild(guildName, worldName) {
+    const worldId = await WorldService.getWordId(worldName);
+    const guildId = await GuildService.getGuildId(guildName, worldId);
+    const characters = await Character.findAll({ where: { guild_id: guildId } });
+    return characters;
+}
 
 async function createCharacter(guildName, worldName, characterName) {
     const worldId = await WorldService.getWordId(worldName);
@@ -87,6 +93,7 @@ async function updateCharacter(guildName, worldName,characterName) {
 
 module.exports = {
     getCharacter,
+    getCharactersByGuild,
     createCharacter,
     updateCharacter,
 }
