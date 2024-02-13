@@ -28,7 +28,7 @@ const Guild = sequelize.define('Guild', {
     },
     master_name: {      // 길드 마스터 닉네임
         type: DataTypes.STRING(12),
-        allowNull: true,    
+        allowNull: true,
     },
     member_count: {     // 길드원 수
         type: DataTypes.INTEGER,
@@ -43,12 +43,13 @@ const Guild = sequelize.define('Guild', {
         allowNull: true,
     },
     guild_mark: {               // 기본 길드 마크
-       type: DataTypes.STRING,
-       allowNull: true, 
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     guild_mark_custom: {        // 커스텀 길드 마크
-        type: DataTypes.BLOB,
-        allowNull: true, 
+        type: DataTypes.STRING,
+        allowNull: true,
+
     },
     last_updated: {     // 최근 갱신일
         type: DataTypes.DATE,
