@@ -4,19 +4,25 @@ const WorldService = require('./worldService.js');
 const GuildService = require('./guildService.js');
 const GuildAPIService = require('./guildApiService.js');
 
-async function createCharacter(characterName) {
+async function getCharacter(characterName) {
+    const character = await Character.findOne({ where: { name: characterName } });
+    return character;
+}
+
+
+async function createCharacter(guildName, worldName, characterName) {
+    const worldId = await WorldService.getWordId(worldName);
+    const guildId = await GuildService.getGuildId(guildName, worldId);
     try {
         let apiData = await GuildAPIService.getCharacterOcid(characterName);
         apiData = {
             ...apiData,
             ... await GuildAPIService.getCharacterBasicData(apiData.ocid)
         };
-        console.log("apiData:", apiData);
+       
+        const apiDate = new Date(apiData.date);
+        apiDate.setHours(apiDate.getHours() + 9);
 
-        const guildName = apiData.character_guild_name;
-        const worldId = await WorldService.getWordId(apiData.world_name);
-        const guildId = await GuildService.getGuildId(guildName, worldId);
-        
         await Character.create({
             guild_id: guildId,
             name: characterName,
@@ -24,47 +30,63 @@ async function createCharacter(characterName) {
             class: apiData.character_class,
             level: apiData.character_level,
             image: apiData.character_image,
-            last_updated: new Date(),
+            last_updated: apiDate,
         });
-        console.log("캐릭터 정보 추가 성공");
+        console.log(characterName, "캐릭터 정보 추가 성공");
+
 
     } catch (error) {
         console.error('에러 발생:', error);
-        throw new Error('서버 에러');
+
+        // 에러가 발생하면 특정 필드만 null로 설정하여 저장
+        const nullCharacterData = {
+            guild_id: guildId,
+            name: characterName,
+            ocid: null,
+            class: null,
+            level: null,
+            image: null,
+            last_updated: null,
+        };
+
+        await Character.create(nullCharacterData);
+        console.log("에러 발생으로 캐릭터 정보 일부만 추가");
     }
 }
 
-async function updateCharacter(characterName) {
+async function updateCharacter(guildName, worldName,characterName) {
+    const worldId = await WorldService.getWordId(worldName);
+    const guildId = await GuildService.getGuildId(guildName, worldId);
     try {
         let apiData = await GuildAPIService.getCharacterOcid(characterName);
         apiData = {
             ...apiData,
             ... await GuildAPIService.getCharacterBasicData(apiData.ocid)
         };
-        console.log("apiData:", apiData);
+        // console.log("apiData:", apiData);
 
-        const guildName = apiData.character_guild_name;
-        const worldId = await WorldService.getWordId(apiData.world_name);
-        const guildId = await GuildService.getGuild(guildName, worldId);
-        
+        const apiDate = new Date(apiData.date);
+        apiDate.setHours(apiDate.getHours() + 9);
+
         await Character.update({
             guild_id: guildId,
             name: characterName,
             class: apiData.character_class,
             level: apiData.character_level,
             image: apiData.character_image,
-            last_updated: new Date(),
+            last_updated: apiDate,
         }, { where: { ocid: apiData.ocid } }
         );
-        console.log("캐릭터 정보 추가 성공");
+        console.log(characterName, "캐릭터 정보 업데이트 성공");
 
     } catch (error) {
-        console.error('에러 발생:', error);
-        throw new Error('서버 에러');
+        console.error('에러 발생:', error);       
+        console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
     }
 }
 
 module.exports = {
+    getCharacter,
     createCharacter,
-    updateCharacter
+    updateCharacter,
 }
