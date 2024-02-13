@@ -10,13 +10,30 @@ async function getGuildController(req, res) {
         const guild = await GuildService.getGuild(guildName, wolrdId);
 
         if (guild) {
-            const response = guild.map(record => ({
-                ...record.toJSON(),
-            }));
-
-            res.json(response);
+            res.json(guild);
+            console.log("guild_mark_custom", guild);
         } else {
             res.status(404).json({ error: '존재하지 않는 길드' });
+        }
+    } catch (error) {
+        console.error('에러 발생: ', error);
+        res.status(500).send('서버 에러');
+    }
+}
+
+async function getCharacterController(req, res) {
+    const guildName = req.params.guildName;
+    const worldName = req.params.worldName;
+    try {
+        const characters = await CharacterService.getCharactersByGuild(guildName, worldName);
+
+        if (characters) {
+            const response = characters.map(record => ({
+                ...record.toJSON(),
+            }));
+            res.json(response);
+        } else {
+            res.status(404).json({ error: '존재하지 않는 캐릭터' });
         }
     } catch (error) {
         console.error('에러 발생: ', error);
@@ -27,8 +44,7 @@ async function getGuildController(req, res) {
 async function dataFetcherController(req, res) {
     const guildName = req.params.guildName;
     const worldName = req.params.worldName;
-    console.log("guildName: ", guildName);
-    console.log("worldName: ", worldName);
+
     try {
         const wolrdId = await WorldService.getWordId(worldName);
         const guildExists = await GuildService.getGuild(guildName, wolrdId);
@@ -52,7 +68,7 @@ async function dataFetcherController(req, res) {
                 for (const guildMember of guildMembers) {
                     const guildMemberExists = await CharacterService.getCharacter(guildMember);
                     // console.log("guildMEmberExists", guildMemberExists);
-                    if(!guildMemberExists) {
+                    if (!guildMemberExists) {
                         await CharacterService.createCharacter(guildName, worldName, guildMember);
                     } else {
                         await CharacterService.updateCharacter(guildName, worldName, guildMember);
@@ -71,5 +87,6 @@ async function dataFetcherController(req, res) {
 
 module.exports = {
     getGuildController,
+    getCharacterController,
     dataFetcherController,
 }
