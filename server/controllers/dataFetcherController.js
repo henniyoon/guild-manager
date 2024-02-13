@@ -40,13 +40,11 @@ async function dataFetcherController(req, res) {
 
         } else {
             const currentDate = new Date();
-            // currentDate.setDate(currentDate.getDate() - 1);
-            // currentDate.setHours(currentDate.getHours() + 9);
-            // UTC 시간을 현재 시간대로 변환
-            const localTime = new Date(currentDate.getTime() + currentDate.getTimezoneOffset() * 60000);
-            localTime.setHours(0, 0, 0, 0);
+            currentDate.setHours(0, 0, 0, 0);
+            currentDate.setDate(currentDate.getDate() - 1);
+            currentDate.setHours(currentDate.getHours() + 9);            
 
-            console.log("localTime:", localTime);
+            console.log("localTime:", currentDate);
 
             if (guildExists.last_updated < currentDate) {
                 await GuildService.updateGuild(guildName, worldName);
