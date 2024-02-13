@@ -21,7 +21,6 @@ async function createGuild(guild, worldName) {
             ...apiData,
             ... await GuildAPIService.getGuildBasicData(apiData.oguild_id)
         };
-    
         const guildMembers = apiData.guild_member;
 
         const apiDate = new Date(apiData.date);
@@ -59,6 +58,7 @@ async function updateGuild(guild, worldName) {
             ...apiData,
             ... await GuildAPIService.getGuildBasicData(apiData.oguild_id)
         };
+        const guildMembers = apiData.guild_member;
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
@@ -77,6 +77,8 @@ async function updateGuild(guild, worldName) {
             { where: { oguild_id: apiData.oguild_id } }
         );
         console.log("길드 정보 업데이트 성공");
+
+        return guildMembers;
 
     } catch (error) {
         console.error('에러 발생:', error);
