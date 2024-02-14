@@ -285,6 +285,17 @@ const Adminpage: React.FC = () => {
     ];
     setTableData(newData);
   };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      console.log("선택된 파일들:");
+      Array.from(files).forEach(file => {
+        console.log(file.name);
+      });
+    }
+  };
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -317,6 +328,15 @@ const Adminpage: React.FC = () => {
       <button onClick={handleAddNewRow}>추가</button> */}
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
+      {isEditMode && (
+        <>
+          <label htmlFor="file-upload" className="custom-file-upload">
+            첨부파일
+          </label>
+          <input id="file-upload" type="file" multiple onChange={handleFileSelect} style={{display: 'none'}} />
+          {/* 스타일링을 위해 label을 사용하고, 실제 파일 입력은 숨김 처리 */}
+        </>
+      )}
       <button onClick={handleSaveClick}>저장</button>
       <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
 
