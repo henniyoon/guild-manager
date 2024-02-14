@@ -8,7 +8,6 @@ const Guild = require('./models/Guild.js');
 const Character = require('./models/Character.js')
 const Record = require('./models/Record.js')
 const { Op } = require('sequelize');
-const multer = require('multer');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -116,27 +115,6 @@ app.post('/test', (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
-});
-
-// 파일 저장을 위한 multer 설정
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, 'uploads/') // 파일이 저장될 경로 설정
-  },
-  filename: function(req, file, cb) {
-    // 파일명 설정 (여기서는 원본 파일명을 사용)
-    cb(null, file.originalname)
-  }
-});
-
-const upload = multer({ storage: storage });
-
-app.use(express.static('public')); // 정적 파일 제공을 위한 디렉터리 설정
-
-// 여러 파일 업로드 처리를 위한 라우트 설정
-app.post('/uploadImages', upload.array('files'), (req, res) => {
-  console.log(req.files); // 업로드된 파일 정보 로깅
-  res.send({ message: '파일이 성공적으로 업로드되었습니다.', files: req.files });
 });
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
