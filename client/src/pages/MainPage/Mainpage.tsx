@@ -37,7 +37,7 @@ const Mainpage = () => {
 
   return (
     <div className='h90 d-flex justify-content-center align-items-center p-3'>
-      <form onSubmit={handleButtonClick} className='d-flex justify-content-center align-items-center mb-3'>
+      <form onSubmit={handleButtonClick} className='d-flex justify-content-center align-items-center'>
         <div className='p-2 bd-highlight'>
           <SelectServer value={worldName} onChange={setSelectedServer} />
         </div>
