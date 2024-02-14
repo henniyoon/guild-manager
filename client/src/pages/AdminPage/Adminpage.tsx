@@ -41,20 +41,30 @@ const Adminpage: React.FC = () => {
     direction: "ascending",
   });
 
-  // 데이터를 불러오는 함수
-  const fetchTableData = () => {
-    // selectedDate를 사용하여 서버에 요청 보내기
-    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setTableData(data);
-        setEditedData(data);
-      })
-      .catch((error) =>
-        console.error("데이터를 불러오는 데 실패했습니다:", error)
-      );
-  };
+// 데이터를 불러오는 함수
+const fetchTableData = () => {
+  // selectedDate를 사용하여 서버에 요청 보내기
+  const url = `/records?week=${encodeURIComponent(selectedDate)}`;
+  // 로컬 스토리지에서 토큰 가져오기
+  const token = localStorage.getItem('token');
+
+  fetch(url, {
+    method: 'GET', // 요청 메소드 설정
+    headers: {
+      'Authorization': `Bearer ${token}`, // 토큰을 헤더에 추가
+      'Content-Type': 'application/json' // 내용 유형 지정 (필요한 경우)
+    }
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log('2222222222222 : ',data)
+    setTableData(data);
+    setEditedData(data);
+  })
+  .catch((error) =>
+    console.error("데이터를 불러오는 데 실패했습니다:", error)
+  );
+}
 
   useEffect(() => {
     fetchTableData();
@@ -224,7 +234,7 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <h1>관리자 페이지</h1>
-      <button onClick={testclick}>test</button>
+      <button onClick={testclick}>목록 불러오기</button>
       <input
         name="character_name"
         value={newRowData.character_name}
