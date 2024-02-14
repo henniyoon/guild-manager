@@ -57,7 +57,7 @@ const fetchTableData = () => {
   })
   .then((response) => response.json())
   .then((data) => {
-    console.log('2222222222222 : ',data)
+    console.log('guild+week 조회된 데이터 : ',data)
     setTableData(data);
     setEditedData(data);
   })
