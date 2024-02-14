@@ -10,7 +10,7 @@ interface ButtonProps {
 
 const Button = ({ children, onClick, className, type = "button" }: ButtonProps) => {
   return (
-    <button className={`button ${className}`} onClick={onClick} type={type}>
+    <button className='btn btn-outline-success' onClick={onClick} type={type}>
       {children}
     </button>
   );

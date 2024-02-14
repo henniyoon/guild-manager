@@ -36,11 +36,19 @@ const Mainpage = () => {
   };
 
   return (
-    <form onSubmit={handleButtonClick} className="MainPage-Contents">
-      <SelectServer value={worldName} onChange={setSelectedServer} />
-      <InputBox value={guildName} onChange={setInputValue} />
-      <Button type="submit">Enter</Button>
-    </form>
+    <div className='h90 d-flex justify-content-center align-items-center p-3'>
+      <form onSubmit={handleButtonClick} className='d-flex justify-content-center align-items-center mb-3'>
+        <div className='p-2 bd-highlight'>
+          <SelectServer value={worldName} onChange={setSelectedServer} />
+        </div>
+        <div className='bd-highlight'>
+          <InputBox value={guildName} onChange={setInputValue} />
+        </div>
+        <div className='bd-highlight'>
+        <Button type="submit">검색</Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

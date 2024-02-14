@@ -13,8 +13,8 @@ const InputBox = ({ value, onChange }: InputBoxProps) => {
 
   return (
     <input
-      type="text"
-      className="content-input"
+      type="search"
+      className="form-control"
       placeholder="길드명을 입력하세요"
       value={value}
       onChange={handleInputChange}
