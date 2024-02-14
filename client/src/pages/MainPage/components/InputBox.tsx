@@ -15,7 +15,7 @@ const InputBox = ({ value, onChange }: InputBoxProps) => {
     <input
       type="text"
       className="content-input"
-      placeholder="텍스트를 입력하세요"
+      placeholder="길드명을 입력하세요"
       value={value}
       onChange={handleInputChange}
     />
