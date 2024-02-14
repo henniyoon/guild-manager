@@ -9,6 +9,8 @@ import SignUppage from './pages/SingUpPage/SignUppage';
 
 const App: React.FC = () => {
   return (
+    <div className='container-sm'>
+
     <Routes>
       <Route path="/" element={<Mainpage />} />
       <Route path="/Guildpage/:worldName/:guildName" element={<Guildpage />} />
@@ -17,6 +19,8 @@ const App: React.FC = () => {
       <Route path="/Login" element={<Loginpage />} />
       <Route path="/SignUp" element={<SignUppage />} />
     </Routes>
+
+    </div>
   );
 };
 
