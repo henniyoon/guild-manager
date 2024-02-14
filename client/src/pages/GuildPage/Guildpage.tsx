@@ -19,7 +19,7 @@ interface CharacterData {
   name: string;
   class: string;
   level: number;
-  image: string; 
+  image: string;
 }
 
 const Guildpage: React.FC = () => {
@@ -28,7 +28,7 @@ const Guildpage: React.FC = () => {
   const [characterData, setCharacterData] = useState<CharacterData[] | null>(null);
   const navigate = useNavigate();
 
- // 길드 정보 불러오기 서버에 GET 요청
+  // 길드 정보 불러오기 서버에 GET 요청
   useEffect(() => {
     const fetchGuildData = async () => {
       try {
@@ -96,7 +96,8 @@ const Guildpage: React.FC = () => {
           </div>
         </div>
       )}
-  
+      <Button onClick={AdminButtonClick}>Admin</Button>
+
       {characterData && characterData.length > 0 && (
         <div className={styles.memberUl}>
           {characterData.map((character, index) => (
@@ -121,8 +122,6 @@ const Guildpage: React.FC = () => {
           ))}
         </div>
       )}
-  
-      <Button onClick={AdminButtonClick}>Admin</Button>
     </div>
   );
 };
