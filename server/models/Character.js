@@ -12,7 +12,7 @@ const Characters = sequelize.define('Characters', {
   },
   guild_id: {       // 길드 번호 (guilds 테이블의 id를 외래키로 사용)
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: Guild,
       key: 'id',

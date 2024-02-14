@@ -7,18 +7,38 @@ import Button from '../../components/Button';
 
 const Mainpage = () => {
   const navigate = useNavigate();
-  const [selectedServer, setSelectedServer] = useState('스카니아');
-  const [inputValue, setInputValue] = useState('별빛');
+  const [worldName, setSelectedServer] = useState('스카니아');
+  const [guildName, setInputValue] = useState('별빛');
 
-  const handleButtonClick = (e: FormEvent) => {
-    e.preventDefault(); // 폼의 기본 제출 이벤트를 방지
-    navigate(`/Guildpage/${encodeURIComponent(selectedServer)}/${encodeURIComponent(inputValue)}`);
+  const handleButtonClick = async (e: FormEvent) => {
+    e.preventDefault();
+
+    try {
+      // 서버에 데이터를 전송하는 fetch 사용
+      await fetch(`/GuildPage/${encodeURIComponent(worldName)}/${encodeURIComponent(guildName)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // 필요에 따라 적절한 Content-Type 설정
+        },
+        // body에 필요한 데이터를 JSON 형태로 전달
+        body: JSON.stringify({
+          worldName: encodeURIComponent(worldName),
+          guildName: encodeURIComponent(guildName),
+        }),
+      });
+
+      // 성공적으로 요청이 완료되면 페이지 이동
+      navigate(`/GuildPage/${encodeURIComponent(worldName)}/${encodeURIComponent(guildName)}`);
+    } catch (error) {
+      // 에러 처리
+      console.error('Error submitting data:', error);
+    }
   };
 
   return (
     <form onSubmit={handleButtonClick} className="MainPage-Contents">
-      <SelectServer value={selectedServer} onChange={setSelectedServer} />
-      <InputBox value={inputValue} onChange={setInputValue} />
+      <SelectServer value={worldName} onChange={setSelectedServer} />
+      <InputBox value={guildName} onChange={setInputValue} />
       <Button type="submit">Enter</Button>
     </form>
   );
