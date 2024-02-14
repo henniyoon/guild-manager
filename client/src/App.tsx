@@ -11,7 +11,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Mainpage />} />
-      <Route path="/Guildpage/:server/:guild" element={<Guildpage />} />
+      <Route path="/Guildpage/:worldName/:guildName" element={<Guildpage />} />
       <Route path="/Graphpage/:memberName" element={<Graphpage />} />
       <Route path="/Adminpage" element={<Adminpage />} />
       <Route path="/Login" element={<Loginpage />} />
