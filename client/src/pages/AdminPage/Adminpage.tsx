@@ -6,7 +6,6 @@ interface TableRowData {
   id: number;
   character_id: number;
   character_name: string;
-  name: string;
   weekly_score: number;
   suro_score: number;
   flag_score: number;
@@ -40,30 +39,30 @@ const Adminpage: React.FC = () => {
     direction: "ascending",
   });
 
-// 데이터를 불러오는 함수
-const fetchTableData = () => {
-  // selectedDate를 사용하여 서버에 요청 보내기
-  const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-  // 로컬 스토리지에서 토큰 가져오기
-  const token = localStorage.getItem('token');
+  // 데이터를 불러오는 함수
+  const fetchTableData = () => {
+    // selectedDate를 사용하여 서버에 요청 보내기
+    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
+    // 로컬 스토리지에서 토큰 가져오기
+    const token = localStorage.getItem("token");
 
-  fetch(url, {
-    method: 'GET', // 요청 메소드 설정
-    headers: {
-      'Authorization': `Bearer ${token}`, // 토큰을 헤더에 추가
-      'Content-Type': 'application/json' // 내용 유형 지정 (필요한 경우)
-    }
-  })
-  .then((response) => response.json())
-  .then((data) => {
-    console.log('guild+week 조회된 데이터 : ',data)
-    setTableData(data);
-    setEditedData(data);
-  })
-  .catch((error) =>
-    console.error("데이터를 불러오는 데 실패했습니다:", error)
-  );
-}
+    fetch(url, {
+      method: "GET", // 요청 메소드 설정
+      headers: {
+        Authorization: `Bearer ${token}`, // 토큰을 헤더에 추가
+        "Content-Type": "application/json", // 내용 유형 지정 (필요한 경우)
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("guild+week 조회된 데이터 : ", data);
+        setTableData(data);
+        setEditedData(data);
+      })
+      .catch((error) =>
+        console.error("데이터를 불러오는 데 실패했습니다:", error)
+      );
+  };
 
   useEffect(() => {
     fetchTableData();
@@ -201,8 +200,8 @@ const fetchTableData = () => {
   // ? 길드원 채워넣는 로직
   const testclick = () => {
     const token = localStorage.token;
-    console.log(selectedDate)
-    
+    console.log(selectedDate);
+
     fetch("/test", {
       method: "POST", // 또는 'POST', 'PUT', 'DELETE' 등 요청 메소드를 선택합니다.
       headers: {
@@ -228,12 +227,40 @@ const fetchTableData = () => {
         // 사용자에게 오류를 알리거나 다른 처리를 수행할 수 있습니다.
       });
   };
-
   // ? 길드원 채워넣는 로직 끝
+
+  const handleAddEmptyRowBelowSelected = () => {
+    if (selectedRowId === null) {
+      alert("추가할 위치를 선택해주세요.");
+      return;
+    }
+    // 선택된 행의 인덱스를 찾습니다.
+    const selectedIndex = tableData.findIndex(
+      (row) => row.id === selectedRowId
+    );
+    // 비어있는 행을 생성합니다. 여기서는 character_name을 비워두고, 나머지 값을 0 혹은 적절한 기본값으로 설정할 수 있습니다.
+    const emptyRow: TableRowData = {
+      id: Math.max(...tableData.map((row) => row.id)) + 1, // 임시 ID 생성, 실제 환경에서는 서버나 다른 메커니즘을 통해 고유한 ID를 생성해야 합니다.
+      character_id: 0,
+      character_name: "",
+      weekly_score: 0,
+      suro_score: 0,
+      flag_score: 0,
+    };
+
+    // 선택된 행 아래에 비어있는 행을 추가합니다.
+    const newData = [
+      ...tableData.slice(0, selectedIndex + 1),
+      emptyRow,
+      ...tableData.slice(selectedIndex + 1),
+    ];
+    setTableData(newData);
+  };
   return (
     <div>
       <h1>관리자 페이지</h1>
       <button onClick={testclick}>목록 불러오기</button>
+      <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       {/* <input
         name="character_name"
         value={newRowData.character_name}
@@ -289,40 +316,62 @@ const fetchTableData = () => {
             >
               {isEditMode ? (
                 <>
-                  <input
-                    title="insert-name"
-                    type="text"
-                    defaultValue={row.character_name}
-                    onChange={(e) =>
-                      handleInputChange(row.id, "name", e.target.value)
-                    }
-                  />
-                  <input
-                    title="insert-weekly_score"
-                    type="number"
-                    defaultValue={row.weekly_score}
-                    onChange={(e) =>
-                      handleInputChange(row.id, "weekly_score", e.target.value)
-                    }
-                  />
-                  <input
-                    title="insert-suro_score"
-                    type="number"
-                    defaultValue={row.suro_score}
-                    onChange={(e) =>
-                      handleInputChange(row.id, "suro_score", e.target.value)
-                    }
-                  />
-                  <input
-                    title="insert-flag_score"
-                    type="number"
-                    defaultValue={row.flag_score}
-                    onChange={(e) =>
-                      handleInputChange(row.id, "flag_score", e.target.value)
-                    }
-                  />
+                  {/* character_name에 대한 입력 필드. 비어있는 경우 수정 불가능 */}
+                  <td>
+                    {row.character_name === "" ? (
+                      row.character_name
+                    ) : (
+                      <input
+                        title="character_name"
+                        type="text"
+                        defaultValue={row.character_name}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "character_name",
+                            e.target.value
+                          )
+                        }
+                      />
+                    )}
+                  </td>
+                  <td>
+                    <input
+                      title="weekly_score"
+                      type="number"
+                      defaultValue={row.weekly_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "weekly_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      title="suro_score"
+                      type="number"
+                      defaultValue={row.suro_score}
+                      onChange={(e) =>
+                        handleInputChange(row.id, "suro_score", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      title="flag_score"
+                      type="number"
+                      defaultValue={row.flag_score}
+                      onChange={(e) =>
+                        handleInputChange(row.id, "flag_score", e.target.value)
+                      }
+                    />
+                  </td>
                 </>
               ) : (
+                // 비편집 모드에서의 행 렌더링
                 <>
                   <td>{row.character_name}</td>
                   <td>{row.weekly_score}</td>
