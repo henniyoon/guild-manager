@@ -25,7 +25,6 @@ async function createGuild(guild, worldName) {
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-
         await Guild.create({
             world_id: worldId,
             name: guild,
@@ -62,18 +61,17 @@ async function updateGuild(guild, worldName) {
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-
         await Guild.update({
-                world_id: worldId,
-                name: guild,
-                master_name: apiData.guild_master_name,
-                member_count: apiData.guild_member_count,
-                level: apiData.guild_level,
-                noblesse_skill_level: apiData.guild_noblesse_skill.reduce((sum, skill) => sum + skill.skill_level, 0),
-                guild_mark: apiData.guild_mark,
-                guild_mark_custom: apiData.guild_mark_custom,
-                last_updated: apiDate,
-            },
+            world_id: worldId,
+            name: guild,
+            master_name: apiData.guild_master_name,
+            member_count: apiData.guild_member_count,
+            level: apiData.guild_level,
+            noblesse_skill_level: apiData.guild_noblesse_skill.reduce((sum, skill) => sum + skill.skill_level, 0),
+            guild_mark: apiData.guild_mark,
+            guild_mark_custom: apiData.guild_mark_custom,
+            last_updated: apiDate,
+        },
             { where: { oguild_id: apiData.oguild_id } }
         );
         console.log("길드 정보 업데이트 성공");
@@ -92,5 +90,3 @@ module.exports = {
     createGuild,
     updateGuild,
 };
-
-// createGuild("리더", "스카니아");
