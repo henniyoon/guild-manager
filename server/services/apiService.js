@@ -13,7 +13,7 @@ async function getApiResponse(url) {
         return response.data;
     } catch (error) {
         console.error('API 조회 에러:', error);
-        throw new Error('서버 에러');
+        // throw new Error('서버 에러');
     }
 }
 

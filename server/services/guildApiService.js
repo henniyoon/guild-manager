@@ -9,21 +9,25 @@ const currentDate = new Date();
 currentDate.setDate(currentDate.getDate() - 1);
 const formattedDate = currentDate.toISOString().split('T')[0];
 
+// 길드명, 월드명으로 oguild_id 조회
 async function getOguildId(guild, worldName) {
     const guildIdUrl = `${API_BASE_URL}${GUILD_ID_ENDPOINT}?guild_name=${encodeURIComponent(guild)}&world_name=${encodeURIComponent(worldName)}`;
     return await APIService.getApiResponse(guildIdUrl);
 }
 
+// oguild_id로 길드 정보 조회
 async function getGuildBasicData(oguildId) {
     const guildDataUrl = `${API_BASE_URL}${GUILD_BASIC_ENDPOINT}?oguild_id=${oguildId}&date=${formattedDate}`;
     return await APIService.getApiResponse(guildDataUrl);
 }
 
+// 캐릭터명으로 ocid 조회
 async function getCharacterOcid(characterName) {
     const characterOcidUrl = `${API_BASE_URL}/id?character_name=${encodeURIComponent(characterName)}`;
     return await APIService.getApiResponse(characterOcidUrl);
 }
 
+// ocid로 캐릭터 정보 조회
 async function getCharacterBasicData(ocid) {
     const characterDataUrl = `${API_BASE_URL}${CHARACTER_BASIC_ENDPOINT}?ocid=${encodeURIComponent(ocid)}&date=${formattedDate}`;
     return await APIService.getApiResponse(characterDataUrl);
