@@ -28,7 +28,6 @@ async function createCharacter(guildName, worldName, characterName) {
        
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-
         await Character.create({
             guild_id: guildId,
             name: characterName,
@@ -60,7 +59,7 @@ async function createCharacter(guildName, worldName, characterName) {
     }
 }
 
-async function updateCharacter(guildName, worldName,characterName) {
+async function updateCharacter(guildName, worldName, characterName) {
     const worldId = await WorldService.getWordId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldId);
     try {
@@ -73,7 +72,6 @@ async function updateCharacter(guildName, worldName,characterName) {
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-
         await Character.update({
             guild_id: guildId,
             name: characterName,
