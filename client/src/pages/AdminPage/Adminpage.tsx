@@ -241,7 +241,7 @@ const Adminpage: React.FC = () => {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      const filesArray = Array.from(event.target.files);
+      const filesArray = Array.from(event.target.files).slice(0, 15); // 최대 15개 파일 선택
       setSelectedFiles(filesArray);
       console.log("선택된 파일들:", filesArray);
     }
