@@ -11,7 +11,6 @@ async function getGuildController(req, res) {
 
         if (guild) {
             res.json(guild);
-            console.log("guild_mark_custom", guild);
         } else {
             res.status(404).json({ error: '존재하지 않는 길드' });
         }
