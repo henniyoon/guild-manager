@@ -193,9 +193,20 @@ app.get('/Graphpage/:memberName', async (req, res) => {
       if (!character) {
           return res.status(404).send('Character not found');
       }
-      // 조회된 캐릭터의 ID를 JSON 형태로 반환합니다.
-      res.json(character);
-      console.log(character.id)
+
+      // 해당 캐릭터 ID를 가진 모든 레코드를 조회합니다.
+      const records = await Record.findAll({
+          raw: true,
+          where: { character_id: character.id }
+      });
+
+      if (!records) {
+          return res.status(404).send('Records not found');
+      }
+
+      // 조회된 레코드를 JSON 형태로 반환합니다.
+      res.json(records);
+      console.log('records : ', records)
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
