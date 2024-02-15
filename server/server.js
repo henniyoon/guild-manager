@@ -11,6 +11,7 @@ const { Op } = require("sequelize");
 const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
+const fss = require("fs").promises;
 const { exec } = require("child_process");
 
 const recordRoutes = require("./routes/recordRoutes.js");
@@ -137,11 +138,9 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   }
 
   // 전처리된 이미지에 대해 OCR 처리
-  const processedImagePaths = processedFiles
-    .map((file) => `"${file}"`)
-    .join(" ");
+  const processedImagePaths = processedFiles.map((file) => `"${file}"`).join(" ");
   const command = `python ocr.py ${processedImagePaths}`;
-  exec(command, (error, stdout, stderr) => {
+  exec(command, async (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return res.status(500).send("OCR 처리 중 오류 발생");
@@ -158,21 +157,20 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
       const ocrResults = stdout
         .trim()
         .split("\n")
-        .map((result) => {
-          // 문자열에서 배열 형태로 변환하기 위해 JSON.parse 사용
-          // 단일 따옴표를 이중 따옴표로 변환하여 JSON 파싱이 가능하도록 조정
-          return JSON.parse(result.replace(/'/g, '"'));
-        });
+        .map((result) => JSON.parse(result.replace(/'/g, '"')));
 
       // 변환된 배열들을 하나의 배열로 합치기
-      const concatenatedResults = ocrResults.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      );
+      const concatenatedResults = ocrResults.reduce((acc, current) => acc.concat(current), []);
+
+      // 파일 삭제 로직 추가
+      for (const filePath of processedFiles) {
+        await fss.unlink(filePath);
+      }
+      console.log('OCR 작업 완료한 파일들이 삭제되었습니다.');
 
       // 합쳐진 결과 반환
       res.send({
-        message: "OCR 처리 완료",
+        message: "OCR 처리 및 파일 삭제 완료",
         concatenatedResults: concatenatedResults,
       });
     } catch (parseError) {
