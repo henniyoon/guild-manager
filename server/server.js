@@ -11,6 +11,7 @@ const { Op } = require('sequelize');
 const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
+const { exec } = require('child_process');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -109,6 +110,33 @@ app.post('/test', (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
+});
+
+const upload = multer({ dest: 'uploads/' }); // 임시 저장소 설정
+
+app.post('/uploadImages', upload.single('file0'), async (req, res) => {
+  try {
+    // 전처리하고 저장할 이미지의 경로와 파일명 설정
+    const outputPath = path.join(__dirname, 'processed', `${Date.now()}-${req.file.originalname}`);
+
+    // sharp를 사용하여 이미지 전처리
+    await sharp(req.file.path)
+      .resize(800) // 예: 너비를 800px로 조정
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(outputPath);
+
+    // 임시 파일 삭제
+    fs.unlinkSync(req.file.path);
+
+    // 여기에서 OCR 처리 로직을 추가할 수 있습니다.
+    // 예: const extractedText = await performOCR(outputPath);
+
+    res.json({ message: 'File uploaded and processed', path: outputPath });
+  } catch (error) {
+    console.error('Error processing file', error);
+    res.status(500).send('Error processing file');
+  }
 });
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
