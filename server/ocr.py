@@ -43,4 +43,4 @@ def process_image(image_path):
 if __name__ == "__main__":
     for image_path in sys.argv[1:]:  # 첫 번째 인자부터 모든 이미지 파일 경로 처리
         ocr_results = process_image(image_path)
-        print(f'{image_path}: {ocr_results}')
+        print(f'{ocr_results}')
