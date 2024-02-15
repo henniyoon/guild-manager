@@ -180,6 +180,28 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   });
 });
 
+app.get('/Graphpage/:memberName', async (req, res) => {
+  try {
+      const { memberName } = req.params;
+      // Characters 테이블에서 memberName으로 캐릭터를 조회합니다.
+      const character = await Character.findOne({
+          raw: true,
+          where: { name: memberName },
+          attributes: ['id'] // 캐릭터의 ID만 조회합니다.
+      });
+
+      if (!character) {
+          return res.status(404).send('Character not found');
+      }
+      // 조회된 캐릭터의 ID를 JSON 형태로 반환합니다.
+      res.json(character);
+      console.log(character.id)
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 // 클라이언트 리액트 앱 라우팅 처리
 app.get("*", (req, res) => {
