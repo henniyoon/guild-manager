@@ -30,15 +30,6 @@ sequelize.authenticate()
     console.error('데이터베이스 연결 실패:', err.message);
   });
 
-// 테이블 생성
-// sequelize.sync()
-// .then(() => {
-//   console.log('테이블이 성공적으로 생성되었습니다.');
-// })
-// .catch((err) => {
-//   console.error('테이블 생성 실패:', err.message);
-// });
-
 // API 라우터 등록
 app.use(recordRoutes);
 app.use(authRoutes);
