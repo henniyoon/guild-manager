@@ -8,6 +8,9 @@ const Guild = require('./models/Guild.js');
 const Character = require('./models/Character.js')
 const Record = require('./models/Record.js')
 const { Op } = require('sequelize');
+const multer = require('multer');
+const sharp = require('sharp');
+const fs = require('fs');
 
 const recordRoutes = require('./routes/recordRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
