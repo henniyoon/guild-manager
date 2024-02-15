@@ -35,6 +35,10 @@ const Characters = sequelize.define('Characters', {
     type: DataTypes.SMALLINT.UNSIGNED,
     allowNull: true,
   },
+  main_character_name: {  // 본캐릭명
+    type: DataTypes.STRING(12),
+    allowNull: true,
+  },
   image: {          // 캐릭터 외형 이미지
     type: DataTypes.STRING(511),
     allowNull: true,
