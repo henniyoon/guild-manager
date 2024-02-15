@@ -38,6 +38,7 @@ const Adminpage: React.FC = () => {
     key: null,
     direction: "ascending",
   });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -285,6 +286,40 @@ const Adminpage: React.FC = () => {
     ];
     setTableData(newData);
   };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const filesArray = Array.from(event.target.files);
+      setSelectedFiles(filesArray);
+      console.log("선택된 파일들:", filesArray);
+    }
+  };
+
+  // 파일 서버로 전송
+  const handleUploadFiles = () => {
+    const formData = new FormData();
+    selectedFiles.forEach((file, index) => {
+      formData.append(`file${index}`, file);
+    });
+
+    // 예시 URL, 실제 엔드포인트로 변경해야 함
+    fetch("/uploadImages", {
+      method: "POST",
+      body: formData,
+      // 'Content-Type': 'multipart/form-data' 헤더는 설정하지 않습니다.
+      // 브라우저가 자동으로 설정하기 때문입니다.
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("업로드 성공:", data);
+      alert("파일 업로드 성공!");
+    })
+    .catch(error => {
+      console.error("업로드 실패:", error);
+      alert("파일 업로드 실패.");
+    });
+  };
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -317,6 +352,22 @@ const Adminpage: React.FC = () => {
       <button onClick={handleAddNewRow}>추가</button> */}
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
+      {isEditMode && (
+        <>
+          <label htmlFor="file-upload" className="custom-file-upload">
+            이미지 첨부
+          </label>
+          <input
+            id="file-upload"
+            type="file"
+            multiple
+            onChange={handleFileSelect}
+            style={{display: 'none'}}
+            accept="image/*" // 이미지 파일만 선택 가능하도록 설정
+          />
+          <button onClick={handleUploadFiles}>파일 업로드</button>
+        </>
+      )}
       <button onClick={handleSaveClick}>저장</button>
       <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
 
