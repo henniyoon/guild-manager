@@ -180,6 +180,19 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   });
 });
 
+router.get('/graph', async (req, res) => {
+  try {
+      const records = await Record.findAll({
+          include: ['character']
+      });
+      res.json(records);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+  }
+});
+
+
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 // 클라이언트 리액트 앱 라우팅 처리
 app.get("*", (req, res) => {
