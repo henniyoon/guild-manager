@@ -251,7 +251,7 @@ const Adminpage: React.FC = () => {
   const handleUploadFiles = () => {
     const formData = new FormData();
     selectedFiles.forEach((file, index) => {
-      formData.append(`file${index}`, file);
+      formData.append('files', file);
     });
 
     // 예시 URL, 실제 엔드포인트로 변경해야 함

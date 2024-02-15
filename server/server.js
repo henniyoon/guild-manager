@@ -114,30 +114,46 @@ app.post('/test', (req, res) => {
 
 const upload = multer({ dest: 'uploads/' }); // 임시 저장소 설정
 
-app.post('/uploadImages', upload.single('file0'), async (req, res) => {
-  try {
-    // 전처리하고 저장할 이미지의 경로와 파일명 설정
-    const outputPath = path.join(__dirname, 'processed', `${Date.now()}-${req.file.originalname}`);
+// 이미지 업로드 및 처리를 위한 라우트
+// 'processed' 디렉토리가 없으면 생성
+const processedDirPath = path.join(__dirname, 'processed');
+if (!fs.existsSync(processedDirPath)) {
+    fs.mkdirSync(processedDirPath, { recursive: true });
+}
 
-    // sharp를 사용하여 이미지 전처리
-    await sharp(req.file.path)
-      .resize(800) // 예: 너비를 800px로 조정
-      .toFormat('jpeg')
-      .jpeg({ quality: 90 })
-      .toFile(outputPath);
+app.post('/uploadImages', upload.array('files', 15), async (req, res) => {
+    const processedFiles = [];
 
-    // 임시 파일 삭제
-    fs.unlinkSync(req.file.path);
+    for (const file of req.files) {
+        // Sharp를 사용하여 이미지 전처리
+        const processedFilePath = path.join(processedDirPath, file.originalname);
+        await sharp(file.path)
+            .extract({ left: 604, top: 151, width: 60, height: 415 })
+            .threshold(120) // 임계값 설정 (0-255 사이의 값, 기본값은 128)
+            .blur(0.5) // 블러 정도 설정 (0은 블러 없음, 숫자가 클수록 더 많은 블러 적용) 너비 800px로 리사이즈
+            .toFile(processedFilePath);
+        processedFiles.push(processedFilePath);
+    }
 
-    // 여기에서 OCR 처리 로직을 추가할 수 있습니다.
-    // 예: const extractedText = await performOCR(outputPath);
-
-    res.json({ message: 'File uploaded and processed', path: outputPath });
-  } catch (error) {
-    console.error('Error processing file', error);
-    res.status(500).send('Error processing file');
-  }
+    // 전처리된 이미지에 대해 OCR 처리
+    const processedImagePaths = processedFiles.map(file => `"${file}"`).join(' ');
+    const command = `python ocr.py ${processedImagePaths}`;
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return res.status(500).send('OCR 처리 중 오류 발생');
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return res.status(500).send('OCR 처리 중 오류 발생');
+        }
+        
+        // OCR 결과 처리
+        console.log(`OCR 결과:\n${stdout}`);
+        res.send({ message: 'OCR 처리 완료', ocrResults: stdout });
+    });
 });
+
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 // 클라이언트 리액트 앱 라우팅 처리
