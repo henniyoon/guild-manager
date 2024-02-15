@@ -11,7 +11,6 @@ const { Op } = require("sequelize");
 const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
-const fss = require("fs").promises;
 const { exec } = require("child_process");
 
 const recordRoutes = require("./routes/recordRoutes.js");
@@ -162,10 +161,11 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
       // 변환된 배열들을 하나의 배열로 합치기
       const concatenatedResults = ocrResults.reduce((acc, current) => acc.concat(current), []);
 
-      // 파일 삭제 로직 추가
-      for (const filePath of processedFiles) {
-        await fss.unlink(filePath);
+       // 전처리된 파일들을 삭제하는 로직
+       for (const filePath of processedFiles) {
+        await fs.promises.unlink(filePath); // 'processed' 폴더 내 파일 삭제
       }
+
       console.log('OCR 작업 완료한 파일들이 삭제되었습니다.');
 
       // 합쳐진 결과 반환
