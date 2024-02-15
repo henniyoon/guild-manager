@@ -1,7 +1,12 @@
 import React from "react";
+import Chart from "./components/Chart";
 
-const Graphpage = () => {
-  return <div> 유저의 기록을 그래프로 보여주면 좋겠음 ! </div>;
+const GraphPage = () => {
+    return (
+        <div>
+            <Chart />
+        </div>
+    );
 };
 
-export default Graphpage;
+export default GraphPage;
