@@ -1,6 +1,6 @@
 const Guild = require('../models/Guild.js');
 const WorldService = require('./worldService.js');
-const GuildAPIService = require('./guildApiService.js');
+const APIService = require('./apiService.js');
 
 async function getGuild(guildName, worldId) {
     const guild = await Guild.findOne({ where: { name: guildName, world_id: worldId } });
@@ -16,10 +16,10 @@ async function createGuild(guild, worldName) {
     // 해당 월드의 월드 번호 조회
     const worldId = await WorldService.getWordId(worldName);
     try {
-        let apiData = await GuildAPIService.getOguildId(guild, worldName);
+        let apiData = await APIService.getOguildId(guild, worldName);
         apiData = {
             ...apiData,
-            ... await GuildAPIService.getGuildBasicData(apiData.oguild_id)
+            ... await APIService.getGuildBasicData(apiData.oguild_id)
         };
         const guildMembers = apiData.guild_member;
 
@@ -52,10 +52,10 @@ async function updateGuild(guild, worldName) {
     // 해당 월드의 월드 번호 조회
     const worldId = await WorldService.getWordId(worldName);
     try {
-        let apiData = await GuildAPIService.getOguildId(guild, worldName);
+        let apiData = await APIService.getOguildId(guild, worldName);
         apiData = {
             ...apiData,
-            ... await GuildAPIService.getGuildBasicData(apiData.oguild_id)
+            ... await APIService.getGuildBasicData(apiData.oguild_id)
         };
         const guildMembers = apiData.guild_member;
 
