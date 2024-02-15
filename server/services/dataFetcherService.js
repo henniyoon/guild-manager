@@ -184,8 +184,6 @@ async function guildData(guild, world_name) {
 
 };
 
-guildData("별빛", "스카니아");
-
 module.exports = {
     guildData,
 };
