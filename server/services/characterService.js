@@ -22,24 +22,26 @@ async function createCharacter(guildName, worldName, characterName) {
     try {
         let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
-            ...apiData,
-            ... await APIService.getCharacterBasicData(apiData.ocid)
+            ... apiData,
+            ... await APIService.getCharacterBasicData(apiData.ocid),
+            ... await APIService.getMainCharacterName(worldName, apiData.ocid)
         };
        
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-        await Character.create({
+        const createdCharacter = await Character.create({
             guild_id: guildId,
             name: characterName,
             ocid: apiData.ocid,
             class: apiData.character_class,
             level: apiData.character_level,
+            main_character_name: apiData.ranking[0].character_name,
             image: apiData.character_image,
             last_updated: apiDate,
         });
         console.log(characterName, "캐릭터 정보 추가 성공");
 
-
+        return createdCharacter;
     } catch (error) {
         console.error('에러 발생:', error);
 
@@ -65,24 +67,26 @@ async function updateCharacter(guildName, worldName, characterName) {
     try {
         let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
-            ...apiData,
-            ... await APIService.getCharacterBasicData(apiData.ocid)
+            ... apiData,
+            ... await APIService.getCharacterBasicData(apiData.ocid),
+            ... await APIService.getMainCharacterName(worldName, apiData.ocid)
         };
-        // console.log("apiData:", apiData);
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-        await Character.update({
+        const updatedCharacter = await Character.update({
             guild_id: guildId,
             name: characterName,
             class: apiData.character_class,
             level: apiData.character_level,
+            main_character_name: apiData.ranking[0].character_name,
             image: apiData.character_image,
             last_updated: apiDate,
         }, { where: { ocid: apiData.ocid } }
         );
         console.log(characterName, "캐릭터 정보 업데이트 성공");
 
+        return updatedCharacter;
     } catch (error) {
         console.error('에러 발생:', error);       
         console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
