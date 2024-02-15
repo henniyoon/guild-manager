@@ -4,7 +4,7 @@ const {
     getCharacterOcid,
     getCharacterBasicData,
     getMainCharacterName
-} = require('../services/apiService.js');
+} = require('../../services/apiService.js');
 
 
 test('OguildId 조회', async () => {
