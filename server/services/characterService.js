@@ -2,7 +2,7 @@ const Guild = require('../models/Guild.js');
 const Character = require('../models/Character.js');
 const WorldService = require('./worldService.js');
 const GuildService = require('./guildService.js');
-const GuildAPIService = require('./guildApiService.js');
+const APIService = require('./apiService.js');
 
 async function getCharacter(characterName) {
     const character = await Character.findOne({ where: { name: characterName } });
@@ -20,10 +20,10 @@ async function createCharacter(guildName, worldName, characterName) {
     const worldId = await WorldService.getWordId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldId);
     try {
-        let apiData = await GuildAPIService.getCharacterOcid(characterName);
+        let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
             ...apiData,
-            ... await GuildAPIService.getCharacterBasicData(apiData.ocid)
+            ... await APIService.getCharacterBasicData(apiData.ocid)
         };
        
         const apiDate = new Date(apiData.date);
@@ -63,10 +63,10 @@ async function updateCharacter(guildName, worldName, characterName) {
     const worldId = await WorldService.getWordId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldId);
     try {
-        let apiData = await GuildAPIService.getCharacterOcid(characterName);
+        let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
             ...apiData,
-            ... await GuildAPIService.getCharacterBasicData(apiData.ocid)
+            ... await APIService.getCharacterBasicData(apiData.ocid)
         };
         // console.log("apiData:", apiData);
 
