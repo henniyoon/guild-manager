@@ -12,7 +12,10 @@ async function getCharacter(characterName) {
 async function getCharactersByGuild(guildName, worldName) {
     // const worldId = await WorldService.getWorldId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldName);
-    const characters = await Character.findAll({ where: { guild_id: guildId } });
+    const characters = await Character.findAll({
+        where: { guild_id: guildId },
+        order: [['name', 'ASC']]
+    });
     return characters;
 }
 
