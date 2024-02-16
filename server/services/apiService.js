@@ -10,12 +10,13 @@ const API_BASE_URL = "https://open.api.nexon.com/maplestory/v1";
 
 const currentDate = new Date();
 currentDate.setDate(currentDate.getDate() - 1);
+currentDate.setHours(currentDate.getHours() + 9);
 const formattedDate = currentDate.toISOString().split('T')[0];
 
 // nexon open api 조회 
-async function getApiResponse(url) {
+async function getApiResponse(url, apiKey = API_KEY) {
     try {
-        const response = await axios.get(url, { headers: { "x-nxopen-api-key": API_KEY } });
+        const response = await axios.get(url, { headers: { "x-nxopen-api-key": apiKey } });
         return response.data;
     } catch (error) {
         console.error('API 조회 에러:', error);
@@ -58,10 +59,57 @@ async function getMainCharacterName(worldName, ocid) {
     return await getApiResponse(unionRankingUrl);
 }
 
+// 유저의 api Key를 제공 받아 본캐 찾기
+async function getHistoryCharacterName(apiKey) {
+    try {
+        const characterNames = [];
+
+        const today = new Date();
+        today.setHours(today.getHours() + 9);  // 시간 보정
+
+        // 7일치만 조회
+        for (let i = 0; i < 7; i++) {
+            const apiDate = new Date(today);
+            apiDate.setDate(today.getDate() - i);
+            const formattedApiDate = apiDate.toISOString().split('T')[0];
+
+            // 잠재능력 재설정 내역
+            const potentialHistoryUrl = `${API_BASE_URL}/history/potential?count=10&date=${formattedApiDate}`;
+            const potentialHistory = await getApiResponse(potentialHistoryUrl, apiKey);
+            if (potentialHistory && potentialHistory.potential_history && potentialHistory.potential_history[0]) {
+                characterNames.push(potentialHistory.potential_history[0].character_name);
+            }
+            
+            // 큐브 사용 내역
+            const cubeHistoryUrl = `${API_BASE_URL}/history/cube?count=10&date=${formattedApiDate}`;
+            const cubeHistory = await getApiResponse(cubeHistoryUrl, apiKey);
+            if (cubeHistory && cubeHistory.cube_history && cubeHistory.cube_history[0]) {
+                characterNames.push(cubeHistory.cube_history[0].character_name);
+            }
+
+            // 스타포스 강화 내역
+            const starforceHistoryUrl = `${API_BASE_URL}/history/starforce?count=10&date=${formattedApiDate}`
+            const starforceHistory = await getApiResponse(starforceHistoryUrl, apiKey);
+            if (starforceHistory && starforceHistory.starforce_history && starforceHistory.starforce_history[0]) {
+                characterNames.push(starforceHistory.starforce_history[0].character_name);
+            }   
+        }
+        const uniqueCharacterNames = [...new Set(characterNames)];
+        console.log(uniqueCharacterNames);
+        return uniqueCharacterNames;
+    } catch (error) {
+        console.error('API 조회 에러:', error);
+        // throw new Error('서버 에러');
+    }
+}
+
 module.exports = {
     getOguildId,
     getGuildBasicData,
     getCharacterOcid,
     getCharacterBasicData,
     getMainCharacterName,
+    getHistoryCharacterName
 };
+
+getHistoryCharacterName("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3");
