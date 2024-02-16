@@ -296,9 +296,10 @@ const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro
   return (
     <div>
       <h1>관리자 페이지</h1>
+      <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={testclick}>목록 불러오기</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
-      <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <>
           <label htmlFor="file-upload" className="custom-file-upload">
@@ -315,8 +316,6 @@ const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro
           <button onClick={handleUploadFiles}>파일 업로드</button>
         </>
       <button onClick={handleSaveClick}>저장</button>
-      <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
-
       <table>
         <thead>
           <th onClick={() => sortData("character_name")}>
