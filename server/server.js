@@ -123,73 +123,101 @@ if (!fs.existsSync(processedDirPath)) {
 }
 
 app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
-  const processedFilesArea1 = [];
-  const processedFilesArea2 = [];
-  const processedFilesArea3 = [];
+  const weekly_score_Area = [];
+  const suro_score_Area = [];
+  const flag_score_Area = [];
 
   for (const file of req.files) {
-    // 첫 번째 영역 전처리
-    const processedFilePathArea1 = path.join(processedDirPath, `area1_${file.originalname}`);
-    await sharp(file.path)
-      .extract({ left: 604, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathArea1);
-    processedFilesArea1.push(processedFilePathArea1);
-
-    // 두 번째 영역 전처리
-    const processedFilePathArea2 = path.join(processedDirPath, `area2_${file.originalname}`);
+    // 주간 점수 영역 전처리
+    const processedFilePathWeekly = path.join(
+      processedDirPath,
+      `weekly_${file.originalname}`
+    );
     await sharp(file.path)
       .extract({ left: 462, top: 151, width: 60, height: 415 })
       .threshold(120)
       .blur(0.5)
-      .toFile(processedFilePathArea2);
-    processedFilesArea2.push(processedFilePathArea2);
+      .toFile(processedFilePathWeekly);
+    weekly_score_Area.push(processedFilePathWeekly);
 
-    // 세 번째 영역 전처리
-    const processedFilePathArea3 = path.join(processedDirPath, `area3_${file.originalname}`);
+    // 수로 점수 영역 전처리
+    const processedFilePathSuro = path.join(
+      processedDirPath,
+      `suro_${file.originalname}`
+    );
+    await sharp(file.path)
+      .extract({ left: 604, top: 151, width: 60, height: 415 })
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathSuro);
+    suro_score_Area.push(processedFilePathSuro);
+
+    // 플래그 점수 영역 전처리
+    const processedFilePathFlag = path.join(
+      processedDirPath,
+      `flag_${file.originalname}`
+    );
     await sharp(file.path)
       .extract({ left: 528, top: 151, width: 60, height: 415 })
       .threshold(120)
       .blur(0.5)
-      .toFile(processedFilePathArea3);
-    processedFilesArea3.push(processedFilePathArea3);
+      .toFile(processedFilePathFlag);
+    flag_score_Area.push(processedFilePathFlag);
   }
 
   // 전처리된 이미지에 대해 OCR 처리
   // 각 영역별로 OCR 명령어 실행
   async function processOcr(processedFiles) {
-    const processedImagePaths = processedFiles.map((file) => `"${file}"`).join(" ");
+    const processedImagePaths = processedFiles
+      .map((file) => `"${file}"`)
+      .join(" ");
     const command = `python ocr.py ${processedImagePaths}`;
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         if (error || stderr) {
           reject(error || stderr);
         } else {
-          resolve(stdout.trim().split("\n").map((result) => JSON.parse(result.replace(/'/g, '"'))));
+          resolve(
+            stdout
+              .trim()
+              .split("\n")
+              .map((result) => JSON.parse(result.replace(/'/g, '"')))
+          );
         }
       });
     });
   }
 
   try {
-    const resultsArea1 = await processOcr(processedFilesArea1);
-    const resultsArea2 = await processOcr(processedFilesArea2);
-    const resultsArea3 = await processOcr(processedFilesArea3);
+    const resultsWeekly = await processOcr(weekly_score_Area);
+    const resultsSuro = await processOcr(suro_score_Area);
+    const resultsFlag = await processOcr(flag_score_Area);
 
     const concatenatedResults = {
-      area1: resultsArea1.reduce((acc, current) => acc.concat(current), []),
-      area2: resultsArea2.reduce((acc, current) => acc.concat(current), []),
-      area3: resultsArea3.reduce((acc, current) => acc.concat(current), [])
+      weekly_score_Area: resultsWeekly.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+      suro_score_Area: resultsSuro.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+      flag_score_Area: resultsFlag.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
     };
 
     // 전처리된 파일들을 삭제하는 로직
-    const allProcessedFiles = processedFilesArea1.concat(processedFilesArea2, processedFilesArea3);
+    const allProcessedFiles = suro_score_Area.concat(
+      weekly_score_Area,
+      flag_score_Area
+    );
     for (const filePath of allProcessedFiles) {
       await fs.promises.unlink(filePath);
     }
 
-    console.log('OCR 작업 완료한 파일들이 삭제되었습니다.');
+    console.log("OCR 작업 완료한 파일들이 삭제되었습니다.");
 
     // 합쳐진 결과 반환
     res.send({
@@ -202,37 +230,36 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   }
 });
 
-
-app.get('/Graphpage/:memberName', async (req, res) => {
+app.get("/Graphpage/:memberName", async (req, res) => {
   try {
-      const { memberName } = req.params;
-      // Characters 테이블에서 memberName으로 캐릭터를 조회합니다.
-      const character = await Character.findOne({
-          raw: true,
-          where: { name: memberName },
-          attributes: ['id'] // 캐릭터의 ID만 조회합니다.
-      });
+    const { memberName } = req.params;
+    // Characters 테이블에서 memberName으로 캐릭터를 조회합니다.
+    const character = await Character.findOne({
+      raw: true,
+      where: { name: memberName },
+      attributes: ["id"], // 캐릭터의 ID만 조회합니다.
+    });
 
-      if (!character) {
-          return res.status(404).send('Character not found');
-      }
+    if (!character) {
+      return res.status(404).send("Character not found");
+    }
 
-      // 해당 캐릭터 ID를 가진 모든 레코드를 조회합니다.
-      const records = await Record.findAll({
-          raw: true,
-          where: { character_id: character.id }
-      });
+    // 해당 캐릭터 ID를 가진 모든 레코드를 조회합니다.
+    const records = await Record.findAll({
+      raw: true,
+      where: { character_id: character.id },
+    });
 
-      if (!records) {
-          return res.status(404).send('Records not found');
-      }
+    if (!records) {
+      return res.status(404).send("Records not found");
+    }
 
-      // 조회된 레코드를 JSON 형태로 반환합니다.
-      res.json(records);
-      console.log('records : ', records)
+    // 조회된 레코드를 JSON 형태로 반환합니다.
+    res.json(records);
+    console.log("records : ", records);
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
