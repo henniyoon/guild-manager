@@ -300,7 +300,6 @@ const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro
       <button onClick={testclick}>목록 불러오기</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
-      <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <>
           <label htmlFor="file-upload" className="custom-file-upload">
             이미지 첨부
@@ -315,6 +314,7 @@ const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro
           />
           <button onClick={handleUploadFiles}>파일 업로드</button>
         </>
+      <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
       <table>
         <thead>
