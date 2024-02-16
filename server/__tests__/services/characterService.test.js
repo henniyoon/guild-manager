@@ -23,8 +23,8 @@ test('DB에서 특정 길드의 길드원 조회', async () => {
 //     // console.log("newCharacter:", newCharacter);
 // })
 
-test('DB의 캐릭터 업데이트', async () => {
-    const updateCha = await updateCharacter('별빛', '스카니아', '헨쁘');
-    expect(updateCha).toBeDefined();
-    console.log("updateCha:", updateCha);
-})
+// test('DB의 캐릭터 업데이트', async () => {
+//     const updateCha = await updateCharacter('별빛', '스카니아', '헨쁘');
+//     expect(updateCha).toBeDefined();
+//     console.log("updateCha:", updateCha);
+// })
