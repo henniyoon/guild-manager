@@ -33,7 +33,7 @@ const Adminpage: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(getCurrentWeek());
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: "ascending",
@@ -96,12 +96,12 @@ const Adminpage: React.FC = () => {
       // 여기서는 간단한 객체 비교를 사용합니다. 더 복잡한 데이터 구조의 경우, 깊은 비교(deep comparison)가 필요할 수 있습니다.
       return JSON.stringify(editedRow) !== JSON.stringify(originalRow);
     });
-  
+
     if (modifiedData.length === 0) {
       alert("변경된 데이터가 없습니다.");
       return;
     }
-  
+
     console.log("서버로 전송될 변경된 데이터:", modifiedData);
     fetch("/updateRecords", {
       method: "POST",
@@ -120,7 +120,7 @@ const Adminpage: React.FC = () => {
           method: "GET", // 요청 메소드 설정
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json",
           },
         });
       })
@@ -139,26 +139,39 @@ const Adminpage: React.FC = () => {
   };
 
   const handleRowClick = (id: number) => {
-    setSelectedRowId(id);
-    console.log("선택된 행 : ", id);
+    // 이미 선택된 행인지 확인
+    if (selectedRowIds.includes(id)) {
+      // 이미 선택된 행이라면 선택 해제
+      setSelectedRowIds(selectedRowIds.filter((rowId) => rowId !== id));
+    } else {
+      // 새로운 행을 선택한 경우, 기존 선택된 행들에 추가
+      setSelectedRowIds([...selectedRowIds, id]);
+    }
   };
-
-  const handleDeleteSelectedRow = () => {
-    if (selectedRowId === null) {
+  const handleDeleteSelectedRows = () => {
+    if (selectedRowIds.length === 0) {
       alert("삭제할 행을 선택해주세요.");
       return;
     }
-    // 서버에 선택된 행 삭제 요청을 보내는 로직 구현
-    fetch(`/deleteRecord/${selectedRowId}`, {
-      method: "DELETE",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("삭제 결과:", data);
-        setSelectedRowId(null); // 삭제 후 선택된 행 ID 초기화
+
+    // 선택된 모든 행에 대해 삭제 요청을 순차적으로 보냅니다.
+    // Promise.all을 사용하여 모든 삭제 요청이 완료된 후 처리를 계속합니다.
+    Promise.all(
+      selectedRowIds.map((selectedRowId) =>
+        fetch(`/deleteRecord/${selectedRowId}`, {
+          method: "DELETE",
+        }).then((response) => response.json())
+      )
+    )
+      .then((results) => {
+        console.log("삭제 결과:", results);
+        setSelectedRowIds([]); // 삭제 후 선택된 행 ID 목록 초기화
         fetchTableData(); // 삭제 후 테이블 데이터 새로고침
       })
-      .catch((error) => console.error("데이터 삭제 실패:", error));
+      .catch((error) => {
+        console.error("데이터 삭제 실패:", error);
+        alert("데이터 삭제에 실패했습니다.");
+      });
   };
 
   const sortData = (key: keyof TableRowData) => {
@@ -212,30 +225,40 @@ const Adminpage: React.FC = () => {
   // ? 길드원 채워넣는 로직 끝
 
   const handleAddEmptyRowBelowSelected = () => {
-    if (selectedRowId === null) {
+    if (selectedRowIds.length === 0) {
       alert("추가할 위치를 선택해주세요.");
       return;
     }
-    // 선택된 행의 인덱스를 찾습니다.
-    const selectedIndex = tableData.findIndex(
-      (row) => row.id === selectedRowId
-    );
-    // 비어있는 행을 생성합니다. 여기서는 character_name을 비워두고, 나머지 값을 0 혹은 적절한 기본값으로 설정할 수 있습니다.
-    const emptyRow: TableRowData = {
-      id: Math.max(...tableData.map((row) => row.id)) + 1, // 임시 ID 생성, 실제 환경에서는 서버나 다른 메커니즘을 통해 고유한 ID를 생성해야 합니다.
-      character_id: 0,
-      character_name: "",
-      weekly_score: 0,
-      suro_score: 0,
-      flag_score: 0,
-    };
 
-    // 선택된 행 아래에 비어있는 행을 추가합니다.
-    const newData = [
-      ...tableData.slice(0, selectedIndex + 1),
-      emptyRow,
-      ...tableData.slice(selectedIndex + 1),
-    ];
+    // 선택된 행의 인덱스를 모두 찾습니다.
+    const selectedIndexes = selectedRowIds
+      .map((id) => tableData.findIndex((row) => row.id === id))
+      .filter((index) => index !== -1) // 유효한 인덱스만 필터링
+      .sort((a, b) => a - b); // 인덱스 기준으로 정렬
+
+    let newData = [...tableData];
+    let addedCount = 0;
+
+    selectedIndexes.forEach((index) => {
+      const newIndex = index + addedCount + 1; // 이미 추가된 행 수를 고려하여 인덱스 조정
+      const emptyRow: TableRowData = {
+        id: Math.max(...newData.map((row) => row.id)) + 1 + addedCount, // 고유한 ID 생성
+        character_id: 0,
+        character_name: "",
+        weekly_score: 0,
+        suro_score: 0,
+        flag_score: 0,
+      };
+
+      newData = [
+        ...newData.slice(0, newIndex),
+        emptyRow,
+        ...newData.slice(newIndex),
+      ];
+
+      addedCount++; // 추가된 행의 수를 업데이트
+    });
+
     setTableData(newData);
   };
 
@@ -250,70 +273,83 @@ const Adminpage: React.FC = () => {
   // 파일 서버로 전송
   const handleUploadFiles = () => {
     const formData = new FormData();
-    selectedFiles.forEach(file => {
-        formData.append('files', file);
+    selectedFiles.forEach((file) => {
+      formData.append("files", file);
     });
 
     fetch("/uploadImages", {
-        method: "POST",
-        body: formData,
+      method: "POST",
+      body: formData,
     })
-    .then(response => response.json())
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log("업로드 성공:", data);
         alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
         updateTableDataWithOcrResults(data);
-    })
-    .catch(error => {
+      })
+      .catch((error) => {
         console.error("업로드 실패:", error);
         alert("파일 업로드 실패.");
-    });
-};
+      });
+  };
 
-// OCR 결과를 테이블 데이터에 반영
-const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro_score_Area: never[]; weekly_score_Area: never[]; }) => {
-  // 각 점수 영역을 안전하게 추출하고, 기본값으로 빈 배열을 설정
-  const flag_score_Area = ocrData.flag_score_Area || [];
-  const suro_score_Area = ocrData.suro_score_Area || [];
-  const weekly_score_Area = ocrData.weekly_score_Area || [];
- console.log('flag_score_Area : ',flag_score_Area)
- console.log('ocrData : ',ocrData)
-  // 테이블 데이터 업데이트 로직에 안전한 접근 방법 적용
-  const newTableData = tableData.map((row, index) => {
+  // OCR 결과를 테이블 데이터에 반영
+  const updateTableDataWithOcrResults = (ocrData: {
+    flag_score_Area: never[];
+    suro_score_Area: never[];
+    weekly_score_Area: never[];
+  }) => {
+    // 각 점수 영역을 안전하게 추출하고, 기본값으로 빈 배열을 설정
+    const flag_score_Area = ocrData.flag_score_Area || [];
+    const suro_score_Area = ocrData.suro_score_Area || [];
+    const weekly_score_Area = ocrData.weekly_score_Area || [];
+    console.log("flag_score_Area : ", flag_score_Area);
+    console.log("ocrData : ", ocrData);
+    // 테이블 데이터 업데이트 로직에 안전한 접근 방법 적용
+    const newTableData = tableData.map((row, index) => {
       // 안전한 접근을 위해 조건부 연산자 사용
       const updatedRow = {
-          ...row,
-          weekly_score: weekly_score_Area.length > index ? weekly_score_Area[index] : row.weekly_score,
-          suro_score: suro_score_Area.length > index ? suro_score_Area[index] : row.suro_score,
-          flag_score: flag_score_Area.length > index ? flag_score_Area[index] : row.flag_score,
+        ...row,
+        weekly_score:
+          weekly_score_Area.length > index
+            ? weekly_score_Area[index]
+            : row.weekly_score,
+        suro_score:
+          suro_score_Area.length > index
+            ? suro_score_Area[index]
+            : row.suro_score,
+        flag_score:
+          flag_score_Area.length > index
+            ? flag_score_Area[index]
+            : row.flag_score,
       };
       return updatedRow;
-  });
+    });
 
-  setTableData(newTableData); // 업데이트된 테이블 데이터로 상태 업데이트
-};
+    setTableData(newTableData); // 업데이트된 테이블 데이터로 상태 업데이트
+  };
   return (
     <div>
       <h1>관리자 페이지</h1>
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       <button onClick={testclick}>목록 불러오기</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
-      <button onClick={handleDeleteSelectedRow}>선택된 행 삭제</button>
+      <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
       <>
-          <label htmlFor="file-upload" className="custom-file-upload">
-            이미지 첨부
-          </label>
-          <input
-            id="file-upload"
-            type="file"
-            multiple
-            onChange={handleFileSelect}
-            style={{display: 'none'}}
-            accept="image/*" // 이미지 파일만 선택 가능하도록 설정
-          />
-          <button onClick={handleUploadFiles}>파일 업로드</button>
-        </>
+        <label htmlFor="file-upload" className="custom-file-upload">
+          이미지 첨부
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          multiple
+          onChange={handleFileSelect}
+          style={{ display: "none" }}
+          accept="image/*" // 이미지 파일만 선택 가능하도록 설정
+        />
+        <button onClick={handleUploadFiles}>파일 업로드</button>
+      </>
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
       <table>
@@ -336,7 +372,7 @@ const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro
               key={row.id}
               onClick={() => handleRowClick(row.id)}
               className={`${styles.rowClickable} ${
-                selectedRowId === row.id ? styles.rowSelected : ""
+                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
               }`}
             >
               {isEditMode ? (
