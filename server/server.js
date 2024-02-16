@@ -193,21 +193,6 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     const resultsSuro = await processOcr(suro_score_Area);
     const resultsFlag = await processOcr(flag_score_Area);
 
-    const concatenatedResults = {
-      weekly_score_Area: resultsWeekly.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      ),
-      suro_score_Area: resultsSuro.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      ),
-      flag_score_Area: resultsFlag.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      ),
-    };
-
     // 전처리된 파일들을 삭제하는 로직
     const allProcessedFiles = suro_score_Area.concat(
       weekly_score_Area,
@@ -222,7 +207,18 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     // 합쳐진 결과 반환
     res.send({
       message: "OCR 처리 및 파일 삭제 완료",
-      concatenatedResults: concatenatedResults,
+      weekly_score_Area: resultsWeekly.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+      suro_score_Area: resultsSuro.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+      flag_score_Area: resultsFlag.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
     });
   } catch (error) {
     console.error(`OCR 처리 중 오류: ${error}`);
