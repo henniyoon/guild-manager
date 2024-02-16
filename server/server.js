@@ -211,11 +211,11 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
         (acc, current) => acc.concat(current),
         []
       ),
-      suro_score_Area: resultsSuro.reduce(
+      suro_score_Area: resultsFlag.reduce(
         (acc, current) => acc.concat(current),
         []
       ),
-      flag_score_Area: resultsFlag.reduce(
+      flag_score_Area: resultsSuro.reduce(
         (acc, current) => acc.concat(current),
         []
       ),
