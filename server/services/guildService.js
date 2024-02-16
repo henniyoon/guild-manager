@@ -1,22 +1,23 @@
 const Guild = require('../models/Guild.js');
-const WorldService = require('./worldService.js');
 const APIService = require('./apiService.js');
+const WorldService = require('./worldService.js');
 
-async function getGuild(guildName, worldId) {
+async function getGuild(guildName, worldName) {
+    const worldId = await WorldService.getWorldId(worldName);
     const guild = await Guild.findOne({ where: { name: guildName, world_id: worldId } });
     return guild;
 }
 
-async function getGuildId(guildName, worldId) {
+async function getGuildId(guildName, worldName) {
+    const worldId = await WorldService.getWorldId(worldName);
     const guild = await Guild.findOne({ where: { name: guildName, world_id: worldId } });
     return guild ? guild.id : null;
 }
 
-async function createGuild(guild, worldName) {
-    // 해당 월드의 월드 번호 조회
-    const worldId = await WorldService.getWordId(worldName);
+async function createGuild(guildName, worldName) {
+    const worldId = await WorldService.getWorldId(worldName);
     try {
-        let apiData = await APIService.getOguildId(guild, worldName);
+        let apiData = await APIService.getOguildId(guildName, worldName);
         apiData = {
             ...apiData,
             ... await APIService.getGuildBasicData(apiData.oguild_id)
@@ -27,7 +28,7 @@ async function createGuild(guild, worldName) {
         apiDate.setHours(apiDate.getHours() + 9);
         await Guild.create({
             world_id: worldId,
-            name: guild,
+            name: guildName,
             oguild_id: apiData.oguild_id,
             master_name: apiData.guild_master_name,
             member_count: apiData.guild_member_count,
@@ -48,22 +49,22 @@ async function createGuild(guild, worldName) {
     }
 }
 
-async function updateGuild(guild, worldName) {
-    // 해당 월드의 월드 번호 조회
-    const worldId = await WorldService.getWordId(worldName);
+async function updateGuild(guildName, worldName) {
+    const worldId = await WorldService.getWorldId(worldName);
     try {
-        let apiData = await APIService.getOguildId(guild, worldName);
+        let apiData = await APIService.getOguildId(guildName, worldName);
         apiData = {
             ...apiData,
             ... await APIService.getGuildBasicData(apiData.oguild_id)
         };
         const guildMembers = apiData.guild_member;
+        console.log("apiData:", apiData);
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
         await Guild.update({
             world_id: worldId,
-            name: guild,
+            name: guildName,
             master_name: apiData.guild_master_name,
             member_count: apiData.guild_member_count,
             level: apiData.guild_level,
