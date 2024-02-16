@@ -60,7 +60,7 @@ async function getMainCharacterName(worldName, ocid) {
 }
 
 // 유저의 api Key를 제공 받아 본캐 찾기
-async function getHistoryCharacterName(apiKey) {
+async function getHistoryCharacterNames(apiKey) {
     try {
         const characterNames = [];
 
@@ -95,7 +95,6 @@ async function getHistoryCharacterName(apiKey) {
             }   
         }
         const uniqueCharacterNames = [...new Set(characterNames)];
-        console.log(uniqueCharacterNames);
         return uniqueCharacterNames;
     } catch (error) {
         console.error('API 조회 에러:', error);
@@ -109,7 +108,8 @@ module.exports = {
     getCharacterOcid,
     getCharacterBasicData,
     getMainCharacterName,
-    getHistoryCharacterName
+    getHistoryCharacterNames,
 };
 
-getHistoryCharacterName("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3");
+// getHistoryCharacterNames("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3");
+// getMainCharacterName("스카니아", "bff1b13291a2d97cc0b7a988cd3095d6");
