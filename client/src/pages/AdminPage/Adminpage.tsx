@@ -250,28 +250,49 @@ const Adminpage: React.FC = () => {
   // 파일 서버로 전송
   const handleUploadFiles = () => {
     const formData = new FormData();
-    selectedFiles.forEach((file, index) => {
-      formData.append('files', file);
+    selectedFiles.forEach(file => {
+        formData.append('files', file);
     });
 
-    // 예시 URL, 실제 엔드포인트로 변경해야 함
     fetch("/uploadImages", {
-      method: "POST",
-      body: formData,
-      // 'Content-Type': 'multipart/form-data' 헤더는 설정하지 않습니다.
-      // 브라우저가 자동으로 설정하기 때문입니다.
+        method: "POST",
+        body: formData,
     })
     .then(response => response.json())
     .then(data => {
-      console.log("업로드 성공:", data);
-      alert("파일 업로드 성공!");
+        console.log("업로드 성공:", data);
+        alert("파일 업로드 성공!");
+        // OCR 결과를 테이블 데이터에 반영하는 함수 호출
+        updateTableDataWithOcrResults(data);
     })
     .catch(error => {
-      console.error("업로드 실패:", error);
-      alert("파일 업로드 실패.");
+        console.error("업로드 실패:", error);
+        alert("파일 업로드 실패.");
     });
-  };
+};
 
+// OCR 결과를 테이블 데이터에 반영
+const updateTableDataWithOcrResults = (ocrData: { flag_score_Area: never[]; suro_score_Area: never[]; weekly_score_Area: never[]; }) => {
+  // 각 점수 영역을 안전하게 추출하고, 기본값으로 빈 배열을 설정
+  const flag_score_Area = ocrData.flag_score_Area || [];
+  const suro_score_Area = ocrData.suro_score_Area || [];
+  const weekly_score_Area = ocrData.weekly_score_Area || [];
+ console.log('flag_score_Area : ',flag_score_Area)
+ console.log('ocrData : ',ocrData)
+  // 테이블 데이터 업데이트 로직에 안전한 접근 방법 적용
+  const newTableData = tableData.map((row, index) => {
+      // 안전한 접근을 위해 조건부 연산자 사용
+      const updatedRow = {
+          ...row,
+          weekly_score: weekly_score_Area.length > index ? weekly_score_Area[index] : row.weekly_score,
+          suro_score: suro_score_Area.length > index ? suro_score_Area[index] : row.suro_score,
+          flag_score: flag_score_Area.length > index ? flag_score_Area[index] : row.flag_score,
+      };
+      return updatedRow;
+  });
+
+  setTableData(newTableData); // 업데이트된 테이블 데이터로 상태 업데이트
+};
   return (
     <div>
       <h1>관리자 페이지</h1>
