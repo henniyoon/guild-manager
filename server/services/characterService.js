@@ -107,28 +107,6 @@ async function updateCharacter(characterName) {
         console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
     }
 }
-
-async function verifyAdmin(apiKey, guildName, worldName) {
-    try {
-        const userCharacters = await APIService.getHistoryCharacterNames(apiKey);
-        const character = await getCharacter(userCharacters);
-        const mainCharacter = character.main_character_name;
-
-        const guild = await GuildService.getGuild(guildName, worldName);
-        const guildMaster = guild.master_name;
-        const guildMastersMainCharacter = await getCharacter(guildMaster);
-        const guildMastersMainCharacterName = guildMastersMainCharacter.main_character_name;
-
-        if (mainCharacter == guildMastersMainCharacterName) {
-            console.log("인증 성공");
-        } else {
-            console.log("인증 실패");
-        }
-    } catch (error) {
-        console.error('에러 발생:', error);
-    }
-
-}
 module.exports = {
     getCharacter,
     getCharacterByOcid,
@@ -136,6 +114,3 @@ module.exports = {
     createCharacter,
     updateCharacter,
 }
-
-verifyAdmin("test_51a72486d6ea2528359dd65ac6d066018a9039af4e0529bd0432f26e4744123a05f0445e41873440742bb6f5e750d93f", "별빛", "스카니아");
-// verifyAdmin("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3", "초깜찍", "스카니아");
