@@ -6,6 +6,7 @@ import Graphpage from './pages/GraphPage/Graphpage';
 import Adminpage from './pages/AdminPage/Adminpage'
 import Loginpage from './pages/LoginPage/Loginpage';
 import SignUppage from './pages/SingUpPage/SignUppage';
+import Filterpage from './pages/FilterPage/Filterpage'
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
       <Route path="/Adminpage" element={<Adminpage />} />
       <Route path="/Login" element={<Loginpage />} />
       <Route path="/SignUp" element={<SignUppage />} />
+      <Route path="/Filter" element={<Filterpage />} />
     </Routes>
 
     </div>
