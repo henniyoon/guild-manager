@@ -3,6 +3,15 @@ const APIService = require('./apiService.js');
 const GuildService = require('./guildService.js');
 const characterService = require('./characterService.js');
 
+async function getUser(id) {
+    const user = await User.findOne({ where: { id: id } });
+    if(user) {
+        const { username, email } = user;
+        return { username, email };
+    }
+    return null;
+}
+
 async function setUserRole(apikey, id, guildName, worldName) {
     const verify = await verifyAdmin(apikey, guildName, worldName);
     if (verify) {
@@ -40,9 +49,11 @@ async function verifyAdmin(apiKey, guildName, worldName) {
 }
 
 module.exports = {
+    getUser,
     setUserRole,
     verifyAdmin,
 }
 
-setUserRole("test_51a72486d6ea2528359dd65ac6d066018a9039af4e0529bd0432f26e4744123a05f0445e41873440742bb6f5e750d93f", 1, "별빛", "스카니아");
+// setUserRole("test_51a72486d6ea2528359dd65ac6d066018a9039af4e0529bd0432f26e4744123a05f0445e41873440742bb6f5e750d93f", 1, "별빛", "스카니아");
 // verifyAdmin("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3", "초깜찍", "스카니아");
+getUser(1);
