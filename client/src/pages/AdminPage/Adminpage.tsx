@@ -39,6 +39,11 @@ const Adminpage: React.FC = () => {
     direction: "ascending",
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [filters, setFilters] = useState({
+    weekly_score: { min: "", max: "" },
+    suro_score: { min: "", max: "" },
+    flag_score: { min: "", max: "" },
+  });
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -333,6 +338,32 @@ const Adminpage: React.FC = () => {
     <div>
       <h1>관리자 페이지</h1>
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      {/* 필터링 조건을 입력받는 UI 구성 */}
+      <div>
+        <input
+          type="text"
+          placeholder="주간점수 최소값"
+          value={filters.weekly_score.min}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              weekly_score: { ...filters.weekly_score, min: e.target.value },
+            })
+          }
+        />
+        <input
+          type="text"
+          placeholder="주간점수 최대값"
+          value={filters.weekly_score.max}
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              weekly_score: { ...filters.weekly_score, max: e.target.value },
+            })
+          }
+        />
+        {/* 수로와 플래그 필터링 입력 필드 추가 */}
+      </div>
       <button onClick={testclick}>목록 불러오기</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
@@ -352,96 +383,130 @@ const Adminpage: React.FC = () => {
       </>
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
+
       <table>
         <thead>
-          <th onClick={() => sortData("character_name")}>
-            닉네임{" "}
-            {sortConfig.key === "character_name"
-              ? sortConfig.direction === "ascending"
-                ? "↑"
-                : "↓"
-              : ""}
-          </th>
-          <th onClick={() => sortData("weekly_score")}>주간점수</th>
-          <th onClick={() => sortData("suro_score")}>수로</th>
-          <th onClick={() => sortData("flag_score")}>플래그</th>
+          <tr>
+            <th onClick={() => sortData("character_name")}>닉네임</th>
+            <th onClick={() => sortData("weekly_score")}>주간점수</th>
+            <th onClick={() => sortData("suro_score")}>수로</th>
+            <th onClick={() => sortData("flag_score")}>플래그</th>
+          </tr>
         </thead>
         <tbody>
-          {tableData.map((row) => (
-            <tr
-              key={row.id}
-              onClick={() => handleRowClick(row.id)}
-              className={`${styles.rowClickable} ${
-                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-              }`}
-            >
-              {isEditMode ? (
-                <>
-                  {/* character_name에 대한 입력 필드. 비어있는 경우 수정 불가능 */}
-                  <td>
-                    {row.character_name === "" ? (
-                      row.character_name
-                    ) : (
+          {tableData
+            .filter((row) => {
+              const minWeeklyScore = filters.weekly_score.min
+                ? parseInt(filters.weekly_score.min, 10)
+                : -Infinity;
+              const maxWeeklyScore = filters.weekly_score.max
+                ? parseInt(filters.weekly_score.max, 10)
+                : Infinity;
+              const minSuroScore = filters.suro_score.min
+                ? parseInt(filters.suro_score.min, 10)
+                : -Infinity;
+              const maxSuroScore = filters.suro_score.max
+                ? parseInt(filters.suro_score.max, 10)
+                : Infinity;
+              const minFlagScore = filters.flag_score.min
+                ? parseInt(filters.flag_score.min, 10)
+                : -Infinity;
+              const maxFlagScore = filters.flag_score.max
+                ? parseInt(filters.flag_score.max, 10)
+                : Infinity;
+
+              return (
+                (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
+                (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
+                (!minSuroScore || row.suro_score >= minSuroScore) &&
+                (!maxSuroScore || row.suro_score <= maxSuroScore) &&
+                (!minFlagScore || row.flag_score >= minFlagScore) &&
+                (!maxFlagScore || row.flag_score <= maxFlagScore)
+              );
+            })
+            .map((row) => (
+              <tr
+                key={row.id}
+                onClick={() => handleRowClick(row.id)}
+                className={`${styles.rowClickable} ${
+                  selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+                }`}
+              >
+                {isEditMode ? (
+                  <>
+                    {/* character_name에 대한 입력 필드. 비어있는 경우 수정 불가능 */}
+                    <td>
+                      {row.character_name === "" ? (
+                        row.character_name
+                      ) : (
+                        <input
+                          title="character_name"
+                          type="text"
+                          defaultValue={row.character_name}
+                          onChange={(e) =>
+                            handleInputChange(
+                              row.id,
+                              "character_name",
+                              e.target.value
+                            )
+                          }
+                        />
+                      )}
+                    </td>
+                    <td>
                       <input
-                        title="character_name"
-                        type="text"
-                        defaultValue={row.character_name}
+                        title="weekly_score"
+                        type="number"
+                        defaultValue={row.weekly_score}
                         onChange={(e) =>
                           handleInputChange(
                             row.id,
-                            "character_name",
+                            "weekly_score",
                             e.target.value
                           )
                         }
                       />
-                    )}
-                  </td>
-                  <td>
-                    <input
-                      title="weekly_score"
-                      type="number"
-                      defaultValue={row.weekly_score}
-                      onChange={(e) =>
-                        handleInputChange(
-                          row.id,
-                          "weekly_score",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      title="suro_score"
-                      type="number"
-                      defaultValue={row.suro_score}
-                      onChange={(e) =>
-                        handleInputChange(row.id, "suro_score", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      title="flag_score"
-                      type="number"
-                      defaultValue={row.flag_score}
-                      onChange={(e) =>
-                        handleInputChange(row.id, "flag_score", e.target.value)
-                      }
-                    />
-                  </td>
-                </>
-              ) : (
-                // 비편집 모드에서의 행 렌더링
-                <>
-                  <td>{row.character_name}</td>
-                  <td>{row.weekly_score}</td>
-                  <td>{row.suro_score}</td>
-                  <td>{row.flag_score}</td>
-                </>
-              )}
-            </tr>
-          ))}
+                    </td>
+                    <td>
+                      <input
+                        title="suro_score"
+                        type="number"
+                        defaultValue={row.suro_score}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "suro_score",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        title="flag_score"
+                        type="number"
+                        defaultValue={row.flag_score}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "flag_score",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                  </>
+                ) : (
+                  // 비편집 모드에서의 행 렌더링
+                  <>
+                    <td>{row.character_name}</td>
+                    <td>{row.weekly_score}</td>
+                    <td>{row.suro_score}</td>
+                    <td>{row.flag_score}</td>
+                  </>
+                )}
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
