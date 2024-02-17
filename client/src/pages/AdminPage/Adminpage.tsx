@@ -362,7 +362,61 @@ const Adminpage: React.FC = () => {
             })
           }
         />
-        {/* 수로와 플래그 필터링 입력 필드 추가 */}
+        {/* 수로(suro_score) 필터링 입력 필드 */}
+        <div>
+          <label>수로 점수 이상:</label>
+          <input
+            type="number"
+            placeholder="수로 최소값"
+            value={filters.suro_score.min}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                suro_score: { ...filters.suro_score, min: e.target.value },
+              })
+            }
+          />
+          <label>수로 점수 이하:</label>
+          <input
+            type="number"
+            placeholder="수로 최대값"
+            value={filters.suro_score.max}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                suro_score: { ...filters.suro_score, max: e.target.value },
+              })
+            }
+          />
+        </div>
+
+        {/* 플래그(flag_score) 필터링 입력 필드 */}
+        <div>
+          <label>플래그 점수 이상:</label>
+          <input
+            type="number"
+            placeholder="플래그 최소값"
+            value={filters.flag_score.min}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                flag_score: { ...filters.flag_score, min: e.target.value },
+              })
+            }
+          />
+          <label>플래그 점수 이하:</label>
+          <input
+            type="number"
+            placeholder="플래그 최대값"
+            value={filters.flag_score.max}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                flag_score: { ...filters.flag_score, max: e.target.value },
+              })
+            }
+          />
+        </div>
       </div>
       <button onClick={testclick}>목록 불러오기</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
