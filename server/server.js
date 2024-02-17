@@ -123,93 +123,139 @@ if (!fs.existsSync(processedDirPath)) {
 }
 
 app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
-  const processedFiles = [];
+  const weekly_score_Area = [];
+  const suro_score_Area = [];
+  const flag_score_Area = [];
 
   for (const file of req.files) {
-    // Sharp를 사용하여 이미지 전처리
-    const processedFilePath = path.join(processedDirPath, file.originalname);
+    // 주간 점수 영역 전처리
+    const processedFilePathWeekly = path.join(
+      processedDirPath,
+      `weekly_${file.originalname}`
+    );
+    await sharp(file.path)
+      .extract({ left: 462, top: 151, width: 60, height: 415 })
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathWeekly);
+    weekly_score_Area.push(processedFilePathWeekly);
+
+    // 수로 점수 영역 전처리
+    const processedFilePathSuro = path.join(
+      processedDirPath,
+      `suro_${file.originalname}`
+    );
     await sharp(file.path)
       .extract({ left: 604, top: 151, width: 60, height: 415 })
-      .threshold(120) // 임계값 설정
-      .blur(0.5) // 블러 정도 설정
-      .toFile(processedFilePath);
-    processedFiles.push(processedFilePath);
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathSuro);
+    suro_score_Area.push(processedFilePathSuro);
+
+    // 플래그 점수 영역 전처리
+    const processedFilePathFlag = path.join(
+      processedDirPath,
+      `flag_${file.originalname}`
+    );
+    await sharp(file.path)
+      .extract({ left: 528, top: 151, width: 60, height: 415 })
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathFlag);
+    flag_score_Area.push(processedFilePathFlag);
   }
 
   // 전처리된 이미지에 대해 OCR 처리
-  const processedImagePaths = processedFiles.map((file) => `"${file}"`).join(" ");
-  const command = `python ocr.py ${processedImagePaths}`;
-  exec(command, async (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      return res.status(500).send("OCR 처리 중 오류 발생");
-    }
-    if (stderr) {
-      console.error(`stderr: ${stderr}`);
-      return res.status(500).send("OCR 처리 중 오류 발생");
-    }
-
-    console.log(`OCR 결과:\n${stdout}`);
-
-    try {
-      // stdout에서 개별 결과를 추출하여 배열로 변환
-      const ocrResults = stdout
-        .trim()
-        .split("\n")
-        .map((result) => JSON.parse(result.replace(/'/g, '"')));
-
-      // 변환된 배열들을 하나의 배열로 합치기
-      const concatenatedResults = ocrResults.reduce((acc, current) => acc.concat(current), []);
-
-       // 전처리된 파일들을 삭제하는 로직
-       for (const filePath of processedFiles) {
-        await fs.promises.unlink(filePath); // 'processed' 폴더 내 파일 삭제
-      }
-
-      console.log('OCR 작업 완료한 파일들이 삭제되었습니다.');
-
-      // 합쳐진 결과 반환
-      res.send({
-        message: "OCR 처리 및 파일 삭제 완료",
-        concatenatedResults: concatenatedResults,
+  // 각 영역별로 OCR 명령어 실행
+  async function processOcr(processedFiles) {
+    const processedImagePaths = processedFiles
+      .map((file) => `"${file}"`)
+      .join(" ");
+    const command = `python ocr.py ${processedImagePaths}`;
+    return new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error || stderr) {
+          reject(error || stderr);
+        } else {
+          resolve(
+            stdout
+              .trim()
+              .split("\n")
+              .map((result) => JSON.parse(result.replace(/'/g, '"')))
+          );
+        }
       });
-    } catch (parseError) {
-      console.error(`결과 파싱 중 오류: ${parseError}`);
-      res.status(500).send("OCR 결과 파싱 중 오류 발생");
+    });
+  }
+
+  try {
+    const resultsWeekly = await processOcr(weekly_score_Area);
+    const resultsSuro = await processOcr(suro_score_Area);
+    const resultsFlag = await processOcr(flag_score_Area);
+
+    // 전처리된 파일들을 삭제하는 로직
+    const allProcessedFiles = suro_score_Area.concat(
+      weekly_score_Area,
+      flag_score_Area
+    );
+    for (const filePath of allProcessedFiles) {
+      await fs.promises.unlink(filePath);
     }
-  });
+
+    console.log("OCR 작업 완료한 파일들이 삭제되었습니다.");
+
+    // 합쳐진 결과 반환
+    res.send({
+      message: "OCR 처리 및 파일 삭제 완료",
+      weekly_score_Area: resultsWeekly.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+      suro_score_Area: resultsFlag.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+      flag_score_Area: resultsSuro.reduce(
+        (acc, current) => acc.concat(current),
+        []
+      ),
+    });
+  } catch (error) {
+    console.error(`OCR 처리 중 오류: ${error}`);
+    res.status(500).send("OCR 처리 중 오류 발생");
+  }
 });
 
-app.get('/Graphpage/:memberName', async (req, res) => {
+app.get("/Graphpage/:memberName", async (req, res) => {
   try {
-      const { memberName } = req.params;
-      // Characters 테이블에서 memberName으로 캐릭터를 조회합니다.
-      const character = await Character.findOne({
-          raw: true,
-          where: { name: memberName },
-          attributes: ['id'] // 캐릭터의 ID만 조회합니다.
-      });
+    const { memberName } = req.params;
+    // Characters 테이블에서 memberName으로 캐릭터를 조회합니다.
+    const character = await Character.findOne({
+      raw: true,
+      where: { name: memberName },
+      attributes: ["id"], // 캐릭터의 ID만 조회합니다.
+    });
 
-      if (!character) {
-          return res.status(404).send('Character not found');
-      }
+    if (!character) {
+      return res.status(404).send("Character not found");
+    }
 
-      // 해당 캐릭터 ID를 가진 모든 레코드를 조회합니다.
-      const records = await Record.findAll({
-          raw: true,
-          where: { character_id: character.id }
-      });
+    // 해당 캐릭터 ID를 가진 모든 레코드를 조회합니다.
+    const records = await Record.findAll({
+      raw: true,
+      where: { character_id: character.id },
+    });
 
-      if (!records) {
-          return res.status(404).send('Records not found');
-      }
+    if (!records) {
+      return res.status(404).send("Records not found");
+    }
 
-      // 조회된 레코드를 JSON 형태로 반환합니다.
-      res.json(records);
-      console.log('records : ', records)
+    // 조회된 레코드를 JSON 형태로 반환합니다.
+    res.json(records);
+    console.log("records : ", records);
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
