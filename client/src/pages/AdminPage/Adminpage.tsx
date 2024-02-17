@@ -9,6 +9,7 @@ interface TableRowData {
   weekly_score: number;
   suro_score: number;
   flag_score: number;
+  noble_limit: boolean;
 }
 
 interface SortConfig {
@@ -131,7 +132,6 @@ const Adminpage: React.FC = () => {
       })
       .then((response) => response.json())
       .then((data) => {
-        // 서버로부터 받은 최신 데이터로 UI 업데이트
         setTableData(data);
         alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
       })
@@ -253,6 +253,7 @@ const Adminpage: React.FC = () => {
         weekly_score: 0,
         suro_score: 0,
         flag_score: 0,
+        noble_limit: false,
       };
 
       newData = [
@@ -445,6 +446,7 @@ const Adminpage: React.FC = () => {
             <th onClick={() => sortData("weekly_score")}>주간점수</th>
             <th onClick={() => sortData("suro_score")}>수로</th>
             <th onClick={() => sortData("flag_score")}>플래그</th>
+            <th>노블제한</th> 
           </tr>
         </thead>
         <tbody>
@@ -557,6 +559,7 @@ const Adminpage: React.FC = () => {
                     <td>{row.weekly_score}</td>
                     <td>{row.suro_score}</td>
                     <td>{row.flag_score}</td>
+                    <td>{row.noble_limit ? "제한됨" : "제한 없음"}</td>
                   </>
                 )}
               </tr>
