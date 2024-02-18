@@ -9,6 +9,12 @@ async function getCharacter(characterName) {
     return character;
 }
 
+async function getCharacterByOcid(ocid) {
+    const character = await Character.findOne({ where: { ocid: ocid } });
+
+    return character;
+}
+
 async function getCharactersByGuild(guildName, worldName) {
     // const worldId = await WorldService.getWorldId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldName);
@@ -101,9 +107,9 @@ async function updateCharacter(characterName) {
         console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
     }
 }
-
 module.exports = {
     getCharacter,
+    getCharacterByOcid,
     getCharactersByGuild,
     createCharacter,
     updateCharacter,
