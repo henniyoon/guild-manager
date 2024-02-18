@@ -371,12 +371,6 @@ const Adminpage: React.FC = () => {
       .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
   };
 
-  // 모두 선택 버튼의 이벤트 핸들러
-const handleSelectAllFilteredRows = () => {
-  const filteredRowIds = getFilteredRowIds();
-  setSelectedRowIds(filteredRowIds);
-};
-
 // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
 const handleSelectOrDeselectAll = () => {
   // 현재 선택된 행이 하나라도 있는지 확인합니다.
