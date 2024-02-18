@@ -48,7 +48,6 @@ const Adminpage: React.FC = () => {
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
-    // 기존 로직 유지
     const url = `/records?week=${encodeURIComponent(selectedDate)}`;
     const token = localStorage.getItem("token");
   
@@ -61,47 +60,22 @@ const Adminpage: React.FC = () => {
     })
     .then((response) => response.json())
     .then((data) => {
-      // 커스텀 정렬 로직을 사용하여 숫자, 영어, 한글 순으로 정렬합니다.
-      const sortedData = data.sort((a: { character_name: string; }, b: { character_name: string; }) => {
-        // 정규 표현식을 사용하여 비교 대상이 숫자인지, 영어인지 확인합니다.
-        const isANumeric = /^\d/.test(a.character_name);
-        const isBNumeric = /^\d/.test(b.character_name);
-        const isAEnglish = /^[A-Za-z]/.test(a.character_name);
-        const isBEnglish = /^[A-Za-z]/.test(b.character_name);
-  
-        // 둘 다 숫자로 시작하는 경우
-        if (isANumeric && isBNumeric) {
-          return a.character_name.localeCompare(b.character_name, undefined, {numeric: true});
-        }
-        // A만 숫자로 시작하는 경우
-        if (isANumeric) return -1;
-        // B만 숫자로 시작하는 경우
-        if (isBNumeric) return 1;
-  
-        // 둘 다 영어로 시작하는 경우
-        if (isAEnglish && isBEnglish) {
-          return a.character_name.localeCompare(b.character_name);
-        }
-        // A만 영어로 시작하는 경우
-        if (isAEnglish) return -1;
-        // B만 영어로 시작하는 경우
-        if (isBEnglish) return 1;
-  
-        // 그 외의 경우 (한글 등), 문자열 비교를 사용합니다.
-        return a.character_name.localeCompare(b.character_name);
+      // 데이터를 character_name 기준으로 오름차순 정렬합니다.
+      // localeCompare 대신 기본 비교 연산자를 사용합니다.
+      const sortedData = data.sort((a: { character_name: number; }, b: { character_name: number; }) => {
+        if (a.character_name < b.character_name) return -1;
+        if (a.character_name > b.character_name) return 1;
+        return 0;
       });
-  
       setTableData(sortedData);
       setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
     })
     .catch((error) => console.error("데이터를 불러오는 데 실패했습니다:", error));
   };
   
-  
-  // useEffect를 사용하여 컴포넌트 마운트 시 fetchTableData를 호출
   useEffect(() => {
     fetchTableData();
-  }, [selectedDate]); // selectedDate가 변경될 때마다 데이터를 새로 불러옵니다.
+  }, [selectedDate]);
 
   // 편집 모드 전환 함수
   const toggleEditMode = () => {
