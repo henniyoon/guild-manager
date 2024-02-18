@@ -48,29 +48,31 @@ const Adminpage: React.FC = () => {
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
-    // selectedDate를 사용하여 서버에 요청 보내기
     const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-    // 로컬 스토리지에서 토큰 가져오기
     const token = localStorage.getItem("token");
-
+  
     fetch(url, {
-      method: "GET", // 요청 메소드 설정
+      method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`, // 토큰을 헤더에 추가
-        "Content-Type": "application/json", // 내용 유형 지정 (필요한 경우)
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("guild+week 조회된 데이터 : ", data);
-        setTableData(data);
-        setEditedData(data);
-      })
-      .catch((error) =>
-        console.error("데이터를 불러오는 데 실패했습니다:", error)
-      );
+    .then((response) => response.json())
+    .then((data) => {
+      // 데이터를 character_name 기준으로 오름차순 정렬합니다.
+      // localeCompare 대신 기본 비교 연산자를 사용합니다.
+      const sortedData = data.sort((a: { character_name: number; }, b: { character_name: number; }) => {
+        if (a.character_name < b.character_name) return -1;
+        if (a.character_name > b.character_name) return 1;
+        return 0;
+      });
+      setTableData(sortedData);
+      setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
+    })
+    .catch((error) => console.error("데이터를 불러오는 데 실패했습니다:", error));
   };
-
+  
   useEffect(() => {
     fetchTableData();
   }, [selectedDate]);
@@ -335,6 +337,59 @@ const Adminpage: React.FC = () => {
 
     setTableData(newTableData); // 업데이트된 테이블 데이터로 상태 업데이트
   };
+
+  const getFilteredRowIds = () => {
+    return tableData
+      .filter((row) => {
+        const minWeeklyScore = filters.weekly_score.min
+          ? parseInt(filters.weekly_score.min, 10)
+          : -Infinity;
+        const maxWeeklyScore = filters.weekly_score.max
+          ? parseInt(filters.weekly_score.max, 10)
+          : Infinity;
+        const minSuroScore = filters.suro_score.min
+          ? parseInt(filters.suro_score.min, 10)
+          : -Infinity;
+        const maxSuroScore = filters.suro_score.max
+          ? parseInt(filters.suro_score.max, 10)
+          : Infinity;
+        const minFlagScore = filters.flag_score.min
+          ? parseInt(filters.flag_score.min, 10)
+          : -Infinity;
+        const maxFlagScore = filters.flag_score.max
+          ? parseInt(filters.flag_score.max, 10)
+          : Infinity;
+  
+        // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
+        return (
+          (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
+          (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
+          (!minSuroScore || row.suro_score >= minSuroScore) &&
+          (!maxSuroScore || row.suro_score <= maxSuroScore) &&
+          (!minFlagScore || row.flag_score >= minFlagScore) &&
+          (!maxFlagScore || row.flag_score <= maxFlagScore)
+        );
+      })
+      .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
+  };
+
+// 모두 선택 또는 선택 해제 버튼 클릭 핸들러
+const handleSelectOrDeselectAll = () => {
+  // 현재 선택된 행이 하나라도 있는지 확인합니다.
+  if (selectedRowIds.length > 0) {
+    // 선택된 행이 있다면 모든 선택을 해제합니다.
+    setSelectedRowIds([]);
+  } else {
+    // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
+    const filteredRowIds = getFilteredRowIds();
+    setSelectedRowIds(filteredRowIds);
+  }
+};
+
+// 버튼 텍스트 동적으로 설정
+const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "모두 선택";
+
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -420,6 +475,7 @@ const Adminpage: React.FC = () => {
         </div>
       </div>
       <button onClick={testclick}>목록 불러오기</button>
+      <button onClick={handleSelectOrDeselectAll}>{selectDeselectButtonText}</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
       <>
