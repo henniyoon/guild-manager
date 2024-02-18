@@ -335,6 +335,48 @@ const Adminpage: React.FC = () => {
 
     setTableData(newTableData); // 업데이트된 테이블 데이터로 상태 업데이트
   };
+
+  const getFilteredRowIds = () => {
+    return tableData
+      .filter((row) => {
+        const minWeeklyScore = filters.weekly_score.min
+          ? parseInt(filters.weekly_score.min, 10)
+          : -Infinity;
+        const maxWeeklyScore = filters.weekly_score.max
+          ? parseInt(filters.weekly_score.max, 10)
+          : Infinity;
+        const minSuroScore = filters.suro_score.min
+          ? parseInt(filters.suro_score.min, 10)
+          : -Infinity;
+        const maxSuroScore = filters.suro_score.max
+          ? parseInt(filters.suro_score.max, 10)
+          : Infinity;
+        const minFlagScore = filters.flag_score.min
+          ? parseInt(filters.flag_score.min, 10)
+          : -Infinity;
+        const maxFlagScore = filters.flag_score.max
+          ? parseInt(filters.flag_score.max, 10)
+          : Infinity;
+  
+        // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
+        return (
+          (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
+          (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
+          (!minSuroScore || row.suro_score >= minSuroScore) &&
+          (!maxSuroScore || row.suro_score <= maxSuroScore) &&
+          (!minFlagScore || row.flag_score >= minFlagScore) &&
+          (!maxFlagScore || row.flag_score <= maxFlagScore)
+        );
+      })
+      .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
+  };
+
+  // 모두 선택 버튼의 이벤트 핸들러
+const handleSelectAllFilteredRows = () => {
+  const filteredRowIds = getFilteredRowIds();
+  setSelectedRowIds(filteredRowIds);
+};
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -420,6 +462,7 @@ const Adminpage: React.FC = () => {
         </div>
       </div>
       <button onClick={testclick}>목록 불러오기</button>
+      <button onClick={handleSelectAllFilteredRows}>모두 선택</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
       <>
