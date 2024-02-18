@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useAuth } from "../../../components/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+// import * as React from 'react';
+import Button from '@mui/material/Button';
 
 interface LoginProps {
   // 필요한 경우 추가 props 정의
@@ -54,6 +56,7 @@ const Login: React.FC<LoginProps> = () => {
   };
 
   return (
+    
     <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="email">이메일:</label>
@@ -75,7 +78,7 @@ const Login: React.FC<LoginProps> = () => {
           required
         />
       </div>
-      <button type="submit">로그인</button>
+      <Button variant="contained" type="submit">로그인</Button>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
     </form>
   );
