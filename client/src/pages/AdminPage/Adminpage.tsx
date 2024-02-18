@@ -377,6 +377,23 @@ const handleSelectAllFilteredRows = () => {
   setSelectedRowIds(filteredRowIds);
 };
 
+// 모두 선택 또는 선택 해제 버튼 클릭 핸들러
+const handleSelectOrDeselectAll = () => {
+  // 현재 선택된 행이 하나라도 있는지 확인합니다.
+  if (selectedRowIds.length > 0) {
+    // 선택된 행이 있다면 모든 선택을 해제합니다.
+    setSelectedRowIds([]);
+  } else {
+    // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
+    const filteredRowIds = getFilteredRowIds();
+    setSelectedRowIds(filteredRowIds);
+  }
+};
+
+// 버튼 텍스트 동적으로 설정
+const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "모두 선택";
+
+
   return (
     <div>
       <h1>관리자 페이지</h1>
@@ -462,7 +479,7 @@ const handleSelectAllFilteredRows = () => {
         </div>
       </div>
       <button onClick={testclick}>목록 불러오기</button>
-      <button onClick={handleSelectAllFilteredRows}>모두 선택</button>
+      <button onClick={handleSelectOrDeselectAll}>{selectDeselectButtonText}</button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
       <>
