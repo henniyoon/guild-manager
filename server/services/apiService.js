@@ -27,7 +27,7 @@ async function getApiResponse(url, apiKey = API_KEY) {
 // 길드명, 월드명으로 oguild_id 조회
 async function getOguildId(guild, worldName) {
     const guildIdUrl = `${API_BASE_URL}/guild/id?guild_name=${encodeURIComponent(guild)}&world_name=${encodeURIComponent(worldName)}`;
-
+    
     return await getApiResponse(guildIdUrl);
 }
 
@@ -41,7 +41,7 @@ async function getGuildBasicData(oguildId) {
 // 캐릭터명으로 ocid 조회
 async function getCharacterOcid(characterName) {
     const characterOcidUrl = `${API_BASE_URL}/id?character_name=${encodeURIComponent(characterName)}`;
-
+    
     return await getApiResponse(characterOcidUrl);
 }
 
@@ -55,7 +55,7 @@ async function getCharacterBasicData(ocid) {
 // 월드명과 ocid로 캐릭터 유니온 랭킹 조회 (본캐 찾기)
 async function getMainCharacterName(worldName, ocid) {
     const unionRankingUrl = `${API_BASE_URL}/ranking/union?date=${formattedDate}&world_name=${encodeURIComponent(worldName)}&ocid=${encodeURIComponent(ocid)}`;
-
+    
     return await getApiResponse(unionRankingUrl);
 }
 
@@ -95,6 +95,7 @@ async function getHistoryCharacterNames(apiKey) {
             }   
         }
         const uniqueCharacterNames = [...new Set(characterNames)];
+        
         return uniqueCharacterNames;
     } catch (error) {
         console.error('API 조회 에러:', error);
@@ -110,6 +111,3 @@ module.exports = {
     getMainCharacterName,
     getHistoryCharacterNames,
 };
-
-// getHistoryCharacterNames("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3");
-// getMainCharacterName("스카니아", "bff1b13291a2d97cc0b7a988cd3095d6");

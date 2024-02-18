@@ -14,7 +14,7 @@ const SelectServer = ({ value, onChange }: SelectServerProps) => {
   };
 
   return (
-    <select title="SelectServer" className="form-select" value={value} onChange={handleChange}>
+    <select title="SelectServer" className="form-select border-0 bg-transparent text-white" value={value} onChange={handleChange}>
       {options.map((option, index) => (
         <option key={index} value={option}>{option}</option>
       ))}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './styles/Guildpage.module.css'
 import Button from '../../components/Button';
+import { Container, Card, Row, Col } from 'react-bootstrap';
 
 interface GuildData {
   id: number;
@@ -80,50 +81,57 @@ const Guildpage: React.FC = () => {
     // 캐릭터 카드를 클릭했을 때 해당 경로로 이동
     navigate(`/Graphpage/${character.name}`);
   };
+
   return (
-    <div>
+    <Container>
+      {/* <img src="/guildpage.png"></img> */}
       {guildData && (
-        <div>
-          <div>
-            <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" />
-            <h1>{guildName}</h1>
-            <p>Lv.{guildData.level}</p>
-          </div>
-          <div>
+        <Row className="m-3">
+          <Col xs={12} md={3}>
+            <Row className="align-items-center">
+              <Col xs="auto" className="p-0">
+                <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
+              </Col>
+              <Col xs="auto" className="p-0">
+                <h1 className="fw-bold">{guildName}</h1>
+              </Col>
+              <Col xs="auto">
+                <p>Lv.{guildData.level}</p>
+              </Col>
+            </Row>
+          </Col>
+          <Col xs={12} md={7}>
             <p>마스터: {guildData.master_name}</p>
             <p>길드원: {guildData.member_count}명</p>
             <p>노블: {guildData.noblesse_skill_level}</p>
-          </div>
-        </div>
+          </Col>
+          <Col xs={12} md={2} className="text-end">
+            <Button className="mt-1 mb-1 contents" onClick={AdminButtonClick}>Admin</Button>
+          </Col>
+        </Row>
       )}
-      <Button onClick={AdminButtonClick}>Admin</Button>
 
       {characterData && characterData.length > 0 && (
-        <div className={styles.memberUl}>
+        <Row xs={1} md={5} className="mt-2 g-4 justify-content-center">
           {characterData.map((character, index) => (
-            <div
-              key={index}
-              className={styles.memberLi}
-              onClick={() => handleMemberClick(character)}
-            >
-              <div className={`${styles.padding15} ${styles.card}`}>
-                <>
-                  <img
-                    src={character.image}
-                    alt="Character Image"
-                    className={styles.characterImage}
-                  />
-                  <h4>{character.name}</h4>
-                  <p>Lv.{character.level}</p>
-                  <p>{character.class}</p>
-                </>
-              </div>
-            </div>
+            // <Col  className="mb-3">
+            <Card key={index} className="m-2 p-2 border-dark text-center d-flex flex-column h-100" onClick={() => handleMemberClick(character)} style={{ width: '100%', maxWidth: '12rem' }}>
+              {/* <div className=""> */}
+              <Card.Img src={character.image} alt="Character Image" className="card-img-top p-3 pb-0" style={{ objectFit: 'cover' }} />
+              <Card.Body className="p-2 flex-grow-1">
+                {character.name} <br />
+                Lv.{character.level} <br />
+                {character.class}
+              </Card.Body>
+              {/* </div> */}
+            </Card>
+            // </Col>
           ))}
-        </div>
+        </Row>
       )}
-    </div>
+    </Container>
   );
+
 };
 
 export default Guildpage;
