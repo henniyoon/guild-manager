@@ -34,15 +34,15 @@ const Header: React.FC = () => {
     }
   };
 
+  const drawerWidth = 240;
+
   return (
-    <AppBar position="static" className={styles.appBar}>
+    <AppBar 
+    position="fixed"
+    sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+    >
       <Toolbar>
-        <Link to="/" className={styles.logoLink}>
-          <img src="/logo.png" className={styles.logo} alt="Guild Manager Logo" />
-          <Typography variant="h5" noWrap>
-            길드매니저
-          </Typography>
-        </Link>
+        
         <div className={styles.grow} />
         <div className={styles.authLinks}>{renderAuthLinks()}</div>
       </Toolbar>
