@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/SelectServer.css';
+import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 
 interface SelectServerProps {
   value: string;
@@ -7,18 +7,25 @@ interface SelectServerProps {
 }
 
 const SelectServer = ({ value, onChange }: SelectServerProps) => {
-  const options = ['스카니아', '루나', '엘리시움','리부트2'];
+  const options = ['스카니아', '루나', '엘리시움', '리부트2'];
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (e: SelectChangeEvent<string>) => {
     onChange(e.target.value);
   };
 
   return (
-    <select title="SelectServer" className="form-select border-0 bg-transparent text-white" value={value} onChange={handleChange}>
+    <Select
+      value={value}
+      onChange={handleChange}
+      displayEmpty
+      // inputProps={{ 'aria-label': 'Without label' }}
+    >
       {options.map((option, index) => (
-        <option key={index} value={option}>{option}</option>
+        <MenuItem key={index} value={option}>
+          {option}
+        </MenuItem>
       ))}
-    </select>
+    </Select>
   );
 };
 

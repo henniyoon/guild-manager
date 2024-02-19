@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/Button.css';
+import '../styles/Button.css';
 
 interface ButtonProps {
   children: React.ReactNode;
