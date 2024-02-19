@@ -276,16 +276,19 @@ const Adminpage: React.FC = () => {
       const filesArray = Array.from(event.target.files).slice(0, 15); // 최대 15개 파일 선택
       setSelectedFiles(filesArray);
       console.log("선택된 파일들:", filesArray);
+  
+      // 파일 선택 후 자동으로 업로드 실행
+      handleUploadFiles(filesArray);
     }
   };
 
   // 파일 서버로 전송
-  const handleUploadFiles = () => {
+  const handleUploadFiles = (files: File[]) => {
     const formData = new FormData();
-    selectedFiles.forEach((file) => {
+    files.forEach((file) => {
       formData.append("files", file);
     });
-
+  
     fetch("/uploadImages", {
       method: "POST",
       body: formData,
@@ -296,7 +299,6 @@ const Adminpage: React.FC = () => {
         alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
         updateTableDataWithOcrResults(data);
-        
       })
       .catch((error) => {
         console.error("업로드 실패:", error);
@@ -495,7 +497,6 @@ const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "
           style={{ display: "none" }}
           accept="image/*" // 이미지 파일만 선택 가능하도록 설정
         />
-        <button onClick={handleUploadFiles}>파일 업로드</button>
       </>
       <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
       <button onClick={handleSaveClick}>저장</button>
