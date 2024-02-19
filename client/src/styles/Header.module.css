@@ -1,0 +1,37 @@
+Header.module.css
+
+.appBar {
+  background-color: #000000; /* 배경색을 원하는 색상으로 지정하세요 */
+  padding: 2px; /* 패딩을 원하는 크기로 지정하세요 */
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo {
+  max-height: 50px;
+  margin-right: 10px;
+}
+
+h1 {
+  margin: 0;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+  margin-right: 10px;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.authLinks {
+  display: flex;
+  align-items: center;
+}

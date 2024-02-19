@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/InputBox.css'
+import { TextField } from '@mui/material';
 
 interface InputBoxProps {
   value: string;
@@ -12,10 +12,9 @@ const InputBox = ({ value, onChange }: InputBoxProps) => {
   };
 
   return (
-    <input
-      type="search"
-      className="form-control border-0 bg-transparent text-white"
-      placeholder="길드명을 입력하세요"
+    <TextField
+      id="filled-search"
+      placeholder='길드를 검색하세요'
       value={value}
       onChange={handleInputChange}
     />

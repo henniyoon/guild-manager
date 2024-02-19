@@ -1,43 +1,52 @@
 import React from 'react';
-import '../style/Header.css';
 import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import AppBar from '@mui/material/AppBar';
+import { Toolbar, Button, Typography } from '@mui/material';
+import styles from '../styles/Header.module.css';
 
 const Header: React.FC = () => {
   const { isLoggedIn, userInfo, logout } = useAuth();
-  const linkStyle = {
-    textDecoration: 'none',
-    color: 'inherit'
+
+  const renderAuthLinks = () => {
+    if (!isLoggedIn) {
+      return (
+        <>
+          <Button component={Link} to="/SignUp" color="inherit" className={styles.link}>
+            회원가입
+          </Button>
+          <Button component={Link} to="/Login" color="inherit" className={styles.link}>
+            로그인
+          </Button>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Button component={Link} to="/MyPage" color="inherit" className={styles.link}>
+            {userInfo?.username}
+          </Button>
+          <Button color="inherit" onClick={logout} className={styles.link}>
+            로그아웃
+          </Button>
+        </>
+      );
+    }
   };
 
+  const drawerWidth = 240;
+
   return (
-    <header className="header p-1" style={{ textAlign: 'center', padding: '10px 0' }}>
-      <nav className="navbar bg-body-tertiary">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">
-            <Link to="/" style={linkStyle}>
-              <img src="/logo.png" style={{ maxHeight: '50px', marginRight: '10px' }} alt="Guild Manager Logo" />
-              길드매니저
-            </Link>
-          </a>
-        </div>
-      </nav>
-      <nav className="nav">
-        {!isLoggedIn && (
-          <>
-            <Link to="/SignUp">회원가입</Link>
-            <Link to="/Login">로그인</Link>
-          </>
-        )}
-        {isLoggedIn && (
-          <>
-            <Link to="/MyPage">{userInfo?.username}</Link>
-            {/* <span>{userInfo?.username}</span> */}
-            <button onClick={logout}>로그아웃</button>
-          </>
-        )}
-      </nav>
-    </header>
+    <AppBar 
+    position="fixed"
+    sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+    >
+      <Toolbar>
+        
+        <div className={styles.grow} />
+        <div className={styles.authLinks}>{renderAuthLinks()}</div>
+      </Toolbar>
+    </AppBar>
   );
 };
 
