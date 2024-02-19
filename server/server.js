@@ -194,6 +194,7 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     const resultsFlag = await processOcr(flag_score_Area);
 
     // 전처리된 파일들을 삭제하는 로직
+    cleanUpOldFiles('uploads', MAX_FILES);
     const allProcessedFiles = suro_score_Area.concat(
       weekly_score_Area,
       flag_score_Area
@@ -225,6 +226,34 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     res.status(500).send("OCR 처리 중 오류 발생");
   }
 });
+
+// 최대 저장 가능한 이미지 파일 개수
+const MAX_FILES = 20;
+
+// uploads 폴더 내의 파일 정리 함수
+function cleanUpOldFiles() {
+  const directory = 'uploads';
+
+  fs.readdir(directory, (err, files) => {
+    if (err) throw err;
+
+    if (files.length > MAX_FILES) {
+      // 파일 생성 시간으로 정렬
+      files.sort((a, b) => {
+        const statA = fs.statSync(path.join(directory, a)).mtime.getTime();
+        const statB = fs.statSync(path.join(directory, b)).mtime.getTime();
+        return statA - statB;
+      });
+
+      // 최대 개수를 초과하는 오래된 파일 삭제
+      while (files.length > MAX_FILES) {
+        const fileToDelete = files.shift();
+        fs.unlinkSync(path.join(directory, fileToDelete));
+        console.log(`${fileToDelete} has been deleted`);
+      }
+    }
+  });
+}
 
 app.get("/Graphpage/:memberName", async (req, res) => {
   try {
