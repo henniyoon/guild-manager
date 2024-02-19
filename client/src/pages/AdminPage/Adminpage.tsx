@@ -50,7 +50,7 @@ const Adminpage: React.FC = () => {
   const fetchTableData = () => {
     const url = `/records?week=${encodeURIComponent(selectedDate)}`;
     const token = localStorage.getItem("token");
-  
+
     fetch(url, {
       method: "GET",
       headers: {
@@ -58,21 +58,25 @@ const Adminpage: React.FC = () => {
         "Content-Type": "application/json",
       },
     })
-    .then((response) => response.json())
-    .then((data) => {
-      // 데이터를 character_name 기준으로 오름차순 정렬합니다.
-      // localeCompare 대신 기본 비교 연산자를 사용합니다.
-      const sortedData = data.sort((a: { character_name: number; }, b: { character_name: number; }) => {
-        if (a.character_name < b.character_name) return -1;
-        if (a.character_name > b.character_name) return 1;
-        return 0;
-      });
-      setTableData(sortedData);
-      setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
-    })
-    .catch((error) => console.error("데이터를 불러오는 데 실패했습니다:", error));
+      .then((response) => response.json())
+      .then((data) => {
+        // 데이터를 character_name 기준으로 오름차순 정렬합니다.
+        // localeCompare 대신 기본 비교 연산자를 사용합니다.
+        const sortedData = data.sort(
+          (a: { character_name: number }, b: { character_name: number }) => {
+            if (a.character_name < b.character_name) return -1;
+            if (a.character_name > b.character_name) return 1;
+            return 0;
+          }
+        );
+        setTableData(sortedData);
+        setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
+      })
+      .catch((error) =>
+        console.error("데이터를 불러오는 데 실패했습니다:", error)
+      );
   };
-  
+
   useEffect(() => {
     fetchTableData();
   }, [selectedDate]);
@@ -203,7 +207,7 @@ const Adminpage: React.FC = () => {
   const testclick = () => {
     const token = localStorage.token;
     console.log(selectedDate);
-  
+
     // test 엔드포인트로 POST 요청을 보내 데이터 업데이트를 수행합니다.
     fetch("/test", {
       method: "POST",
@@ -213,22 +217,22 @@ const Adminpage: React.FC = () => {
       },
       body: JSON.stringify({ selectedDate: selectedDate }),
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("업데이트 성공:", data);
-      // 업데이트가 성공적으로 완료된 후, 최신 데이터를 불러오기 위해
-      // /records?week=${encodeURIComponent(selectedDate)} 엔드포인트로 GET 요청을 보냅니다.
-      return fetchTableData(); // 기존에 정의된 데이터 불러오는 함수를 재사용
-    })
-    .catch(error => {
-      console.error("업데이트 실패:", error);
-      alert("업데이트에 실패했습니다.");
-    });
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("업데이트 성공:", data);
+        // 업데이트가 성공적으로 완료된 후, 최신 데이터를 불러오기 위해
+        // /records?week=${encodeURIComponent(selectedDate)} 엔드포인트로 GET 요청을 보냅니다.
+        return fetchTableData(); // 기존에 정의된 데이터 불러오는 함수를 재사용
+      })
+      .catch((error) => {
+        console.error("업데이트 실패:", error);
+        alert("업데이트에 실패했습니다.");
+      });
   };
   // ? 길드원 채워넣는 로직 끝
 
@@ -276,7 +280,7 @@ const Adminpage: React.FC = () => {
       const filesArray = Array.from(event.target.files).slice(0, 15); // 최대 15개 파일 선택
       setSelectedFiles(filesArray);
       console.log("선택된 파일들:", filesArray);
-  
+
       // 파일 선택 후 자동으로 업로드 실행
       handleUploadFiles(filesArray);
     }
@@ -288,7 +292,7 @@ const Adminpage: React.FC = () => {
     files.forEach((file) => {
       formData.append("files", file);
     });
-  
+
     fetch("/uploadImages", {
       method: "POST",
       body: formData,
@@ -306,44 +310,62 @@ const Adminpage: React.FC = () => {
       });
   };
 
-// OCR 결과를 테이블 데이터에 반영하고, 서버로 전송하는 함수
-const updateTableDataWithOcrResults = (ocrData: { flag_score_Area?: never[] | undefined; suro_score_Area?: never[] | undefined; weekly_score_Area?: never[] | undefined; }) => {
-  const { flag_score_Area = [], suro_score_Area = [], weekly_score_Area = [] } = ocrData;
+  // OCR 결과를 테이블 데이터에 반영하고, 서버로 전송하는 함수
+  const updateTableDataWithOcrResults = (ocrData: {
+    flag_score_Area?: never[] | undefined;
+    suro_score_Area?: never[] | undefined;
+    weekly_score_Area?: never[] | undefined;
+  }) => {
+    const {
+      flag_score_Area = [],
+      suro_score_Area = [],
+      weekly_score_Area = [],
+    } = ocrData;
 
-  // 새로운 테이블 데이터를 생성합니다.
-  const newTableData = tableData.map((row, index) => ({
-    ...row,
-    weekly_score: weekly_score_Area[index] ?? row.weekly_score,
-    suro_score: suro_score_Area[index] ?? row.suro_score,
-    flag_score: flag_score_Area[index] ?? row.flag_score,
-  }));
+    // 새로운 테이블 데이터를 생성합니다.
+    const newTableData = tableData.map((row, index) => ({
+      ...row,
+      weekly_score: weekly_score_Area[index] ?? row.weekly_score,
+      suro_score: suro_score_Area[index] ?? row.suro_score,
+      flag_score: flag_score_Area[index] ?? row.flag_score,
+    }));
 
-  // 상태를 업데이트합니다.
-  setTableData(newTableData);
+    // 상태를 업데이트합니다.
+    setTableData(newTableData);
 
-  // 업데이트된 데이터를 서버로 전송합니다.
-  sendAllDataToServer(newTableData);
-};
+    // 업데이트된 데이터를 서버로 전송합니다.
+    sendAllDataToServer(newTableData);
+  };
 
-// 모든 데이터를 서버로 전송하는 함수
-const sendAllDataToServer = (updatedData: { weekly_score: any; suro_score: any; flag_score: any; id: number; character_id: number; character_name: string; noble_limit: boolean; }[]) => {
-  fetch("/updateRecords", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updatedData),
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log("데이터 전체 업데이트 성공:", data);
-    alert("모든 데이터가 성공적으로 서버에 업데이트되었습니다.");
-  })
-  .catch(error => {
-    console.error("데이터 전체 업데이트 실패:", error);
-    alert("데이터 전체 업데이트에 실패했습니다.");
-  });
-};
+  // 모든 데이터를 서버로 전송하는 함수
+  const sendAllDataToServer = (
+    updatedData: {
+      weekly_score: any;
+      suro_score: any;
+      flag_score: any;
+      id: number;
+      character_id: number;
+      character_name: string;
+      noble_limit: boolean;
+    }[]
+  ) => {
+    fetch("/updateRecords", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("데이터 전체 업데이트 성공:", data);
+        alert("모든 데이터가 성공적으로 서버에 업데이트되었습니다.");
+      })
+      .catch((error) => {
+        console.error("데이터 전체 업데이트 실패:", error);
+        alert("데이터 전체 업데이트에 실패했습니다.");
+      });
+  };
 
   const getFilteredRowIds = () => {
     return tableData
@@ -366,7 +388,7 @@ const sendAllDataToServer = (updatedData: { weekly_score: any; suro_score: any; 
         const maxFlagScore = filters.flag_score.max
           ? parseInt(filters.flag_score.max, 10)
           : Infinity;
-  
+
         // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
         return (
           (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
@@ -380,22 +402,22 @@ const sendAllDataToServer = (updatedData: { weekly_score: any; suro_score: any; 
       .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
   };
 
-// 모두 선택 또는 선택 해제 버튼 클릭 핸들러
-const handleSelectOrDeselectAll = () => {
-  // 현재 선택된 행이 하나라도 있는지 확인합니다.
-  if (selectedRowIds.length > 0) {
-    // 선택된 행이 있다면 모든 선택을 해제합니다.
-    setSelectedRowIds([]);
-  } else {
-    // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
-    const filteredRowIds = getFilteredRowIds();
-    setSelectedRowIds(filteredRowIds);
-  }
-};
+  // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
+  const handleSelectOrDeselectAll = () => {
+    // 현재 선택된 행이 하나라도 있는지 확인합니다.
+    if (selectedRowIds.length > 0) {
+      // 선택된 행이 있다면 모든 선택을 해제합니다.
+      setSelectedRowIds([]);
+    } else {
+      // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
+      const filteredRowIds = getFilteredRowIds();
+      setSelectedRowIds(filteredRowIds);
+    }
+  };
 
-// 버튼 텍스트 동적으로 설정
-const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "모두 선택";
-
+  // 버튼 텍스트 동적으로 설정
+  const selectDeselectButtonText =
+    selectedRowIds.length > 0 ? "선택 해제" : "모두 선택";
 
   return (
     <div>
@@ -403,6 +425,7 @@ const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       {/* 필터링 조건을 입력받는 UI 구성 */}
       <div>
+        <label>주간점수 이상:</label>
         <input
           type="text"
           placeholder="주간점수 최소값"
@@ -414,6 +437,7 @@ const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "
             })
           }
         />
+        <label>주간점수 이하:</label>
         <input
           type="text"
           placeholder="주간점수 최대값"
@@ -482,7 +506,9 @@ const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "
         </div>
       </div>
       <button onClick={testclick}>목록 불러오기</button>
-      <button onClick={handleSelectOrDeselectAll}>{selectDeselectButtonText}</button>
+      <button onClick={handleSelectOrDeselectAll}>
+        {selectDeselectButtonText}
+      </button>
       <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
       <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
       <>
@@ -508,7 +534,7 @@ const selectDeselectButtonText = selectedRowIds.length > 0 ? "선택 해제" : "
             <th onClick={() => sortData("weekly_score")}>주간점수</th>
             <th onClick={() => sortData("suro_score")}>수로</th>
             <th onClick={() => sortData("flag_score")}>플래그</th>
-            <th>노블</th> 
+            <th>노블</th>
           </tr>
         </thead>
         <tbody>
