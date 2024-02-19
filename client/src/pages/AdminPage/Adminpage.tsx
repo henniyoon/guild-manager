@@ -295,6 +295,7 @@ const Adminpage: React.FC = () => {
         alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
         updateTableDataWithOcrResults(data);
+        
       })
       .catch((error) => {
         console.error("업로드 실패:", error);
@@ -302,41 +303,44 @@ const Adminpage: React.FC = () => {
       });
   };
 
-  // OCR 결과를 테이블 데이터에 반영
-  const updateTableDataWithOcrResults = (ocrData: {
-    flag_score_Area: never[];
-    suro_score_Area: never[];
-    weekly_score_Area: never[];
-  }) => {
-    // 각 점수 영역을 안전하게 추출하고, 기본값으로 빈 배열을 설정
-    const flag_score_Area = ocrData.flag_score_Area || [];
-    const suro_score_Area = ocrData.suro_score_Area || [];
-    const weekly_score_Area = ocrData.weekly_score_Area || [];
-    console.log("flag_score_Area : ", flag_score_Area);
-    console.log("ocrData : ", ocrData);
-    // 테이블 데이터 업데이트 로직에 안전한 접근 방법 적용
-    const newTableData = tableData.map((row, index) => {
-      // 안전한 접근을 위해 조건부 연산자 사용
-      const updatedRow = {
-        ...row,
-        weekly_score:
-          weekly_score_Area.length > index
-            ? weekly_score_Area[index]
-            : row.weekly_score,
-        suro_score:
-          suro_score_Area.length > index
-            ? suro_score_Area[index]
-            : row.suro_score,
-        flag_score:
-          flag_score_Area.length > index
-            ? flag_score_Area[index]
-            : row.flag_score,
-      };
-      return updatedRow;
-    });
+// OCR 결과를 테이블 데이터에 반영하고, 서버로 전송하는 함수
+const updateTableDataWithOcrResults = (ocrData: { flag_score_Area?: never[] | undefined; suro_score_Area?: never[] | undefined; weekly_score_Area?: never[] | undefined; }) => {
+  const { flag_score_Area = [], suro_score_Area = [], weekly_score_Area = [] } = ocrData;
 
-    setTableData(newTableData); // 업데이트된 테이블 데이터로 상태 업데이트
-  };
+  // 새로운 테이블 데이터를 생성합니다.
+  const newTableData = tableData.map((row, index) => ({
+    ...row,
+    weekly_score: weekly_score_Area[index] ?? row.weekly_score,
+    suro_score: suro_score_Area[index] ?? row.suro_score,
+    flag_score: flag_score_Area[index] ?? row.flag_score,
+  }));
+
+  // 상태를 업데이트합니다.
+  setTableData(newTableData);
+
+  // 업데이트된 데이터를 서버로 전송합니다.
+  sendAllDataToServer(newTableData);
+};
+
+// 모든 데이터를 서버로 전송하는 함수
+const sendAllDataToServer = (updatedData: { weekly_score: any; suro_score: any; flag_score: any; id: number; character_id: number; character_name: string; noble_limit: boolean; }[]) => {
+  fetch("/updateRecords", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedData),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("데이터 전체 업데이트 성공:", data);
+    alert("모든 데이터가 성공적으로 서버에 업데이트되었습니다.");
+  })
+  .catch(error => {
+    console.error("데이터 전체 업데이트 실패:", error);
+    alert("데이터 전체 업데이트에 실패했습니다.");
+  });
+};
 
   const getFilteredRowIds = () => {
     return tableData
