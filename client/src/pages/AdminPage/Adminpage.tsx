@@ -203,31 +203,32 @@ const Adminpage: React.FC = () => {
   const testclick = () => {
     const token = localStorage.token;
     console.log(selectedDate);
-
+  
+    // test 엔드포인트로 POST 요청을 보내 데이터 업데이트를 수행합니다.
     fetch("/test", {
-      method: "POST", // 또는 'POST', 'PUT', 'DELETE' 등 요청 메소드를 선택합니다.
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Bearer 토큰 형식을 사용하여 Authorization 헤더에 토큰을 포함시킵니다.
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ selectedDate: selectedDate }),
     })
-      .then((response) => {
-        // 서버로부터 받은 응답을 JSON 형식으로 파싱합니다.
-        return response.json();
-      })
-      .then((data) => {
-        // 서버로부터 받은 데이터를 콘솔에 출력합니다.
-        console.log(data);
-        // 받은 데이터를 원하는 방식으로 활용할 수 있습니다.
-        // 예를 들어 UI에 표시하거나 다른 작업을 수행할 수 있습니다.
-      })
-      .catch((error) => {
-        // 오류가 발생한 경우 콘솔에 오류 메시지를 출력합니다.
-        console.error("Error:", error);
-        // 사용자에게 오류를 알리거나 다른 처리를 수행할 수 있습니다.
-      });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("업데이트 성공:", data);
+      // 업데이트가 성공적으로 완료된 후, 최신 데이터를 불러오기 위해
+      // /records?week=${encodeURIComponent(selectedDate)} 엔드포인트로 GET 요청을 보냅니다.
+      return fetchTableData(); // 기존에 정의된 데이터 불러오는 함수를 재사용
+    })
+    .catch(error => {
+      console.error("업데이트 실패:", error);
+      alert("업데이트에 실패했습니다.");
+    });
   };
   // ? 길드원 채워넣는 로직 끝
 
