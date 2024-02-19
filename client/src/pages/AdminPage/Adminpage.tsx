@@ -102,18 +102,16 @@ const Adminpage: React.FC = () => {
   };
 
   const handleSaveClick = () => {
-    // 변경된 행만 추출하기 위한 로직
     const modifiedData = editedData.filter((editedRow) => {
       const originalRow = tableData.find((row) => row.id === editedRow.id);
-      // 여기서는 간단한 객체 비교를 사용합니다. 더 복잡한 데이터 구조의 경우, 깊은 비교(deep comparison)가 필요할 수 있습니다.
       return JSON.stringify(editedRow) !== JSON.stringify(originalRow);
     });
-
+  
     if (modifiedData.length === 0) {
       alert("변경된 데이터가 없습니다.");
       return;
     }
-
+  
     console.log("서버로 전송될 변경된 데이터:", modifiedData);
     fetch("/updateRecords", {
       method: "POST",
@@ -122,30 +120,20 @@ const Adminpage: React.FC = () => {
       },
       body: JSON.stringify(modifiedData), // 변경된 데이터만 전송
     })
-      .then((response) => response.json())
-      .then(() => {
-        console.log("데이터 저장 성공");
-        // 저장이 성공한 후, 선택된 주에 대한 최신 데이터를 불러오기 위해 다시 요청을 보냅니다.
-        const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-        const token = localStorage.getItem("token");
-        return fetch(url, {
-          method: "GET", // 요청 메소드 설정
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        setTableData(data);
-        alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
-      })
-      .catch((error) => {
-        console.error("데이터 업데이트 실패:", error);
-        alert("데이터 업데이트에 실패했습니다.");
-      });
-
+    .then(response => response.json())
+    .then(() => {
+      console.log("데이터 저장 성공");
+      // 여기에서 fetchTableData() 호출
+      return fetchTableData(); // 데이터 저장 성공 후 최신 데이터 불러오기
+    })
+    .then(() => {
+      alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
+    })
+    .catch(error => {
+      console.error("데이터 업데이트 실패:", error);
+      alert("데이터 업데이트에 실패했습니다.");
+    });
+  
     setIsEditMode(false); // 편집 모드 종료
   };
 
