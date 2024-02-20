@@ -53,7 +53,6 @@ async function createGuild(guildName, worldName) {
 // 길드 업데이트
 async function updateGuild(guildName, worldName) {
     try {
-        const worldId = await WorldService.getWorldId(worldName);
         const guild = await getGuild(guildName, worldName);
         let apiData = await APIService.getGuildBasicData(guild.oguild_id);
         
@@ -61,8 +60,6 @@ async function updateGuild(guildName, worldName) {
         apiDate.setHours(apiDate.getHours() + 9);
 
         const updatedGuild = {
-            world_id: worldId,
-            name: guildName,
             master_name: apiData.guild_master_name,
             member_count: apiData.guild_member_count,
             level: apiData.guild_level,
