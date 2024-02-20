@@ -29,19 +29,22 @@ async function createOrUpdateGuildPage(guildName, worldName) {
         const preGuildMembers = await CharacterService.getCharactersByGuild(guildName, worldName);
         const preGuildMemberNames = preGuildMembers.map(member => member.name);
         // 길드 정보 업데이트
-        const updatedGuildMembers = await GuildService.updateGuild(guildName, worldName);
+        const guildMembers = await GuildService.updateGuild(guildName, worldName);
         // 신규 가입자, 탈퇴자 조회
-        const { newMembers, removedMembers } = findNewAndRemovedMembers(preGuildMemberNames, updatedGuildMembers);
-        // 업데이트 한 길드원 + 탈퇴자 정보 갱신
-        const guildMembers = updatedGuildMembers.concat(removedMembers);
+        const { newMembers, removedMembers } = findNewAndRemovedMembers(preGuildMemberNames, guildMembers);
 
-        for(const guildMember of guildMembers) {
+        for (const guildMember of guildMembers) {
             const characterExist = await CharacterService.getCharacter(guildMember);
 
-            if(!characterExist) {
+            if (!characterExist) {
                 await CharacterService.createCharacter(guildName, worldName, guildMember);
             } else {
                 await CharacterService.updateCharacter(guildMember);
+            }
+        }
+        if (removedMembers) {
+            for (const removedMember of removedMembers) {
+                await CharacterService.removeGuildCharacter(removedMember);
             }
         }
     }
