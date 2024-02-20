@@ -1,4 +1,3 @@
-const { workerData } = require('worker_threads');
 const Guild = require('../models/Guild.js');
 const APIService = require('./apiService.js');
 const WorldService = require('./worldService.js');
@@ -86,5 +85,3 @@ module.exports = {
     createGuild,
     updateGuild,
 };
-
-updateGuild("새벽", "루나");
