@@ -17,6 +17,7 @@ table {
     background-color: #f0f0f0; /* 선택된 행의 배경색 */
   }
   
-  .rowHighlight {
+  .row_17th {
     background-color: #e0e0e0; /* 17번째 행마다의 배경색 */
   }
+  
