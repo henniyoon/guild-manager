@@ -522,7 +522,7 @@ const Adminpage: React.FC = () => {
             <th onClick={() => sortData("weekly_score")}>주간점수</th>
             <th onClick={() => sortData("suro_score")}>수로</th>
             <th onClick={() => sortData("flag_score")}>플래그</th>
-            <th>노블</th>
+            <th onClick={() => sortData("noble_limit")}>노블</th>
           </tr>
         </thead>
         <tbody>
