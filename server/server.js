@@ -171,7 +171,7 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     const processedImagePaths = processedFiles
       .map((file) => `"${file}"`)
       .join(" ");
-    const command = `python ocr.py ${processedImagePaths}`;
+    const command = `python3 ocr.py ${processedImagePaths}`;
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         if (error || stderr) {
