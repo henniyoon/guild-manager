@@ -562,7 +562,7 @@ const Adminpage: React.FC = () => {
               onClick={() => handleRowClick(row.id)}
               className={`${styles.rowClickable} ${
                 selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-              } ${index % 17 === 16 ? styles.rowHighlight : ""}`}
+              } ${index % 17 === 16 ? styles.row_17th : ""}`}
             >
                 {isEditMode ? (
                   <>
