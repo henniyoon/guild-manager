@@ -556,14 +556,14 @@ const Adminpage: React.FC = () => {
                 (!maxFlagScore || row.flag_score <= maxFlagScore)
               );
             })
-            .map((row) => (
+            .map((row,index) => (
               <tr
-                key={row.id}
-                onClick={() => handleRowClick(row.id)}
-                className={`${styles.rowClickable} ${
-                  selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-                }`}
-              >
+              key={row.id}
+              onClick={() => handleRowClick(row.id)}
+              className={`${styles.rowClickable} ${
+                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+              } ${index % 17 === 16 ? styles.rowHighlight : ""}`}
+            >
                 {isEditMode ? (
                   <>
                     {/* character_name에 대한 입력 필드. 비어있는 경우 수정 불가능 */}
