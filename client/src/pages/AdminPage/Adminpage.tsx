@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
@@ -285,6 +285,15 @@ const Adminpage: React.FC = () => {
       handleUploadFiles(filesArray);
     }
   };
+  // 컴포넌트 내부에서
+  const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
+
+  const handleFileUploadClick = () => {
+    // fileInputRef.current가 존재하는지 확인
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // 안전하게 click() 메서드 호출
+    }
+  };
 
   // 파일 서버로 전송
   const handleUploadFiles = (files: File[]) => {
@@ -505,36 +514,71 @@ const Adminpage: React.FC = () => {
           />
         </div>
       </div>
-      <button onClick={testclick}>목록 불러오기</button>
-      <button onClick={handleSelectOrDeselectAll}>
+      <button className={styles.buttonStyle} onClick={testclick}>
+        목록 불러오기
+      </button>
+      <button
+        className={styles.buttonStyle}
+        onClick={handleSelectOrDeselectAll}
+      >
         {selectDeselectButtonText}
       </button>
-      <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
-      <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
+      <button
+        className={styles.buttonStyle}
+        onClick={handleAddEmptyRowBelowSelected}
+      >
+        행 추가
+      </button>
+      <button className={styles.buttonStyle} onClick={handleDeleteSelectedRows}>
+        선택된 행 삭제
+      </button>
       <>
-        <label htmlFor="file-upload" className="custom-file-upload">
+        <button
+          type="button"
+          onClick={handleFileUploadClick}
+          className={styles.buttonStyle}
+        >
           이미지 첨부
-        </label>
+        </button>
         <input
-          id="file-upload"
+          title="file-upload"
           type="file"
+          id="file-upload"
+          style={{ display: "none" }}
           multiple
           onChange={handleFileSelect}
-          style={{ display: "none" }}
-          accept="image/*" // 이미지 파일만 선택 가능하도록 설정
+          accept="image/*"
+          ref={fileInputRef} // React Ref 사용
         />
       </>
-      <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
-      <button onClick={handleSaveClick}>저장</button>
+      <button className={styles.buttonStyle} onClick={toggleEditMode}>
+        {isEditMode ? "취소" : "수정"}
+      </button>
+      <button className={styles.buttonStyle} onClick={handleSaveClick}>
+        저장
+      </button>
 
-      <table>
+      <table className={styles.table}>
         <thead>
           <tr>
-            <th onClick={() => sortData("character_name")}>닉네임</th>
-            <th onClick={() => sortData("weekly_score")}>주간점수</th>
-            <th onClick={() => sortData("suro_score")}>수로</th>
-            <th onClick={() => sortData("flag_score")}>플래그</th>
-            <th onClick={() => sortData("noble_limit")}>노블제한</th>
+            <th
+              className={styles.th1}
+              onClick={() => sortData("character_name")}
+            >
+              닉네임
+            </th>
+            <th className={styles.th2} onClick={() => sortData("weekly_score")}>
+              주간점수
+            </th>
+            <th className={styles.th3} onClick={() => sortData("suro_score")}>
+              수로
+            </th>
+            <th className={styles.th4} onClick={() => sortData("flag_score")}>
+              플래그
+            </th>
+            <th className={styles.th5} onClick={() => sortData("noble_limit")}>
+              노블
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -578,7 +622,7 @@ const Adminpage: React.FC = () => {
               >
                 {isEditMode ? (
                   <>
-                    <td>
+                    <td className={styles.td1}>
                       {row.character_name === "" ? (
                         row.character_name
                       ) : (
@@ -596,7 +640,7 @@ const Adminpage: React.FC = () => {
                         />
                       )}
                     </td>
-                    <td>
+                    <td className={styles.td2}>
                       <input
                         title="weekly_score"
                         type="number"
@@ -610,7 +654,7 @@ const Adminpage: React.FC = () => {
                         }
                       />
                     </td>
-                    <td>
+                    <td className={styles.td3}>
                       <input
                         title="suro_score"
                         type="number"
@@ -624,7 +668,7 @@ const Adminpage: React.FC = () => {
                         }
                       />
                     </td>
-                    <td>
+                    <td className={styles.td4}>
                       <input
                         title="flag_score"
                         type="number"
@@ -638,27 +682,31 @@ const Adminpage: React.FC = () => {
                         }
                       />
                     </td>
-                    <input
-                      title="noble_limit"
-                      type="checkbox"
-                      defaultChecked={row.noble_limit}
-                      onChange={(e) =>
-                        handleInputChange(
-                          row.id,
-                          "noble_limit",
-                          e.target.checked.toString()
-                        )
-                      }
-                    />
+                    <td className={styles.td5}>
+                      <input
+                        title="noble_limit"
+                        type="checkbox"
+                        defaultChecked={row.noble_limit}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "noble_limit",
+                            e.target.checked.toString()
+                          )
+                        }
+                      />
+                    </td>
                   </>
                 ) : (
                   // 비편집 모드에서의 행 렌더링
                   <>
-                    <td>{row.character_name}</td>
-                    <td>{row.weekly_score}</td>
-                    <td>{row.suro_score}</td>
-                    <td>{row.flag_score}</td>
-                    <td>{row.noble_limit ? "🔴" : "🟢"}</td>
+                    <td className={styles.td1}>{row.character_name}</td>
+                    <td className={styles.td2}>{row.weekly_score}</td>
+                    <td className={styles.td3}>{row.suro_score}</td>
+                    <td className={styles.td4}>{row.flag_score}</td>
+                    <td className={styles.td5}>
+                      {row.noble_limit ? "🔴" : "🟢"}
+                    </td>
                   </>
                 )}
               </tr>
