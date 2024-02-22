@@ -34,7 +34,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Mainpage />} />
             <Route path="/Guildpage/:worldName/:guildName" element={<Guildpage />} />
             <Route path="/Graphpage/:memberName" element={<Graphpage />} />
-            <Route path="/Adminpage" element={<Adminpage />} />
+            <Route path="/Adminpage/:worldName/:guildName" element={<Adminpage />} />
             <Route path="/Login" element={<Loginpage />} />
             <Route path="/SignUp" element={<SignUppage />} />
             <Route path="/Mypage" element={<Mypage />} />

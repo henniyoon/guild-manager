@@ -95,7 +95,7 @@ const addRecordController = async (req, res) => {
 
 const updateRecordsController = async (req, res) => {
   const updatedRecords = req.body;
-
+console.log('11111111111111', updatedRecords)
   try {
     const result = await RecordService.updateRecords(updatedRecords);
     res.json(result);
