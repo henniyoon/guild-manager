@@ -47,6 +47,7 @@ const Adminpage: React.FC = () => {
     flag_score: { min: "", max: "" },
   });
   const { worldName, guildName } = useParams();
+  const [dataLength, setDataLength] = useState<number>(0);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -225,6 +226,7 @@ const Adminpage: React.FC = () => {
       })
       .then((data) => {
         console.log("업데이트 성공:", data);
+        setDataLength(data.length); // 서버로부터 받은 데이터의 길이를 저장
         // 업데이트가 성공적으로 완료된 후, 최신 데이터를 불러오기 위해
         // /records?week=${encodeURIComponent(selectedDate)} 엔드포인트로 GET 요청을 보냅니다.
         return fetchTableData(); // 기존에 정의된 데이터 불러오는 함수를 재사용
@@ -431,8 +433,11 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <div className={styles.titleContainer}>
-      <h1>관리자 페이지</h1>
-      <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
+        <h1>관리자 페이지</h1>
+        <SelectWeek
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+        />
       </div>
       {/* 필터링 조건을 입력받는 UI 구성 */}
       <div className={styles.filterContainer}>
@@ -524,50 +529,57 @@ const Adminpage: React.FC = () => {
           />
         </div>
       </div>
+      <div className={styles.tableInfoContainer}>
+        <p>서버로부터 받은 길드원 수 : {dataLength}</p>
+        <p>불러온 길드원 수 : {tableData.length}</p>
+      </div>
       <div className={styles.buttonContainer}>
-      <button className={styles.buttonStyle} onClick={testclick}>
-        길드원 불러오기
-      </button>
-      <>
-        <button
-          type="button"
-          onClick={handleFileUploadClick}
-          className={styles.buttonStyle}
-        >
-          이미지 첨부
+        <button className={styles.buttonStyle} onClick={testclick}>
+          길드원 불러오기
         </button>
-        <input
-          title="file-upload"
-          type="file"
-          id="file-upload"
-          style={{ display: "none" }}
-          multiple
-          onChange={handleFileSelect}
-          accept="image/*"
-          ref={fileInputRef} // React Ref 사용
-        />
-      </>
-      <button
-        className={styles.buttonStyle}
-        onClick={handleSelectOrDeselectAll}
-      >
-        {selectDeselectButtonText}
-      </button>
-      <button
-        className={styles.buttonStyle}
-        onClick={handleAddEmptyRowBelowSelected}
-      >
-        행 추가
-      </button>
-      <button className={styles.buttonStyle} onClick={handleDeleteSelectedRows}>
-        선택된 행 삭제
-      </button>
-      <button className={styles.buttonStyle} onClick={toggleEditMode}>
-        {isEditMode ? "취소" : "수정"}
-      </button>
-      <button className={styles.buttonStyle} onClick={handleSaveClick}>
-        저장
-      </button>
+        <>
+          <button
+            type="button"
+            onClick={handleFileUploadClick}
+            className={styles.buttonStyle}
+          >
+            이미지 첨부
+          </button>
+          <input
+            title="file-upload"
+            type="file"
+            id="file-upload"
+            style={{ display: "none" }}
+            multiple
+            onChange={handleFileSelect}
+            accept="image/*"
+            ref={fileInputRef} // React Ref 사용
+          />
+        </>
+        <button
+          className={styles.buttonStyle}
+          onClick={handleSelectOrDeselectAll}
+        >
+          {selectDeselectButtonText}
+        </button>
+        <button
+          className={styles.buttonStyle}
+          onClick={handleAddEmptyRowBelowSelected}
+        >
+          행 추가
+        </button>
+        <button
+          className={styles.buttonStyle}
+          onClick={handleDeleteSelectedRows}
+        >
+          선택된 행 삭제
+        </button>
+        <button className={styles.buttonStyle} onClick={toggleEditMode}>
+          {isEditMode ? "취소" : "수정"}
+        </button>
+        <button className={styles.buttonStyle} onClick={handleSaveClick}>
+          저장
+        </button>
       </div>
       <table className={styles.table}>
         <thead>
