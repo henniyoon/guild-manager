@@ -430,38 +430,45 @@ const Adminpage: React.FC = () => {
 
   return (
     <div>
+      <div className={styles.titleContainer}>
       <h1>관리자 페이지</h1>
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      </div>
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div>
-        <label>주간점수 : </label>
-        <input
-          type="text"
-          placeholder="주간점수 최소값"
-          value={filters.weekly_score.min}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              weekly_score: { ...filters.weekly_score, min: e.target.value },
-            })
-          }
-        />
-        <label>~</label>
-        <input
-          type="text"
-          placeholder="주간점수 최대값"
-          value={filters.weekly_score.max}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              weekly_score: { ...filters.weekly_score, max: e.target.value },
-            })
-          }
-        />
-        {/* 수로(suro_score) 필터링 입력 필드 */}
-        <div>
-          <label>수로 : </label>
+      <div className={styles.filterContainer}>
+        <div className={styles.filtermenu}>
+          <label className={styles.filterLabel}>주간점수 :</label>
           <input
+            className={styles.filterInput}
+            type="text"
+            placeholder="주간점수 최소값"
+            value={filters.weekly_score.min}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                weekly_score: { ...filters.weekly_score, min: e.target.value },
+              })
+            }
+          />
+          <div className={styles.filterSeparator}></div>
+          <input
+            className={styles.filterInput}
+            type="text"
+            placeholder="주간점수 최대값"
+            value={filters.weekly_score.max}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                weekly_score: { ...filters.weekly_score, max: e.target.value },
+              })
+            }
+          />
+        </div>
+        {/* 수로(suro_score) 필터링 입력 필드 */}
+        <div className={styles.filtermenu}>
+          <label className={styles.filterLabel}>수로 : </label>
+          <input
+            className={styles.filterInput}
             type="number"
             placeholder="수로 최소값"
             value={filters.suro_score.min}
@@ -472,8 +479,9 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <label>~</label>
+          <label className={styles.filterSeparator}></label>
           <input
+            className={styles.filterInput}
             type="number"
             placeholder="수로 최대값"
             value={filters.suro_score.max}
@@ -487,9 +495,10 @@ const Adminpage: React.FC = () => {
         </div>
 
         {/* 플래그(flag_score) 필터링 입력 필드 */}
-        <div>
-          <label>플래그 : </label>
+        <div className={styles.filtermenu}>
+          <label className={styles.filterLabel}>플래그 : </label>
           <input
+            className={styles.filterInput}
             type="number"
             placeholder="플래그 최소값"
             value={filters.flag_score.min}
@@ -500,8 +509,9 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <label>~</label>
+          <label className={styles.filterSeparator}></label>
           <input
+            className={styles.filterInput}
             type="number"
             placeholder="플래그 최대값"
             value={filters.flag_score.max}
@@ -514,6 +524,7 @@ const Adminpage: React.FC = () => {
           />
         </div>
       </div>
+      <div className={styles.buttonContainer}>
       <button className={styles.buttonStyle} onClick={testclick}>
         목록 불러오기
       </button>
@@ -557,7 +568,7 @@ const Adminpage: React.FC = () => {
       <button className={styles.buttonStyle} onClick={handleSaveClick}>
         저장
       </button>
-
+      </div>
       <table className={styles.table}>
         <thead>
           <tr>

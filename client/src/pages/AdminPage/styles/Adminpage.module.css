@@ -34,38 +34,81 @@ table {
     width: 20%;
   }
 
-  .customFileUpload {
-    /* display: inline-block; */
-    padding: 10px 20px;
-    cursor: pointer;
-    background-color: #007bff; /* 배경 색상 */
-    color: white; /* 텍스트 색상 */
-    border: none;
-    border-radius: 5px; /* 버튼 모서리 둥글게 */
-    margin: 5px; /* 마진 설정 */
-    font-size: 16px; /* 폰트 크기 */
-    transition: background-color 0.3s ease; /* 호버 효과 */
-  }
-  
-  .customFileUpload:hover {
-    background-color: #0056b3; /* 호버 시 배경 색상 변경 */
-  }
-
   .buttonStyle {
     padding: 10px 20px;
-    background-color: #4CAF50; /* 버튼 배경 색상 */
-    color: white; /* 텍스트 색상 */
+    background-color: #f5f5f5; /* 버튼 배경 색상 */
+    color: black; /* 텍스트 색상 */
     border: none;
     border-radius: 5px; /* 버튼 모서리 둥글게 */
     cursor: pointer; /* 마우스 오버 시 커서 변경 */
-    margin: 5px; /* 마진 설정 */
+    margin-bottom: 20px;
     font-size: 16px; /* 글꼴 크기 */
   }
   
   .buttonStyle:hover {
-    background-color: #45a049; /* 호버 시 배경 색상 변경 */
+    background-color: rgb(168, 168, 168); /* 호버 시 배경 색상 변경 */
   }
   
   .custom-file-upload {
     display: inline-block; /* 라벨을 인라인 블록 요소로 설정 */
+  }
+  /* --------------------------------- */
+  .filterContainer {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+  }
+  
+  .filterLabel {
+    display: inline-block;
+    width: 30%;
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .filterInput {
+    display: inline-block;
+    width: 95%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* 패딩을 너비와 높이에 포함 */
+  }
+  
+  .filterInput:focus {
+    display: inline-block;
+    width: 90%;
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  /* 구분자 스타일 */
+  .filterSeparator {
+    display: inline-block;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .filtermenu{
+    display: inline-block;
+    width: 30%;
+  }
+
+  /* ---------------------------------------- */
+  .buttonContainer{
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .titleContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: #333;
+    font-weight: bold;
   }
