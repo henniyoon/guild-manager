@@ -86,7 +86,11 @@ const Adminpage: React.FC = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleInputChange = (id: number, field: string, value: string | boolean) => {
+  const handleInputChange = (
+    id: number,
+    field: string,
+    value: string | boolean
+  ) => {
     // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
@@ -95,9 +99,11 @@ const Adminpage: React.FC = () => {
       field === "flag_score"
         ? parseInt(value as string, 10)
         : field === "noble_limit" // nobel_limit 필드일 경우
-        ? value === true || value === "true" ? 1 : 0 // true이면 1, 아니면 0으로 변환
+        ? value === true || value === "true"
+          ? 1
+          : 0 // true이면 1, 아니면 0으로 변환
         : value; // 나머지 경우는 그대로 값 유지
-  
+
     setEditedData((editedData) =>
       editedData.map((row) =>
         row.id === id ? { ...row, [field]: parsedValue } : row
@@ -110,12 +116,12 @@ const Adminpage: React.FC = () => {
       const originalRow = tableData.find((row) => row.id === editedRow.id);
       return JSON.stringify(editedRow) !== JSON.stringify(originalRow);
     });
-  
+
     if (modifiedData.length === 0) {
       alert("변경된 데이터가 없습니다.");
       return;
     }
-  
+
     console.log("서버로 전송될 변경된 데이터:", modifiedData);
     fetch("/updateRecords", {
       method: "POST",
@@ -124,20 +130,20 @@ const Adminpage: React.FC = () => {
       },
       body: JSON.stringify(modifiedData), // 변경된 데이터만 전송
     })
-    .then(response => response.json())
-    .then(() => {
-      console.log("데이터 저장 성공");
-      // 여기에서 fetchTableData() 호출
-      return fetchTableData(); // 데이터 저장 성공 후 최신 데이터 불러오기
-    })
-    .then(() => {
-      alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
-    })
-    .catch(error => {
-      console.error("데이터 업데이트 실패:", error);
-      alert("데이터 업데이트에 실패했습니다.");
-    });
-  
+      .then((response) => response.json())
+      .then(() => {
+        console.log("데이터 저장 성공");
+        // 여기에서 fetchTableData() 호출
+        return fetchTableData(); // 데이터 저장 성공 후 최신 데이터 불러오기
+      })
+      .then(() => {
+        alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
+      })
+      .catch((error) => {
+        console.error("데이터 업데이트 실패:", error);
+        alert("데이터 업데이트에 실패했습니다.");
+      });
+
     setIsEditMode(false); // 편집 모드 종료
   };
 
@@ -526,7 +532,7 @@ const Adminpage: React.FC = () => {
             <th onClick={() => sortData("weekly_score")}>주간점수</th>
             <th onClick={() => sortData("suro_score")}>수로</th>
             <th onClick={() => sortData("flag_score")}>플래그</th>
-            <th onClick={() => sortData("noble_limit")}>노블</th>
+            <th onClick={() => sortData("noble_limit")}>노블제한</th>
           </tr>
         </thead>
         <tbody>
@@ -560,22 +566,89 @@ const Adminpage: React.FC = () => {
                 (!maxFlagScore || row.flag_score <= maxFlagScore)
               );
             })
-            .map((row,index) => (
+            .map((row, index) => (
               <tr
-              key={row.id}
-              onClick={() => handleRowClick(row.id)}
-              className={`${styles.rowClickable} ${
-                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-              } ${index % 17 === 16 ? styles.row_17th : ""}`}
-            >
+                key={row.id}
+                onClick={() => handleRowClick(row.id)}
+                className={`${styles.rowClickable} ${
+                  selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+                } ${index % 17 === 16 ? styles.row_17th : ""}`}
+              >
                 {isEditMode ? (
-  <>
-  <td>{row.character_name === "" ? row.character_name : <input title="character_name" type="text" defaultValue={row.character_name} onChange={(e) => handleInputChange(row.id, "character_name", e.target.value)} />}</td>
-  <td><input title="weekly_score" type="number" defaultValue={row.weekly_score} onChange={(e) => handleInputChange(row.id, "weekly_score", e.target.value)} /></td>
-  <td><input title="suro_score" type="number" defaultValue={row.suro_score} onChange={(e) => handleInputChange(row.id, "suro_score", e.target.value)} /></td>
-  <td><input title="flag_score" type="number" defaultValue={row.flag_score} onChange={(e) => handleInputChange(row.id, "flag_score", e.target.value)} /></td>
-  <input title="noble_limit" type="checkbox" defaultChecked={row.noble_limit} onChange={(e) => handleInputChange(row.id, "noble_limit", e.target.checked.toString())} />
-</>
+                  <>
+                    <td>
+                      {row.character_name === "" ? (
+                        row.character_name
+                      ) : (
+                        <input
+                          title="character_name"
+                          type="text"
+                          defaultValue={row.character_name}
+                          onChange={(e) =>
+                            handleInputChange(
+                              row.id,
+                              "character_name",
+                              e.target.value
+                            )
+                          }
+                        />
+                      )}
+                    </td>
+                    <td>
+                      <input
+                        title="weekly_score"
+                        type="number"
+                        defaultValue={row.weekly_score}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "weekly_score",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        title="suro_score"
+                        type="number"
+                        defaultValue={row.suro_score}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "suro_score",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        title="flag_score"
+                        type="number"
+                        defaultValue={row.flag_score}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "flag_score",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <input
+                      title="noble_limit"
+                      type="checkbox"
+                      defaultChecked={row.noble_limit}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "noble_limit",
+                          e.target.checked.toString()
+                        )
+                      }
+                    />
+                  </>
                 ) : (
                   // 비편집 모드에서의 행 렌더링
                   <>
@@ -583,7 +656,7 @@ const Adminpage: React.FC = () => {
                     <td>{row.weekly_score}</td>
                     <td>{row.suro_score}</td>
                     <td>{row.flag_score}</td>
-                    <td>{row.noble_limit ? "❌" : "✅"}</td>
+                    <td>{row.noble_limit ? "🔴" : "🟢"}</td>
                   </>
                 )}
               </tr>
