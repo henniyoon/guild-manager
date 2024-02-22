@@ -86,14 +86,18 @@ const Adminpage: React.FC = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleInputChange = (id: number, field: string, value: string) => {
+  const handleInputChange = (id: number, field: string, value: string | boolean) => {
+    // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
       field === "weekly_score" ||
       field === "suro_score" ||
       field === "flag_score"
-        ? parseInt(value, 10)
-        : value;
+        ? parseInt(value as string, 10)
+        : field === "noble_limit" // nobel_limit 필드일 경우
+        ? value === true || value === "true" ? 1 : 0 // true이면 1, 아니면 0으로 변환
+        : value; // 나머지 경우는 그대로 값 유지
+  
     setEditedData((editedData) =>
       editedData.map((row) =>
         row.id === id ? { ...row, [field]: parsedValue } : row
@@ -565,69 +569,13 @@ const Adminpage: React.FC = () => {
               } ${index % 17 === 16 ? styles.row_17th : ""}`}
             >
                 {isEditMode ? (
-                  <>
-                    {/* character_name에 대한 입력 필드. 비어있는 경우 수정 불가능 */}
-                    <td>
-                      {row.character_name === "" ? (
-                        row.character_name
-                      ) : (
-                        <input
-                          title="character_name"
-                          type="text"
-                          defaultValue={row.character_name}
-                          onChange={(e) =>
-                            handleInputChange(
-                              row.id,
-                              "character_name",
-                              e.target.value
-                            )
-                          }
-                        />
-                      )}
-                    </td>
-                    <td>
-                      <input
-                        title="weekly_score"
-                        type="number"
-                        defaultValue={row.weekly_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "weekly_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        title="suro_score"
-                        type="number"
-                        defaultValue={row.suro_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "suro_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        title="flag_score"
-                        type="number"
-                        defaultValue={row.flag_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "flag_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                  </>
+  <>
+  <td>{row.character_name === "" ? row.character_name : <input title="character_name" type="text" defaultValue={row.character_name} onChange={(e) => handleInputChange(row.id, "character_name", e.target.value)} />}</td>
+  <td><input title="weekly_score" type="number" defaultValue={row.weekly_score} onChange={(e) => handleInputChange(row.id, "weekly_score", e.target.value)} /></td>
+  <td><input title="suro_score" type="number" defaultValue={row.suro_score} onChange={(e) => handleInputChange(row.id, "suro_score", e.target.value)} /></td>
+  <td><input title="flag_score" type="number" defaultValue={row.flag_score} onChange={(e) => handleInputChange(row.id, "flag_score", e.target.value)} /></td>
+  <input title="noble_limit" type="checkbox" defaultChecked={row.noble_limit} onChange={(e) => handleInputChange(row.id, "noble_limit", e.target.checked.toString())} />
+</>
                 ) : (
                   // 비편집 모드에서의 행 렌더링
                   <>
