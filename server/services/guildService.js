@@ -9,7 +9,10 @@ async function getGuild(guildName, worldName) {
 
 async function getGuildId(guildName, worldName) {
     const worldId = await WorldService.getWorldId(worldName);
-    const guild = await Guild.findOne({ where: { name: guildName, world_id: worldId } });
+    const guild = await Guild.findOne({
+        where: { name: guildName, world_id: worldId },
+        attributes: ["id"],
+    });
     return guild ? guild.id : null;
 }
 
@@ -54,7 +57,7 @@ async function updateGuild(guildName, worldName) {
     try {
         const guild = await getGuild(guildName, worldName);
         let apiData = await APIService.getGuildBasicData(guild.oguild_id);
-        
+
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
 
@@ -68,7 +71,7 @@ async function updateGuild(guildName, worldName) {
             last_updated: apiDate,
         };
 
-        await Guild.update(updatedGuild, { where: { oguild_id: guild.oguild_id }})
+        await Guild.update(updatedGuild, { where: { oguild_id: guild.oguild_id } })
         console.log("길드 정보 업데이트 성공");
 
         return apiData.guild_member;
