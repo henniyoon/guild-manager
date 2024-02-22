@@ -41,6 +41,23 @@ const getRecords = async (week) => {
     return records;
 };
 
+const findOrCreateRecords = async (characterId, week) => {
+    const [record, created] = await Record.findOrCreate({
+        where: {
+            character_id: characterId,
+            week: week,
+        },
+        defaults: {
+            weekly_score: 0,
+            suro_score: 0,
+            flag_score: 0,
+            noble_limit: false,
+        },
+    });
+    
+    return record;
+};
+
 // 사용자가 업데이트 한 노블제한 기록을 DB records 테이블에 업데이트
 const updateRecords = async (updatedRecords) => {
     for (let record of updatedRecords) {
@@ -59,8 +76,15 @@ const updateRecords = async (updatedRecords) => {
     return { message: '업데이트 성공' };
 };
 
+const deleteRecords = async (recordId) => {
+    await Record.destroy({ where: { id: recordId } });
+    return { message: '삭제 성공' }
+};
+
 module.exports = {
     addRecord,
     getRecords,
+    findOrCreateRecords,
     updateRecords,
+    deleteRecords,
 };
