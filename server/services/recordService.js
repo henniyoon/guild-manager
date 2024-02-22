@@ -48,7 +48,8 @@ const updateRecords = async (updatedRecords) => {
             {
                 weekly_score: record.weekly_score,
                 suro_score: record.suro_score,
-                flag_score: record.flag_score
+                flag_score: record.flag_score,
+                noble_limit: record.noble_limit
             },
             {
                 where: { id: record.id }
