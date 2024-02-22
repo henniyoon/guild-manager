@@ -425,7 +425,7 @@ const Adminpage: React.FC = () => {
       <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
       {/* 필터링 조건을 입력받는 UI 구성 */}
       <div>
-        <label>주간점수 이상:</label>
+        <label>주간점수 : </label>
         <input
           type="text"
           placeholder="주간점수 최소값"
@@ -437,7 +437,7 @@ const Adminpage: React.FC = () => {
             })
           }
         />
-        <label>주간점수 이하:</label>
+        <label>~</label>
         <input
           type="text"
           placeholder="주간점수 최대값"
@@ -451,7 +451,7 @@ const Adminpage: React.FC = () => {
         />
         {/* 수로(suro_score) 필터링 입력 필드 */}
         <div>
-          <label>수로 점수 이상:</label>
+          <label>수로 : </label>
           <input
             type="number"
             placeholder="수로 최소값"
@@ -463,7 +463,7 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <label>수로 점수 이하:</label>
+          <label>~</label>
           <input
             type="number"
             placeholder="수로 최대값"
@@ -479,7 +479,7 @@ const Adminpage: React.FC = () => {
 
         {/* 플래그(flag_score) 필터링 입력 필드 */}
         <div>
-          <label>플래그 점수 이상:</label>
+          <label>플래그 : </label>
           <input
             type="number"
             placeholder="플래그 최소값"
@@ -491,7 +491,7 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <label>플래그 점수 이하:</label>
+          <label>~</label>
           <input
             type="number"
             placeholder="플래그 최대값"
