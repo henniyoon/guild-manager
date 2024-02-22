@@ -526,22 +526,7 @@ const Adminpage: React.FC = () => {
       </div>
       <div className={styles.buttonContainer}>
       <button className={styles.buttonStyle} onClick={testclick}>
-        목록 불러오기
-      </button>
-      <button
-        className={styles.buttonStyle}
-        onClick={handleSelectOrDeselectAll}
-      >
-        {selectDeselectButtonText}
-      </button>
-      <button
-        className={styles.buttonStyle}
-        onClick={handleAddEmptyRowBelowSelected}
-      >
-        행 추가
-      </button>
-      <button className={styles.buttonStyle} onClick={handleDeleteSelectedRows}>
-        선택된 행 삭제
+        길드원 불러오기
       </button>
       <>
         <button
@@ -562,6 +547,21 @@ const Adminpage: React.FC = () => {
           ref={fileInputRef} // React Ref 사용
         />
       </>
+      <button
+        className={styles.buttonStyle}
+        onClick={handleSelectOrDeselectAll}
+      >
+        {selectDeselectButtonText}
+      </button>
+      <button
+        className={styles.buttonStyle}
+        onClick={handleAddEmptyRowBelowSelected}
+      >
+        행 추가
+      </button>
+      <button className={styles.buttonStyle} onClick={handleDeleteSelectedRows}>
+        선택된 행 삭제
+      </button>
       <button className={styles.buttonStyle} onClick={toggleEditMode}>
         {isEditMode ? "취소" : "수정"}
       </button>

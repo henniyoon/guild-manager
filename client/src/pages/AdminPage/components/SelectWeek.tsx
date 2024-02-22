@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from "../styles/SelectWeek.module.css";
 
 interface SelectWeekProps {
   selectedDate: string;
@@ -8,8 +9,9 @@ interface SelectWeekProps {
 const SelectWeek: React.FC<SelectWeekProps> = ({ selectedDate, onDateChange }) => {
   return (
     <div>
-      <label htmlFor="weekPicker">주 선택: </label>
       <input
+        placeholder='?'
+        className={styles.weekSelecter}
         type="week"
         id="weekPicker"
         value={selectedDate}
