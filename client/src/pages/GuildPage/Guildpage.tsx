@@ -65,7 +65,7 @@ const Guildpage: React.FC = () => {
   }, [worldName, guildName]);
 
   const AdminButtonClick = () => {
-    navigate(`/Adminpage`);
+    navigate(`/Adminpage/${worldName}/${guildName}`);
   };
 
   const handleMemberClick = (character: CharacterData) => {

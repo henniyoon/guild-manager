@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
+import { useParams } from "react-router-dom";
 
 interface TableRowData {
   id: number;
@@ -45,6 +46,7 @@ const Adminpage: React.FC = () => {
     suro_score: { min: "", max: "" },
     flag_score: { min: "", max: "" },
   });
+  const { worldName, guildName } = useParams();
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
