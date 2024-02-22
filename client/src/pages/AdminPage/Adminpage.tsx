@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
+import { useParams } from "react-router-dom";
 
 interface TableRowData {
   id: number;
@@ -45,6 +46,8 @@ const Adminpage: React.FC = () => {
     suro_score: { min: "", max: "" },
     flag_score: { min: "", max: "" },
   });
+  const { worldName, guildName } = useParams();
+  const [dataLength, setDataLength] = useState<number>(0);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -86,14 +89,24 @@ const Adminpage: React.FC = () => {
     setIsEditMode(!isEditMode);
   };
 
-  const handleInputChange = (id: number, field: string, value: string) => {
+  const handleInputChange = (
+    id: number,
+    field: string,
+    value: string | boolean
+  ) => {
+    // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
       field === "weekly_score" ||
       field === "suro_score" ||
       field === "flag_score"
-        ? parseInt(value, 10)
-        : value;
+        ? parseInt(value as string, 10)
+        : field === "noble_limit" // nobel_limit 필드일 경우
+        ? value === true || value === "true"
+          ? 1
+          : 0 // true이면 1, 아니면 0으로 변환
+        : value; // 나머지 경우는 그대로 값 유지
+
     setEditedData((editedData) =>
       editedData.map((row) =>
         row.id === id ? { ...row, [field]: parsedValue } : row
@@ -106,12 +119,12 @@ const Adminpage: React.FC = () => {
       const originalRow = tableData.find((row) => row.id === editedRow.id);
       return JSON.stringify(editedRow) !== JSON.stringify(originalRow);
     });
-  
+
     if (modifiedData.length === 0) {
       alert("변경된 데이터가 없습니다.");
       return;
     }
-  
+
     console.log("서버로 전송될 변경된 데이터:", modifiedData);
     fetch("/updateRecords", {
       method: "POST",
@@ -120,20 +133,20 @@ const Adminpage: React.FC = () => {
       },
       body: JSON.stringify(modifiedData), // 변경된 데이터만 전송
     })
-    .then(response => response.json())
-    .then(() => {
-      console.log("데이터 저장 성공");
-      // 여기에서 fetchTableData() 호출
-      return fetchTableData(); // 데이터 저장 성공 후 최신 데이터 불러오기
-    })
-    .then(() => {
-      alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
-    })
-    .catch(error => {
-      console.error("데이터 업데이트 실패:", error);
-      alert("데이터 업데이트에 실패했습니다.");
-    });
-  
+      .then((response) => response.json())
+      .then(() => {
+        console.log("데이터 저장 성공");
+        // 여기에서 fetchTableData() 호출
+        return fetchTableData(); // 데이터 저장 성공 후 최신 데이터 불러오기
+      })
+      .then(() => {
+        alert("데이터가 성공적으로 저장되고 업데이트되었습니다.");
+      })
+      .catch((error) => {
+        console.error("데이터 업데이트 실패:", error);
+        alert("데이터 업데이트에 실패했습니다.");
+      });
+
     setIsEditMode(false); // 편집 모드 종료
   };
 
@@ -213,6 +226,7 @@ const Adminpage: React.FC = () => {
       })
       .then((data) => {
         console.log("업데이트 성공:", data);
+        setDataLength(data.length); // 서버로부터 받은 데이터의 길이를 저장
         // 업데이트가 성공적으로 완료된 후, 최신 데이터를 불러오기 위해
         // /records?week=${encodeURIComponent(selectedDate)} 엔드포인트로 GET 요청을 보냅니다.
         return fetchTableData(); // 기존에 정의된 데이터 불러오는 함수를 재사용
@@ -271,6 +285,15 @@ const Adminpage: React.FC = () => {
 
       // 파일 선택 후 자동으로 업로드 실행
       handleUploadFiles(filesArray);
+    }
+  };
+  // 컴포넌트 내부에서
+  const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
+
+  const handleFileUploadClick = () => {
+    // fileInputRef.current가 존재하는지 확인
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // 안전하게 click() 메서드 호출
     }
   };
 
@@ -409,38 +432,48 @@ const Adminpage: React.FC = () => {
 
   return (
     <div>
-      <h1>관리자 페이지</h1>
-      <SelectWeek selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      <div className={styles.titleContainer}>
+        <h1>관리자 페이지</h1>
+        <SelectWeek
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+        />
+      </div>
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div>
-        <label>주간점수 이상:</label>
-        <input
-          type="text"
-          placeholder="주간점수 최소값"
-          value={filters.weekly_score.min}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              weekly_score: { ...filters.weekly_score, min: e.target.value },
-            })
-          }
-        />
-        <label>주간점수 이하:</label>
-        <input
-          type="text"
-          placeholder="주간점수 최대값"
-          value={filters.weekly_score.max}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              weekly_score: { ...filters.weekly_score, max: e.target.value },
-            })
-          }
-        />
-        {/* 수로(suro_score) 필터링 입력 필드 */}
-        <div>
-          <label>수로 점수 이상:</label>
+      <div className={styles.filterContainer}>
+        <div className={styles.filtermenu}>
+          <label className={styles.filterLabel}>주간점수 :</label>
           <input
+            className={styles.filterInput}
+            type="text"
+            placeholder="주간점수 최소값"
+            value={filters.weekly_score.min}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                weekly_score: { ...filters.weekly_score, min: e.target.value },
+              })
+            }
+          />
+          <div className={styles.filterSeparator}></div>
+          <input
+            className={styles.filterInput}
+            type="text"
+            placeholder="주간점수 최대값"
+            value={filters.weekly_score.max}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                weekly_score: { ...filters.weekly_score, max: e.target.value },
+              })
+            }
+          />
+        </div>
+        {/* 수로(suro_score) 필터링 입력 필드 */}
+        <div className={styles.filtermenu}>
+          <label className={styles.filterLabel}>수로 : </label>
+          <input
+            className={styles.filterInput}
             type="number"
             placeholder="수로 최소값"
             value={filters.suro_score.min}
@@ -451,8 +484,9 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <label>수로 점수 이하:</label>
+          <label className={styles.filterSeparator}></label>
           <input
+            className={styles.filterInput}
             type="number"
             placeholder="수로 최대값"
             value={filters.suro_score.max}
@@ -466,9 +500,10 @@ const Adminpage: React.FC = () => {
         </div>
 
         {/* 플래그(flag_score) 필터링 입력 필드 */}
-        <div>
-          <label>플래그 점수 이상:</label>
+        <div className={styles.filtermenu}>
+          <label className={styles.filterLabel}>플래그 : </label>
           <input
+            className={styles.filterInput}
             type="number"
             placeholder="플래그 최소값"
             value={filters.flag_score.min}
@@ -479,8 +514,9 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <label>플래그 점수 이하:</label>
+          <label className={styles.filterSeparator}></label>
           <input
+            className={styles.filterInput}
             type="number"
             placeholder="플래그 최대값"
             value={filters.flag_score.max}
@@ -493,36 +529,79 @@ const Adminpage: React.FC = () => {
           />
         </div>
       </div>
-      <button onClick={testclick}>목록 불러오기</button>
-      <button onClick={handleSelectOrDeselectAll}>
-        {selectDeselectButtonText}
-      </button>
-      <button onClick={handleAddEmptyRowBelowSelected}>행 추가</button>
-      <button onClick={handleDeleteSelectedRows}>선택된 행 삭제</button>
-      <>
-        <label htmlFor="file-upload" className="custom-file-upload">
-          이미지 첨부
-        </label>
-        <input
-          id="file-upload"
-          type="file"
-          multiple
-          onChange={handleFileSelect}
-          style={{ display: "none" }}
-          accept="image/*" // 이미지 파일만 선택 가능하도록 설정
-        />
-      </>
-      <button onClick={toggleEditMode}>{isEditMode ? "취소" : "수정"}</button>
-      <button onClick={handleSaveClick}>저장</button>
-
-      <table>
+      <div className={styles.tableInfoContainer}>
+        <p>서버로부터 받은 길드원 수 : {dataLength}</p>
+        <p>불러온 길드원 수 : {tableData.length}</p>
+      </div>
+      <div className={styles.buttonContainer}>
+        <button className={styles.buttonStyle} onClick={testclick}>
+          길드원 불러오기
+        </button>
+        <>
+          <button
+            type="button"
+            onClick={handleFileUploadClick}
+            className={styles.buttonStyle}
+          >
+            이미지 첨부
+          </button>
+          <input
+            title="file-upload"
+            type="file"
+            id="file-upload"
+            style={{ display: "none" }}
+            multiple
+            onChange={handleFileSelect}
+            accept="image/*"
+            ref={fileInputRef} // React Ref 사용
+          />
+        </>
+        <button
+          className={styles.buttonStyle}
+          onClick={handleSelectOrDeselectAll}
+        >
+          {selectDeselectButtonText}
+        </button>
+        <button
+          className={styles.buttonStyle}
+          onClick={handleAddEmptyRowBelowSelected}
+        >
+          행 추가
+        </button>
+        <button
+          className={styles.buttonStyle}
+          onClick={handleDeleteSelectedRows}
+        >
+          선택된 행 삭제
+        </button>
+        <button className={styles.buttonStyle} onClick={toggleEditMode}>
+          {isEditMode ? "취소" : "수정"}
+        </button>
+        <button className={styles.buttonStyle} onClick={handleSaveClick}>
+          저장
+        </button>
+      </div>
+      <table className={styles.table}>
         <thead>
           <tr>
-            <th onClick={() => sortData("character_name")}>닉네임</th>
-            <th onClick={() => sortData("weekly_score")}>주간점수</th>
-            <th onClick={() => sortData("suro_score")}>수로</th>
-            <th onClick={() => sortData("flag_score")}>플래그</th>
-            <th>노블</th>
+            <th
+              className={styles.th1}
+              onClick={() => sortData("character_name")}
+            >
+              닉네임
+            </th>
+            <th className={styles.th2} onClick={() => sortData("weekly_score")}>
+              주간점수
+            </th>
+            <th className={styles.th3} onClick={() => sortData("suro_score")}>
+              수로
+            </th>
+            <th className={styles.th4} onClick={() => sortData("flag_score")}>
+              플래그
+            </th>
+            <th className={styles.th5} onClick={() => sortData("noble_limit")}>
+              노블
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -556,18 +635,17 @@ const Adminpage: React.FC = () => {
                 (!maxFlagScore || row.flag_score <= maxFlagScore)
               );
             })
-            .map((row) => (
+            .map((row, index) => (
               <tr
                 key={row.id}
                 onClick={() => handleRowClick(row.id)}
                 className={`${styles.rowClickable} ${
                   selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-                }`}
+                } ${index % 17 === 16 ? styles.row_17th : ""}`}
               >
                 {isEditMode ? (
                   <>
-                    {/* character_name에 대한 입력 필드. 비어있는 경우 수정 불가능 */}
-                    <td>
+                    <td className={styles.td1}>
                       {row.character_name === "" ? (
                         row.character_name
                       ) : (
@@ -585,7 +663,7 @@ const Adminpage: React.FC = () => {
                         />
                       )}
                     </td>
-                    <td>
+                    <td className={styles.td2}>
                       <input
                         title="weekly_score"
                         type="number"
@@ -599,7 +677,7 @@ const Adminpage: React.FC = () => {
                         }
                       />
                     </td>
-                    <td>
+                    <td className={styles.td3}>
                       <input
                         title="suro_score"
                         type="number"
@@ -613,7 +691,7 @@ const Adminpage: React.FC = () => {
                         }
                       />
                     </td>
-                    <td>
+                    <td className={styles.td4}>
                       <input
                         title="flag_score"
                         type="number"
@@ -627,15 +705,31 @@ const Adminpage: React.FC = () => {
                         }
                       />
                     </td>
+                    <td className={styles.td5}>
+                      <input
+                        title="noble_limit"
+                        type="checkbox"
+                        defaultChecked={row.noble_limit}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "noble_limit",
+                            e.target.checked.toString()
+                          )
+                        }
+                      />
+                    </td>
                   </>
                 ) : (
                   // 비편집 모드에서의 행 렌더링
                   <>
-                    <td>{row.character_name}</td>
-                    <td>{row.weekly_score}</td>
-                    <td>{row.suro_score}</td>
-                    <td>{row.flag_score}</td>
-                    <td>{row.noble_limit ? "❌" : "✅"}</td>
+                    <td className={styles.td1}>{row.character_name}</td>
+                    <td className={styles.td2}>{row.weekly_score}</td>
+                    <td className={styles.td3}>{row.suro_score}</td>
+                    <td className={styles.td4}>{row.flag_score}</td>
+                    <td className={styles.td5}>
+                      {row.noble_limit ? "🔴" : "🟢"}
+                    </td>
                   </>
                 )}
               </tr>

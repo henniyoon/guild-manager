@@ -1,0 +1,8 @@
+.weekSelecter{
+    display: inline-block;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* 패딩을 너비와 높이에 포함 */
+}
