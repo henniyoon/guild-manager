@@ -21,7 +21,7 @@ async function setUserRole(apikey, id, guildName, worldName) {
             { where: { id: id } }
         );
     } else {
-        console.log("인증 실패");
+        console.log("권한 부여 실패");
     }
 }
 
