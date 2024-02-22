@@ -21,3 +21,51 @@ table {
     background-color: #e0e0e0; /* 17번째 행마다의 배경색 */
   }
   
+  .table {
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  .th1, .th3, .th4, .td1, .td3, .td4 {
+    width: 20%;
+  }
+  
+  .th2, .th5, .td2, .td5 {
+    width: 20%;
+  }
+
+  .customFileUpload {
+    /* display: inline-block; */
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff; /* 배경 색상 */
+    color: white; /* 텍스트 색상 */
+    border: none;
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    margin: 5px; /* 마진 설정 */
+    font-size: 16px; /* 폰트 크기 */
+    transition: background-color 0.3s ease; /* 호버 효과 */
+  }
+  
+  .customFileUpload:hover {
+    background-color: #0056b3; /* 호버 시 배경 색상 변경 */
+  }
+
+  .buttonStyle {
+    padding: 10px 20px;
+    background-color: #4CAF50; /* 버튼 배경 색상 */
+    color: white; /* 텍스트 색상 */
+    border: none;
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    cursor: pointer; /* 마우스 오버 시 커서 변경 */
+    margin: 5px; /* 마진 설정 */
+    font-size: 16px; /* 글꼴 크기 */
+  }
+  
+  .buttonStyle:hover {
+    background-color: #45a049; /* 호버 시 배경 색상 변경 */
+  }
+  
+  .custom-file-upload {
+    display: inline-block; /* 라벨을 인라인 블록 요소로 설정 */
+  }
