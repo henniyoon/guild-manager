@@ -13,13 +13,22 @@ const MyInfo: React.FC = () => {
         const token = localStorage.getItem("token");
 
         fetch(url, {
-            method: "GET",
+            method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({ apiKey, guildName, worldName }),
         })
-            .then((response) => response.json())
+            .then((response) => response.text())
+            .then((data) => {
+                // 서버에서 반환한 데이터 처리
+                if (data === "길드 관리자 인증 성공") {
+                    alert("성공적으로 인증되었습니다.");
+                } else {
+                    alert("인증에 실패하였습니다.");
+                }
+            })
             .catch((error) =>
                 console.error("데이터를 불러오는 데 실패했습니다:", error)
             );

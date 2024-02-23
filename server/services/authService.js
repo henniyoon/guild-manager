@@ -2,9 +2,25 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.js');
 const Guild = require('../models/Guild.js');
-const World = require('../models/World.js')
+const World = require('../models/World.js');
 
 const SECRET_KEY = "WE_MUST_HIDE_THIS_KEY";
+
+// 토큰 생성 로직
+function generateToken(data) {
+    const token = jwt.sign(data, SECRET_KEY);
+    return token;
+}
+
+// 토큰 검증 로직
+function verifyToken(token) {
+    try {
+        const decodedToken = jwt.verify(token, SECRET_KEY);
+        return decodedToken;
+    } catch (error) {
+        throw new Error("Invalid token");
+    }
+}
 
 // 회원가입
 const signup = async (username, email, password) => {
@@ -29,7 +45,7 @@ const signup = async (username, email, password) => {
 // ! 현재 토큰을 localstorage에 저장하는 방식인데 XSS공격에 취약함 
 const login = async (email, password) => {
     try {
-        const user = await User.findOne({ 
+        const user = await User.findOne({
             where: { email },
             include: [{
                 model: Guild,
@@ -61,10 +77,12 @@ const login = async (email, password) => {
             username: user.username,
             guild_world_id: user.guild ? user.guild.world_id : null,
             guild_name: user.guild ? user.guild.name : null,
-            world_name: worldName ,
+            world_name: worldName,
             guild_World_Id: guildWorldId,
         };
-        const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+
+        const token = generateToken(payload);
+        // const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
         return { message: '로그인 성공', token };
     } catch (error) {
         console.log(error)
@@ -93,6 +111,8 @@ const checkEmail = async (email) => {
 };
 
 module.exports = {
+    generateToken,
+    verifyToken,
     signup,
     login,
     checkUsername,
