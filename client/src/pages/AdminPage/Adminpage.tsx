@@ -600,7 +600,7 @@ const Adminpage: React.FC = () => {
               플래그
             </th>
             <th className={styles.th5} onClick={() => sortData("noble_limit")}>
-              노블
+              노블제한
             </th>
           </tr>
         </thead>
