@@ -48,6 +48,7 @@ const Adminpage: React.FC = () => {
   });
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
+  const [serverDataLength, setServerDataLength] = useState<number>(0);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -287,7 +288,7 @@ const Adminpage: React.FC = () => {
       handleUploadFiles(filesArray);
     }
   };
-  
+
   // 컴포넌트 내부에서
   const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
 
@@ -314,6 +315,7 @@ const Adminpage: React.FC = () => {
         console.log("업로드 성공:", data);
         alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
+        setServerDataLength(data.weekly_score_Area.length);
         updateTableDataWithOcrResults(data);
       })
       .catch((error) => {
@@ -532,6 +534,7 @@ const Adminpage: React.FC = () => {
       </div>
       <div className={styles.tableInfoContainer}>
         <p>서버로부터 받은 길드원 수 : {dataLength}</p>
+        <p>OCR : {serverDataLength}</p>
         <p>불러온 길드원 수 : {tableData.length}</p>
       </div>
       <div className={styles.buttonContainer}>
