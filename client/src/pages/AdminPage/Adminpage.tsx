@@ -287,6 +287,7 @@ const Adminpage: React.FC = () => {
       handleUploadFiles(filesArray);
     }
   };
+  
   // 컴포넌트 내부에서
   const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
 
@@ -712,7 +713,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td5}>
                       <input
                         title="noble_limit"
-                        className={styles.editInput}
+                        className={styles.customCheckbox}
                         type="checkbox"
                         defaultChecked={row.noble_limit}
                         onChange={(e) =>
