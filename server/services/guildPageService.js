@@ -1,4 +1,4 @@
-const WorldService = require('./worldService.js');
+const APIService = require('./apiService.js');
 const GuildService = require('./guildService.js');
 const CharacterService = require('./characterService.js');
 
@@ -10,13 +10,7 @@ function findNewAndRemovedMembers(preGuildMembers, updatedGuildMembers) {
 }
 
 async function createOrUpdateGuildPage(guildName, worldName) {
-
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    currentDate.setDate(currentDate.getDate() - 1);
-    currentDate.setHours(currentDate.getHours() + 8);
-
-    // const worldId = await WorldService.getWorldId(worldName);
+    const apiDate = new Date(APIService.apiDate());
     const guildExists = await GuildService.getGuild(guildName, worldName);
 
     if (!guildExists) {
@@ -24,8 +18,7 @@ async function createOrUpdateGuildPage(guildName, worldName) {
         for (const guildMember of guildMembers) {
             await CharacterService.createCharacter(guildName, worldName, guildMember);
         }
-
-    } else if (guildExists.last_updated < currentDate) {
+    } else if (guildExists.last_updated < apiDate) {
         const preGuildMembers = await CharacterService.getCharactersByGuild(guildName, worldName);
         const preGuildMemberNames = preGuildMembers.map(member => member.name);
         // 길드 정보 업데이트
@@ -53,3 +46,5 @@ async function createOrUpdateGuildPage(guildName, worldName) {
 module.exports = {
     createOrUpdateGuildPage,
 }
+
+createOrUpdateGuildPage("별빛", "스카니아");
