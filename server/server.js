@@ -230,7 +230,7 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
 });
 
 // 최대 저장 가능한 이미지 파일 개수
-const MAX_FILES = 20;
+const MAX_FILES = 1;
 
 // uploads 폴더 내의 파일 정리 함수
 function cleanUpOldFiles() {
