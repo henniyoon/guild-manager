@@ -14,7 +14,7 @@ async function createOrUpdateGuildPage(guildName, worldName) {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     currentDate.setDate(currentDate.getDate() - 1);
-    currentDate.setHours(currentDate.getHours() + 9);
+    currentDate.setHours(currentDate.getHours() + 8);
 
     // const worldId = await WorldService.getWorldId(worldName);
     const guildExists = await GuildService.getGuild(guildName, worldName);
