@@ -1,3 +1,4 @@
+const TimeService = require('./timeService.js');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -8,10 +9,24 @@ const API_KEY = config.apiKey;
 
 const API_BASE_URL = "https://open.api.nexon.com/maplestory/v1";
 
-const currentDate = new Date();
-currentDate.setDate(currentDate.getDate() - 1);
-currentDate.setHours(currentDate.getHours() + 8);   // 오전 1시에 api 갱신
-const formattedDate = currentDate.toISOString().split('T')[0];
+function apiDate() {
+    // API 조회를 위한 시간 설정
+    const koreaTime = TimeService.getCurrentKoreaTime();
+    // 시간이 1시 이전인지 확인 (NEXON OPEN API 갱신이 1시에 됨)
+    // getHours() 할 때 한국 시간으로 가져오려고 하는지 +9시간을 한 결과가 나와서 10시로 설정
+    if (koreaTime.getHours() < 10) {
+        // 1시 이전이면 2일 전의 날짜로 설정
+        koreaTime.setDate(koreaTime.getDate() - 2);
+    } else {
+        // 1시 이후면 어제의 날짜로 설정
+        koreaTime.setDate(koreaTime.getDate() - 1);
+    }
+    const formattedDate = koreaTime.toISOString().split('T')[0];
+
+    return formattedDate;
+}
+
+const formattedDate = apiDate();
 
 // nexon open api 조회 
 async function getApiResponse(url, apiKey = API_KEY) {
@@ -27,7 +42,7 @@ async function getApiResponse(url, apiKey = API_KEY) {
 // 길드명, 월드명으로 oguild_id 조회
 async function getOguildId(guild, worldName) {
     const guildIdUrl = `${API_BASE_URL}/guild/id?guild_name=${encodeURIComponent(guild)}&world_name=${encodeURIComponent(worldName)}`;
-    
+
     return await getApiResponse(guildIdUrl);
 }
 
@@ -41,7 +56,7 @@ async function getGuildBasicData(oguildId) {
 // 캐릭터명으로 ocid 조회
 async function getCharacterOcid(characterName) {
     const characterOcidUrl = `${API_BASE_URL}/id?character_name=${encodeURIComponent(characterName)}`;
-    
+
     return await getApiResponse(characterOcidUrl);
 }
 
@@ -55,7 +70,7 @@ async function getCharacterBasicData(ocid) {
 // 월드명과 ocid로 캐릭터 유니온 랭킹 조회 (본캐 찾기)
 async function getMainCharacterName(worldName, ocid) {
     const unionRankingUrl = `${API_BASE_URL}/ranking/union?date=${formattedDate}&world_name=${encodeURIComponent(worldName)}&ocid=${encodeURIComponent(ocid)}`;
-    
+
     return await getApiResponse(unionRankingUrl);
 }
 
@@ -79,7 +94,7 @@ async function getHistoryCharacterNames(apiKey) {
             if (potentialHistory && potentialHistory.potential_history && potentialHistory.potential_history[0]) {
                 characterNames.push(potentialHistory.potential_history[0].character_name);
             }
-            
+
             // 큐브 사용 내역
             const cubeHistoryUrl = `${API_BASE_URL}/history/cube?count=10&date=${formattedApiDate}`;
             const cubeHistory = await getApiResponse(cubeHistoryUrl, apiKey);
@@ -92,10 +107,10 @@ async function getHistoryCharacterNames(apiKey) {
             const starforceHistory = await getApiResponse(starforceHistoryUrl, apiKey);
             if (starforceHistory && starforceHistory.starforce_history && starforceHistory.starforce_history[0]) {
                 characterNames.push(starforceHistory.starforce_history[0].character_name);
-            }   
+            }
         }
         const uniqueCharacterNames = [...new Set(characterNames)];
-        
+
         return uniqueCharacterNames;
     } catch (error) {
         console.error('API 조회 에러:', error);
@@ -104,6 +119,7 @@ async function getHistoryCharacterNames(apiKey) {
 }
 
 module.exports = {
+    apiDate,
     getOguildId,
     getGuildBasicData,
     getCharacterOcid,
