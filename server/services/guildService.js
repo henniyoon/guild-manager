@@ -4,8 +4,7 @@ const WorldService = require('./worldService.js');
 
 async function getGuild(guildName, worldName) {
     const worldId = await WorldService.getWorldId(worldName);
-    const guild = await Guild.findOne({ where: { name: guildName, world_id: worldId } });
-    return guild;
+    return await Guild.findOne({ where: { name: guildName, world_id: worldId } });
 }
 
 async function getGuildId(guildName, worldName) {
@@ -14,19 +13,20 @@ async function getGuildId(guildName, worldName) {
     return guild ? guild.id : null;
 }
 
+// 길드 추가
 async function createGuild(guildName, worldName) {
-    const worldId = await WorldService.getWorldId(worldName);
     try {
+        const worldId = await WorldService.getWorldId(worldName);
         let apiData = await APIService.getOguildId(guildName, worldName);
         apiData = {
             ...apiData,
             ... await APIService.getGuildBasicData(apiData.oguild_id)
         };
-        const guildMembers = apiData.guild_member;
 
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-        await Guild.create({
+
+        const guild = {
             world_id: worldId,
             name: guildName,
             oguild_id: apiData.oguild_id,
@@ -37,34 +37,28 @@ async function createGuild(guildName, worldName) {
             guild_mark: apiData.guild_mark,
             guild_mark_custom: apiData.guild_mark_custom,
             last_updated: apiDate,
+        };
 
-        });
+        await Guild.create(guild);
         console.log("길드 정보 추가 성공");
-
-        return guildMembers;
-
+        // 길드원 목록 return
+        return apiData.guild_member;
     } catch (error) {
         console.error('에러 발생:', error);
         throw new Error('서버 에러');
     }
 }
 
+// 길드 업데이트
 async function updateGuild(guildName, worldName) {
-    const worldId = await WorldService.getWorldId(worldName);
     try {
-        let apiData = await APIService.getOguildId(guildName, worldName);
-        apiData = {
-            ...apiData,
-            ... await APIService.getGuildBasicData(apiData.oguild_id)
-        };
-        const guildMembers = apiData.guild_member;
-        console.log("apiData:", apiData);
-
+        const guild = await getGuild(guildName, worldName);
+        let apiData = await APIService.getGuildBasicData(guild.oguild_id);
+        
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
-        await Guild.update({
-            world_id: worldId,
-            name: guildName,
+
+        const updatedGuild = {
             master_name: apiData.guild_master_name,
             member_count: apiData.guild_member_count,
             level: apiData.guild_level,
@@ -72,12 +66,12 @@ async function updateGuild(guildName, worldName) {
             guild_mark: apiData.guild_mark,
             guild_mark_custom: apiData.guild_mark_custom,
             last_updated: apiDate,
-        },
-            { where: { oguild_id: apiData.oguild_id } }
-        );
+        };
+
+        await Guild.update(updatedGuild, { where: { oguild_id: guild.oguild_id }})
         console.log("길드 정보 업데이트 성공");
 
-        return guildMembers;
+        return apiData.guild_member;
 
     } catch (error) {
         console.error('에러 발생:', error);
