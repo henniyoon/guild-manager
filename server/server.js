@@ -16,6 +16,7 @@ const { exec } = require("child_process");
 const recordRoutes = require("./routes/recordRoutes.js");
 const authRoutes = require("./routes/authRoutes.js");
 const dataFetcherRoutes = require("./routes/dataFetcherRoutes.js");
+const userRoutes = require("./routes/userRoutes.js");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -39,6 +40,7 @@ sequelize
 app.use(recordRoutes);
 app.use(authRoutes);
 app.use(dataFetcherRoutes);
+app.use(userRoutes);
 
 // admin 페이지 캐릭터 채우는 로직
 app.post("/test", (req, res) => {
