@@ -9,8 +9,9 @@ const API_KEY = config.apiKey;
 const API_BASE_URL = "https://open.api.nexon.com/maplestory/v1";
 
 const currentDate = new Date();
+console.log("currentDate: ", currentDate);
 currentDate.setDate(currentDate.getDate() - 1);
-currentDate.setHours(currentDate.getHours() + 9);
+currentDate.setHours(currentDate.getHours() + 8);   // 오전 1시에 api 갱신
 const formattedDate = currentDate.toISOString().split('T')[0];
 
 // nexon open api 조회 
