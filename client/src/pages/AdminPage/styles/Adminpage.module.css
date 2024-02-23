@@ -179,3 +179,8 @@ th {
   border-radius: 4px;
   box-sizing: border-box;
 }
+
+.customCheckbox {
+  transform: scale(1.5); /* 체크박스를 1.5배로 확대 */
+  /* margin: 10px; 체크박스 주위의 여백 조절 */
+}
