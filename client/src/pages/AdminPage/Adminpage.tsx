@@ -651,6 +651,7 @@ const Adminpage: React.FC = () => {
                       ) : (
                         <input
                           title="character_name"
+                          className={styles.editInput}
                           type="text"
                           defaultValue={row.character_name}
                           onChange={(e) =>
@@ -666,6 +667,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td2}>
                       <input
                         title="weekly_score"
+                        className={styles.editInput}
                         type="number"
                         defaultValue={row.weekly_score}
                         onChange={(e) =>
@@ -680,6 +682,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td3}>
                       <input
                         title="suro_score"
+                        className={styles.editInput}
                         type="number"
                         defaultValue={row.suro_score}
                         onChange={(e) =>
@@ -694,6 +697,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td4}>
                       <input
                         title="flag_score"
+                        className={styles.editInput}
                         type="number"
                         defaultValue={row.flag_score}
                         onChange={(e) =>
@@ -708,6 +712,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td5}>
                       <input
                         title="noble_limit"
+                        className={styles.editInput}
                         type="checkbox"
                         defaultChecked={row.noble_limit}
                         onChange={(e) =>

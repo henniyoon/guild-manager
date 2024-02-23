@@ -171,3 +171,11 @@ th {
   padding-left: 3%;
   padding-right: 3%;
 }
+
+.editInput {
+  padding: 4px;
+  /* margin: 4px 0; */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
