@@ -48,6 +48,7 @@ const Adminpage: React.FC = () => {
   });
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
+  const [serverDataLength, setServerDataLength] = useState<number>(0);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -75,8 +76,10 @@ const Adminpage: React.FC = () => {
         setTableData(sortedData);
         setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
       })
-      .catch((error) =>
-        console.error("데이터를 불러오는 데 실패했습니다:", error)
+      .catch((error) =>{
+        console.log(error);
+        alert("토큰이 만료되었습니다. 다시 로그인 해주세요.");
+      }
       );
   };
 
@@ -287,6 +290,7 @@ const Adminpage: React.FC = () => {
       handleUploadFiles(filesArray);
     }
   };
+
   // 컴포넌트 내부에서
   const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
 
@@ -313,6 +317,7 @@ const Adminpage: React.FC = () => {
         console.log("업로드 성공:", data);
         alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
+        setServerDataLength(data.weekly_score_Area.length);
         updateTableDataWithOcrResults(data);
       })
       .catch((error) => {
@@ -530,7 +535,7 @@ const Adminpage: React.FC = () => {
         </div>
       </div>
       <div className={styles.tableInfoContainer}>
-        <p>서버로부터 받은 길드원 수 : {dataLength}</p>
+        <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
         <p>불러온 길드원 수 : {tableData.length}</p>
       </div>
       <div className={styles.buttonContainer}>
@@ -600,7 +605,7 @@ const Adminpage: React.FC = () => {
               플래그
             </th>
             <th className={styles.th5} onClick={() => sortData("noble_limit")}>
-              노블
+              노블제한
             </th>
           </tr>
         </thead>
@@ -651,6 +656,7 @@ const Adminpage: React.FC = () => {
                       ) : (
                         <input
                           title="character_name"
+                          className={styles.editInput}
                           type="text"
                           defaultValue={row.character_name}
                           onChange={(e) =>
@@ -666,6 +672,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td2}>
                       <input
                         title="weekly_score"
+                        className={styles.editInput}
                         type="number"
                         defaultValue={row.weekly_score}
                         onChange={(e) =>
@@ -680,6 +687,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td3}>
                       <input
                         title="suro_score"
+                        className={styles.editInput}
                         type="number"
                         defaultValue={row.suro_score}
                         onChange={(e) =>
@@ -694,6 +702,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td4}>
                       <input
                         title="flag_score"
+                        className={styles.editInput}
                         type="number"
                         defaultValue={row.flag_score}
                         onChange={(e) =>
@@ -708,6 +717,7 @@ const Adminpage: React.FC = () => {
                     <td className={styles.td5}>
                       <input
                         title="noble_limit"
+                        className={styles.customCheckbox}
                         type="checkbox"
                         defaultChecked={row.noble_limit}
                         onChange={(e) =>
