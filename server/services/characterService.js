@@ -26,6 +26,7 @@ async function getCharactersByGuild(guildName, worldName) {
 async function createCharacter(guildName, worldName, characterName) {
     const worldId = await WorldService.getWorldId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldName);
+    console.log("guildId: ", guildId);
     try {
         let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
@@ -50,12 +51,12 @@ async function createCharacter(guildName, worldName, characterName) {
         };
 
         const createdCharacter = await Character.create(character);
-        console.log(characterName, "캐릭터 정보 추가 성공");
+        // console.log(characterName, "캐릭터 정보 추가 성공");
 
         return createdCharacter;
     } catch (error) {
         console.error('에러 발생:', error);
-
+        console.log("worldId: ", worldId);
         // 에러가 발생하면 특정 필드만 null로 설정하여 저장
         const nullCharacterData = {
             world_id: worldId,
@@ -76,13 +77,13 @@ async function createCharacter(guildName, worldName, characterName) {
 async function updateCharacter(characterName) {
     try {
         const character = await getCharacter(characterName);
-        console.log("character: ", character);
+       
         let apiData = await APIService.getCharacterBasicData(character.ocid)
         apiData = {
             ...apiData,
             ... await APIService.getMainCharacterName(apiData.world_name, character.ocid)
         };
-        console.log(apiData);
+        // console.log(apiData);
         // 업데이트 시점에는 길드를 옮기거나 월드 리프 했을 가능성이 있음!
         const worldId = await WorldService.getWorldId(apiData.world_name);
         const guildId = await GuildService.getGuildId(apiData.character_guild_name, apiData.world_name);
@@ -100,7 +101,7 @@ async function updateCharacter(characterName) {
             image: apiData.character_image,
             last_updated: apiDate,
         };
-        console.log(characterName, "캐릭터 정보 업데이트 성공");
+        // console.log(characterName, "캐릭터 정보 업데이트 성공");
         return await Character.update(updatedCharacter, { where: { ocid: character.ocid } });
         
     } catch (error) {
