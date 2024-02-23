@@ -76,8 +76,10 @@ const Adminpage: React.FC = () => {
         setTableData(sortedData);
         setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
       })
-      .catch((error) =>
-        console.error("데이터를 불러오는 데 실패했습니다:", error)
+      .catch((error) =>{
+        console.log(error);
+        alert("토큰이 만료되었습니다. 다시 로그인 해주세요.");
+      }
       );
   };
 
