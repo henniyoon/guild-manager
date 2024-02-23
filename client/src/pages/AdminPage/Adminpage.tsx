@@ -533,8 +533,7 @@ const Adminpage: React.FC = () => {
         </div>
       </div>
       <div className={styles.tableInfoContainer}>
-        <p>서버로부터 받은 길드원 수 : {dataLength}</p>
-        <p>OCR : {serverDataLength}</p>
+        <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
         <p>불러온 길드원 수 : {tableData.length}</p>
       </div>
       <div className={styles.buttonContainer}>
