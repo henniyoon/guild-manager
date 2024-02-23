@@ -111,7 +111,7 @@ th {
 
 .filterLabel {
   display: inline-block;
-  width: 30%;
+  width: 100%;
   display: block;
   margin-bottom: 5px;
   color: #333;
@@ -131,7 +131,7 @@ th {
 
 .filterInput:focus {
   display: inline-block;
-  width: 90%;
+  width: 100%;
   border-color: #007bff;
   outline: none;
 }
@@ -170,4 +170,17 @@ th {
   margin-bottom: 20px;
   padding-left: 3%;
   padding-right: 3%;
+}
+
+.editInput {
+  padding: 4px;
+  /* margin: 4px 0; */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.customCheckbox {
+  transform: scale(1.5); /* 체크박스를 1.5배로 확대 */
+  /* margin: 10px; 체크박스 주위의 여백 조절 */
 }
