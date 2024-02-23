@@ -15,7 +15,6 @@ async function getCharacterByOcid(ocid) {
 }
 
 async function getCharactersByGuild(guildName, worldName) {
-    // const worldId = await WorldService.getWorldId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldName);
     const characters = await Character.findAll({
         where: { guild_id: guildId },
@@ -87,7 +86,7 @@ async function updateCharacter(characterName) {
         // 업데이트 시점에는 길드를 옮기거나 월드 리프 했을 가능성이 있음!
         const worldId = await WorldService.getWorldId(apiData.world_name);
         const guildId = await GuildService.getGuildId(apiData.character_guild_name, apiData.world_name);
-
+        
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
 

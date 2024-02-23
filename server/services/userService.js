@@ -20,8 +20,11 @@ async function setUserRole(apikey, id, guildName, worldName) {
         },
             { where: { id: id } }
         );
+        console.log("마스터 권한 부여");
+        return { success: true };
     } else {
         console.log("권한 부여 실패");
+        return { success: false };
     }
 }
 
@@ -44,7 +47,8 @@ async function verifyAdmin(apiKey, guildName, worldName) {
             return false;
         }
     } catch (error) {
-        console.error('에러 발생:', error);
+        console.log("서버 에러");
+        return false;
     }
 }
 
@@ -53,7 +57,3 @@ module.exports = {
     setUserRole,
     verifyAdmin,
 }
-
-// setUserRole("test_51a72486d6ea2528359dd65ac6d066018a9039af4e0529bd0432f26e4744123a05f0445e41873440742bb6f5e750d93f", 1, "별빛", "스카니아");
-// verifyAdmin("live_8889de2bcdbf2ffc389f01c608c335ad8feab2cc9b5a30e4551a599f1f9956847c78d2cca2b6f310be5c3009a02cd2b3", "초깜찍", "스카니아");
-getUser(1);
