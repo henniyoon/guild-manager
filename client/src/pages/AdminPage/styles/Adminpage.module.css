@@ -131,7 +131,7 @@ th {
 
 .filterInput:focus {
   display: inline-block;
-  width: 90%;
+  width: 100%;
   border-color: #007bff;
   outline: none;
 }
