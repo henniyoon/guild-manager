@@ -50,7 +50,7 @@ const Mainpage = () => {
         backgroundSize: 'cover',
       }}
     >
-      <form onSubmit={handleButtonClick} style={{ width: '100%', marginTop: 20 }}>
+      <form onSubmit={handleButtonClick} style={{ width: '100%', marginTop: '15vh', marginRight: '12%' }}>
         <Grid container spacing={0} alignItems="center" justifyContent="center">
           <Grid item>
             <SelectServer value={worldName} onChange={setSelectedServer} />
