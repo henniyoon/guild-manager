@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from "../styles/SelectWeek.module.css";
+import '../../../styles/Footer.module.css'
 
 interface SelectWeekProps {
   selectedDate: string;
