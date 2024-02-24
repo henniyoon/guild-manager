@@ -18,7 +18,7 @@ function verifyToken(token) {
         const decodedToken = jwt.verify(token, SECRET_KEY);
         return decodedToken;
     } catch (error) {
-        throw new Error("Invalid token");
+        // throw new Error("Invalid token");
     }
 }
 
@@ -75,10 +75,12 @@ const login = async (email, password) => {
         const payload = {
             id: user.id,
             username: user.username,
+            email: user.email,
             guild_world_id: user.guild ? user.guild.world_id : null,
             guild_name: user.guild ? user.guild.name : null,
             world_name: worldName,
             guild_World_Id: guildWorldId,
+            role: user.role,
         };
 
         const token = generateToken(payload);
