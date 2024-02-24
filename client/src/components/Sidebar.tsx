@@ -48,11 +48,18 @@ const Sidebar: React.FC<SidebarProps> = ({ mainItems, secondaryItems }) => {
                     boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.4)'
                 }}
             >
-                <Link to="/" className={styles.logoLink} style={{ marginLeft: '5px' }}>
-                    <img src="/logo.png" className={styles.logo} alt="Guild Manager Logo" />
-                    <Typography variant="h5" noWrap style={{ fontWeight: 'bold' }}>
-                        메소
-                    </Typography>
+                <Link to="/" className={styles.logoLink}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <img src="/logo.png" className={styles.logo} alt="Guild Manager Logo" />
+                        <div style={{ marginLeft: '5px' }}>
+                            <Typography variant="h5" noWrap style={{ fontWeight: 'bold' }}>
+                                메소
+                            </Typography>
+                            <Typography style={{ fontWeight: 'bold', fontSize: 15 }}>
+                                메이플길드관리소
+                            </Typography>
+                        </div>
+                    </div>
                 </Link>
             </Toolbar>
             {/* <Divider /> */}
