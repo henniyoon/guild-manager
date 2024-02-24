@@ -32,7 +32,7 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   role: {         // 길드 직위
-    type: DataTypes.ENUM('Master', 'Sub_Master', 'Member'),
+    type: DataTypes.ENUM('마스터', '부마스터', '길드원'),
     allowNull: true,
   },
 }, {
