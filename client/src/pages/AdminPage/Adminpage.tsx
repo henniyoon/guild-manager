@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
+import Modal from '../../components/Modal'
 
 interface TableRowData {
   id: number;
@@ -49,6 +50,7 @@ const Adminpage: React.FC = () => {
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -418,6 +420,14 @@ const Adminpage: React.FC = () => {
       .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
   const handleSelectOrDeselectAll = () => {
     // 현재 선택된 행이 하나라도 있는지 확인합니다.
@@ -439,6 +449,14 @@ const Adminpage: React.FC = () => {
     <div>
       <div className={styles.titleContainer}>
         <h1>관리자 페이지</h1>
+        <div>
+      <button onClick={handleOpenModal}>모달 열기</button>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <h2>모달 제목</h2>
+        <p>모달의 내용입니다.</p>
+        <button onClick={handleCloseModal}>닫기</button>
+      </Modal>
+    </div>
         <SelectWeek
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
