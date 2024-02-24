@@ -16,6 +16,10 @@ async function getGuildId(guildName, worldName) {
     return guild ? guild.id : null;
 }
 
+async function getGuildById(guildId) {
+    return await Guild.findOne({ where: { id: guildId } });
+}
+
 // 길드 추가
 async function createGuild(guildName, worldName) {
     try {
@@ -85,6 +89,7 @@ async function updateGuild(guildName, worldName) {
 module.exports = {
     getGuild,
     getGuildId,
+    getGuildById,
     createGuild,
     updateGuild,
 };
