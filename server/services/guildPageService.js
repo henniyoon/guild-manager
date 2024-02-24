@@ -46,5 +46,3 @@ async function createOrUpdateGuildPage(guildName, worldName) {
 module.exports = {
     createOrUpdateGuildPage,
 }
-
-createOrUpdateGuildPage("별빛", "스카니아");

@@ -8,5 +8,3 @@ function getCurrentKoreaTime() {
 }
 
 module.exports = { getCurrentKoreaTime };
-
-// console.log(getCurrentKoreanTime());
