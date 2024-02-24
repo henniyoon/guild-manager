@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mainItems, secondaryItems }) => {
             </Toolbar>
             {/* <Divider /> */}
             <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+                {['추가 예정', '추가 예정'].map((text, index) => (
                     <ListItem key={text} disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
