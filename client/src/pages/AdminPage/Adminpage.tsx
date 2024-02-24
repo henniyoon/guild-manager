@@ -546,7 +546,7 @@ const Adminpage: React.FC = () => {
       </div>
       <div className={styles.tableInfoContainer}>
         <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
-        <p>불러온 길드원 수 : {tableData.length}</p>
+        <p>행 개수 : {tableData.length}</p>
       </div>
       <div className={styles.buttonContainer}>
         <button className={styles.buttonStyle} onClick={testclick}>
