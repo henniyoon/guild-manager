@@ -19,7 +19,7 @@ async function setUserRole(apikey, id, guildName, worldName) {
     if (verify) {
         await User.update({
             guild_id: guildId,
-            role: "Master",
+            role: "마스터",
         },
             { where: { id: id } }
         );
