@@ -1,0 +1,4 @@
+.bi-discord:hover {
+    fill: #7289da; /* 예시 색상, Discord의 대표 색상 */
+    transition: fill 0.2s ease-in-out; /* 부드러운 색상 변화 효과 */
+}
