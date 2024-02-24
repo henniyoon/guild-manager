@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
+import Modal from "../../components/Modal";
+import HomePageInstructions from "./components/AdminpageManual";
 
 interface TableRowData {
   id: number;
@@ -49,6 +51,7 @@ const Adminpage: React.FC = () => {
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 데이터를 불러오는 함수
   const fetchTableData = () => {
@@ -76,11 +79,10 @@ const Adminpage: React.FC = () => {
         setTableData(sortedData);
         setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
       })
-      .catch((error) =>{
+      .catch((error) => {
         console.log(error);
         alert("토큰이 만료되었습니다. 다시 로그인 해주세요.");
-      }
-      );
+      });
   };
 
   useEffect(() => {
@@ -438,7 +440,15 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <h1>관리자 페이지</h1>
+        <div  className={styles.titleLeft}>
+          <h1>관리자 페이지</h1>
+          <div>
+            <button onClick={() => setIsModalOpen(true)}>ℹ️</button>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+              <HomePageInstructions />
+            </Modal>
+          </div>
+        </div>
         <SelectWeek
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
@@ -536,7 +546,7 @@ const Adminpage: React.FC = () => {
       </div>
       <div className={styles.tableInfoContainer}>
         <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
-        <p>불러온 길드원 수 : {tableData.length}</p>
+        <p>행 개수 : {tableData.length}</p>
       </div>
       <div className={styles.buttonContainer}>
         <button className={styles.buttonStyle} onClick={testclick}>

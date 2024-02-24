@@ -7,7 +7,7 @@ interface SelectServerProps {
 }
 
 const SelectServer = ({ value, onChange }: SelectServerProps) => {
-  const options = ['스카니아', '루나', '엘리시움', '리부트2'];
+  const options = ['스카니아', '베라', '루나', '제니스', '크로아', '유니온', '엘리시움', '이노시스', '레드', '오로라', '아케인', '노바', '리부트', '리부트2'];
 
   const handleChange = (e: SelectChangeEvent<string>) => {
     onChange(e.target.value);
