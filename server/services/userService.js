@@ -1,22 +1,25 @@
 const User = require('../models/User.js');
 const APIService = require('./apiService.js');
+const WorldService = require('./worldService.js');
 const GuildService = require('./guildService.js');
 const characterService = require('./characterService.js');
 
 async function getUser(id) {
     const user = await User.findOne({ where: { id: id } });
     if(user) {
-        const { username, email } = user;
-        return { username, email };
+        const { username, email, guild_id, role  } = user;
+        return { username, email, guild_id, role };
     }
     return null;
 }
 
 async function setUserRole(apikey, id, guildName, worldName) {
+    const guildId = await GuildService.getGuildId(guildName, worldName);
     const verify = await verifyAdmin(apikey, guildName, worldName);
     if (verify) {
         await User.update({
-            role: "Master"
+            guild_id: guildId,
+            role: "Master",
         },
             { where: { id: id } }
         );
