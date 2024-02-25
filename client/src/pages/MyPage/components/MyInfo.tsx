@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Box, TextField, Typography } from "@mui/material";
+import { Link, Button, Box, TextField, Typography, Modal, IconButton } from "@mui/material";
+import InfoIcon from '@mui/icons-material/Info';
 
 interface UserInfo {
     username: string;
@@ -11,12 +12,28 @@ interface UserInfo {
 
 const token = localStorage.getItem("token");
 
+const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: "auto",
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
 const MyInfo: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [id, setId] = useState('');
     const [apiKey, setApiKey] = useState('');
     const [worldName, setWorldName] = useState('');
     const [guildName, setGuildName] = useState('');
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -131,7 +148,35 @@ const MyInfo: React.FC = () => {
 
             <Box>
                 <form>
-                    <Typography variant="h5" style={{ marginBottom: '20px', fontWeight: 'bold' }}>길드 관리자 인증</Typography>
+                    <Typography variant="h5" style={{ marginBottom: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+                        길드 관리자 인증
+                        <IconButton onClick={handleOpen}>
+                            <InfoIcon />
+                        </IconButton>
+                    </Typography>
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={style}>
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                API KEY 발급 가이드
+                            </Typography>
+                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                <Link href="https://openapi.nexon.com" target="_blank" rel="noopener noreferrer" style={{ color: 'blue' }}>
+                                    넥슨 OPEN API
+                                </Link>
+                                로 가서 로그인 후 애플리케이션 - 애플리케이션 등록 <br />
+                                메이플스토리, 서비스단계, 메소, WEB, 현 사이트 URL  입력 후 등록 <br />
+                                <img src="./APIKeyGuide.png" alt="API Key Guide" /> <br />
+
+                                애플리케이션 목록에서 발급 받은 API KEY 복사 후 사용
+                            </Typography>
+                        </Box>
+                    </Modal>
+
                     <TextField
                         label="API KEY"
                         variant="outlined"
