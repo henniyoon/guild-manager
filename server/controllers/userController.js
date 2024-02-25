@@ -11,7 +11,7 @@ async function getUserInfoController(req, res) {
     try {
         // 토큰 검증 및 디코딩
         const decoded = AuthService.verifyToken(token);
-       
+
         const userId = decoded.id;
         const user = await UserService.getUser(userId);
         const guildId = user.guild_id;
@@ -50,7 +50,7 @@ async function getUserInfoController(req, res) {
     }
 }
 
-async function setUserRoleController(req, res) {
+async function setUserRoleMasterController(req, res) {
     const { apiKey, guildName, worldName } = req.body;
     const token = req.headers.authorization?.split(" ")[1]; // "Bearer TOKEN" 형식 가정
     if (!token) {
@@ -61,7 +61,7 @@ async function setUserRoleController(req, res) {
         // 토큰 검증 및 디코딩
         const decoded = AuthService.verifyToken(token);
         const userId = decoded.id;
-        const verify = await UserService.setUserRole(apiKey, userId, guildName, worldName);
+        const verify = await UserService.setUserRoleMaster(apiKey, userId, guildName, worldName);
         // console.log(verify);
         if (verify.success) {
             return res.status(200).send("길드 관리자 인증 성공");
@@ -83,7 +83,27 @@ async function setUserRoleController(req, res) {
     }
 }
 
+async function setUserRoleSubMasterController(req, res) {
+    const data = req.body;
+    const id = data.id;
+    const guildName = data.guildName;
+    const worldName = data.worldName;
+    console.log("id: ", id, " guildName: ", guildName, " worldName: ", worldName);
+    try {
+        const verify = await UserService.setUserRoleSubMaster(id, guildName, worldName);
+        if (verify.success) {
+            return res.status(200).send("길드 관리자 등록 성공");
+        } else {
+            return res.status(401).json({ error: "길드 관리자로의 인증이 실패했습니다.", reason: "ID를 정확히 입력해 주세요." });
+        }
+    } catch (error) {
+        console.error("서버 에러", error);
+        return res.status(500).send("길드 관리자 등록 실패");
+    }
+}
+
 module.exports = {
     getUserInfoController,
-    setUserRoleController,
+    setUserRoleMasterController,
+    setUserRoleSubMasterController,
 }
