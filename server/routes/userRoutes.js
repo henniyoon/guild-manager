@@ -4,6 +4,7 @@ const userRouter = express.Router();
 const UserController = require('../controllers/userController.js');
 
 userRouter.get('/myInfo', UserController.getUserInfoController);
-userRouter.post('/role', UserController.setUserRoleController);
+userRouter.post('/role/master', UserController.setUserRoleMasterController);
+userRouter.post('/role/subMaster', UserController.setUserRoleSubMasterController);
 
 module.exports = userRouter;
