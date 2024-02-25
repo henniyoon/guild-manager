@@ -6,29 +6,11 @@ const characterService = require('./characterService.js');
 
 async function getUser(id) {
     const user = await User.findOne({ where: { id: id } });
-    if(user) {
-        const { username, email, guild_id, role  } = user;
+    if (user) {
+        const { username, email, guild_id, role } = user;
         return { username, email, guild_id, role };
     }
     return null;
-}
-
-async function setUserRole(apikey, id, guildName, worldName) {
-    const guildId = await GuildService.getGuildId(guildName, worldName);
-    const verify = await verifyAdmin(apikey, guildName, worldName);
-    if (verify) {
-        await User.update({
-            guild_id: guildId,
-            role: "마스터",
-        },
-            { where: { id: id } }
-        );
-        console.log("마스터 권한 부여");
-        return { success: true };
-    } else {
-        console.log("권한 부여 실패");
-        return { success: false };
-    }
 }
 
 async function verifyAdmin(apiKey, guildName, worldName) {
@@ -55,8 +37,46 @@ async function verifyAdmin(apiKey, guildName, worldName) {
     }
 }
 
+async function setUserRoleMaster(apikey, id, guildName, worldName) {
+    const guildId = await GuildService.getGuildId(guildName, worldName);
+    const verify = await verifyAdmin(apikey, guildName, worldName);
+    if (verify) {
+        await User.update({
+            guild_id: guildId,
+            role: "마스터",
+        },
+            { where: { id: id } }
+        );
+        console.log("마스터 권한 부여");
+        return { success: true };
+    } else {
+        console.log("권한 부여 실패");
+        return { success: false };
+    }
+}
+
+async function setUserRoleSubMaster(id, guildName, worldName) {
+    const guildId = await GuildService.getGuildId(guildName, worldName);
+    console.log("guildId: ", guildId);
+    try {
+        await User.update({
+            guild_id: guildId,
+            role: "부마스터",
+        },
+            { where: { email: id } }
+        );
+        console.log("부마스터 권한 부여");
+        return { success: true };
+
+    } catch (error) {
+        console.log("권한 부여 실패");
+        return { success: false };
+    }
+}
+
 module.exports = {
     getUser,
-    setUserRole,
     verifyAdmin,
+    setUserRoleMaster,
+    setUserRoleSubMaster,
 }
