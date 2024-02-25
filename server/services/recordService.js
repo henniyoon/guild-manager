@@ -41,6 +41,16 @@ const getRecords = async (week) => {
     return records;
 };
 
+const getRecordsByCharacterId = async(characterId, week) => {
+    const records = await Record.findAll({
+        where: {
+            character_id: characterId,
+            week: week
+        },
+    });
+    return records
+}
+
 const findOrCreateRecords = async (characterId, week) => {
     const [record, created] = await Record.findOrCreate({
         where: {
@@ -84,6 +94,7 @@ const deleteRecords = async (recordId) => {
 module.exports = {
     addRecord,
     getRecords,
+    getRecordsByCharacterId,
     findOrCreateRecords,
     updateRecords,
     deleteRecords,

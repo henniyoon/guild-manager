@@ -6,7 +6,7 @@ const AuthService = require('../services/authService.js');
 const getRecordsController = async (req, res) => {
   const week = req.query.week;
   const token = req.headers.authorization?.split(" ")[1]; // "Bearer TOKEN" 형식 가정
-  
+  console.log("getRecordToken: ", token);
   if (!token) {
     return res.status(401).send("토큰이 필요합니다.");
   }
@@ -14,6 +14,7 @@ const getRecordsController = async (req, res) => {
   try {
     // 토큰 검증 및 디코딩
     const decoded = AuthService.verifyToken(token);
+    console.log("getRecordDecodedToken: ", decoded);
     // 길드 정보 조회
     const guildName = decoded.guild_name;
     const worldName = decoded.world_name;
@@ -34,16 +35,11 @@ const getRecordsController = async (req, res) => {
     // 각 캐릭터에 대한 records 데이터 조회 및 캐릭터 이름 추가
     const charactersRecords = await Promise.all(
       characters.map(async (character) => {
-        const record = await RecordService.findOrCreateRecords(character.id, week);
-        if (record) {
-          return {
-            ...record.toJSON(),
-            character_name: character.name, // 캐릭터 이름 추가
-          };
-        } else {
-          // 만약 레코드가 없을 경우에 대한 처리
-          return null; // 또는 다른 기본값 설정
-        };
+        const records = await RecordService.getRecordsByCharacterId(character.id, week);
+        return records.map((record) => ({
+          ...record.toJSON(),
+          character_name: character.name, // 캐릭터 이름 추가
+        }));
       })
     );
     const response = charactersRecords.flat(); // flat()을 사용하여 중첩 배열을 단일 배열로 평탄화
