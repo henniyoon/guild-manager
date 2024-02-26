@@ -4,6 +4,7 @@ import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
 import HomePageInstructions from "./components/AdminpageManual";
+import InfoIcon from '@mui/icons-material/Info';
 
 interface TableRowData {
   id: number;
@@ -443,7 +444,9 @@ const Adminpage: React.FC = () => {
         <div  className={styles.titleLeft}>
           <h1>관리자 페이지</h1>
           <div>
-            <button onClick={() => setIsModalOpen(true)}>ℹ️</button>
+            <button onClick={() => setIsModalOpen(true)} title="info">
+              <InfoIcon />
+            </button>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
               <HomePageInstructions />
             </Modal>

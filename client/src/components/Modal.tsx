@@ -20,7 +20,7 @@ const Modal: FC<ModalProps> = ({ isOpen, onClose, children }) => {
     <div onClick={onClose} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div onClick={stopPropagation} style={{ backgroundColor: 'white', padding: 20 }}>
         {children}
-        <button onClick={onClose}>닫기</button>
+        {/* <button onClick={onClose}>닫기</button> */}
       </div>
     </div>,
     document.body
