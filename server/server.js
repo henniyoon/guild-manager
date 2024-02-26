@@ -17,7 +17,7 @@ const dataFetcherRoutes = require("./routes/dataFetcherRoutes.js");
 const userRoutes = require("./routes/userRoutes.js");
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 80;
 
 // 미들웨어 등록
 app.use(cors());
