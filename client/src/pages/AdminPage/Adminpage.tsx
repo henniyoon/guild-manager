@@ -411,14 +411,10 @@ const Adminpage: React.FC = () => {
         // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
         return (
           (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-          (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
-          (!minSuroScore || row.suro_score >= minSuroScore) &&
-          (!maxSuroScore || row.suro_score <= maxSuroScore) &&
-          (!minFlagScore || row.flag_score >= minFlagScore) &&
-          (!maxFlagScore || row.flag_score <= maxFlagScore)
+          (!minSuroScore || row.suro_score >= minSuroScore) ||
+          (!minFlagScore || row.flag_score >= minFlagScore)
         );
       })
-      .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
   };
 
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
@@ -429,7 +425,7 @@ const Adminpage: React.FC = () => {
       setSelectedRowIds([]);
     } else {
       // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
-      const filteredRowIds = getFilteredRowIds();
+      const filteredRowIds = getFilteredRowIds().map((row) => row.id);
       setSelectedRowIds(filteredRowIds);
     }
   };
@@ -501,14 +497,14 @@ const Adminpage: React.FC = () => {
             }
           />
           <Select
-          // value={age}
-          // onChange={handleChange}
-          displayEmpty
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
-          <MenuItem value={10}>그리고</MenuItem>
-          <MenuItem value={20}>또는</MenuItem>
-        </Select>
+            // value={age}
+            // onChange={handleChange}
+            displayEmpty
+            inputProps={{ 'aria-label': 'Without label' }}
+          >
+            <MenuItem value={10}>그리고</MenuItem>
+            <MenuItem value={20}>또는</MenuItem>
+          </Select>
           <label className={styles.filterSeparator}></label>
           <input
             className={styles.filterInput}
@@ -630,136 +626,109 @@ const Adminpage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {tableData
-            .filter((row) => {
-              const minWeeklyScore = filters.weekly_score.min
-                ? parseInt(filters.weekly_score.min, 10)
-                : -Infinity;
-              const maxWeeklyScore = filters.weekly_score.max
-                ? parseInt(filters.weekly_score.max, 10)
-                : Infinity;
-              const minSuroScore = filters.suro_score.min
-                ? parseInt(filters.suro_score.min, 10)
-                : -Infinity;
-              const maxSuroScore = filters.suro_score.max
-                ? parseInt(filters.suro_score.max, 10)
-                : Infinity;
-              const minFlagScore = filters.flag_score.min
-                ? parseInt(filters.flag_score.min, 10)
-                : -Infinity;
-              const maxFlagScore = filters.flag_score.max
-                ? parseInt(filters.flag_score.max, 10)
-                : Infinity;
-
-              return (
-                (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-                (!minSuroScore || row.suro_score >= minSuroScore) ||
-                (!minFlagScore || row.flag_score >= minFlagScore)
-              );
-            })
-            .map((row, index) => (
-              <tr
-                key={row.id}
-                onClick={() => handleRowClick(row.id)}
-                className={`${styles.rowClickable} ${selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-                  } ${index % 17 === 16 ? styles.row_17th : ""}`}
-              >
-                {isEditMode ? (
-                  <>
-                    <td className={styles.td1}>
-                      {row.character_name === "" ? (
-                        row.character_name
-                      ) : (
-                        <input
-                          title="character_name"
-                          className={styles.editInput}
-                          type="text"
-                          defaultValue={row.character_name}
-                          onChange={(e) =>
-                            handleInputChange(
-                              row.id,
-                              "character_name",
-                              e.target.value
-                            )
-                          }
-                        />
-                      )}
-                    </td>
-                    <td className={styles.td2}>
+          {getFilteredRowIds().map((row, index) => (
+            <tr
+              key={row.id}
+              onClick={() => handleRowClick(row.id)}
+              className={`${styles.rowClickable} ${selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+                } ${index % 17 === 16 ? styles.row_17th : ""}`}
+            >
+              {isEditMode ? (
+                <>
+                  <td className={styles.td1}>
+                    {row.character_name === "" ? (
+                      row.character_name
+                    ) : (
                       <input
-                        title="weekly_score"
+                        title="character_name"
                         className={styles.editInput}
-                        type="number"
-                        defaultValue={row.weekly_score}
+                        type="text"
+                        defaultValue={row.character_name}
                         onChange={(e) =>
                           handleInputChange(
                             row.id,
-                            "weekly_score",
+                            "character_name",
                             e.target.value
                           )
                         }
                       />
-                    </td>
-                    <td className={styles.td3}>
-                      <input
-                        title="suro_score"
-                        className={styles.editInput}
-                        type="number"
-                        defaultValue={row.suro_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "suro_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className={styles.td4}>
-                      <input
-                        title="flag_score"
-                        className={styles.editInput}
-                        type="number"
-                        defaultValue={row.flag_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "flag_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className={styles.td5}>
-                      <input
-                        title="noble_limit"
-                        className={styles.customCheckbox}
-                        type="checkbox"
-                        defaultChecked={row.noble_limit}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "noble_limit",
-                            e.target.checked.toString()
-                          )
-                        }
-                      />
-                    </td>
-                  </>
-                ) : (
-                  // 비편집 모드에서의 행 렌더링
-                  <>
-                    <td className={styles.td1}>{row.character_name}</td>
-                    <td className={styles.td2}>{row.weekly_score}</td>
-                    <td className={styles.td3}>{row.suro_score}</td>
-                    <td className={styles.td4}>{row.flag_score}</td>
-                    <td className={styles.td5}>
-                      {row.noble_limit ? "🔴" : "🟢"}
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
+                    )}
+                  </td>
+                  <td className={styles.td2}>
+                    <input
+                      title="weekly_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.weekly_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "weekly_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td3}>
+                    <input
+                      title="suro_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.suro_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "suro_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td4}>
+                    <input
+                      title="flag_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.flag_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "flag_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td5}>
+                    <input
+                      title="noble_limit"
+                      className={styles.customCheckbox}
+                      type="checkbox"
+                      defaultChecked={row.noble_limit}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "noble_limit",
+                          e.target.checked.toString()
+                        )
+                      }
+                    />
+                  </td>
+                </>
+              ) : (
+                // 비편집 모드에서의 행 렌더링
+                <>
+                  <td className={styles.td1}>{row.character_name}</td>
+                  <td className={styles.td2}>{row.weekly_score}</td>
+                  <td className={styles.td3}>{row.suro_score}</td>
+                  <td className={styles.td4}>{row.flag_score}</td>
+                  <td className={styles.td5}>
+                    {row.noble_limit ? "🔴" : "🟢"}
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
