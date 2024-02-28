@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
 import HomePageInstructions from "./components/AdminpageManual";
 import InfoIcon from '@mui/icons-material/Info';
+import IconButton from '@mui/material/IconButton';
 import getCurrentWeek from "./components/getCurrentWeek";
 
 interface TableRowData {
@@ -434,9 +435,9 @@ const Adminpage: React.FC = () => {
         <div  className={styles.titleLeft}>
           <h1>관리자 페이지</h1>
           <div>
-            <button onClick={() => setIsModalOpen(true)} title="info">
+            <IconButton onClick={() => setIsModalOpen(true)} title="info">
               <InfoIcon />
-            </button>
+            </IconButton>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
               <HomePageInstructions />
             </Modal>
