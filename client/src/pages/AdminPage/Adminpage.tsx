@@ -3,6 +3,7 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
+import { Select, MenuItem } from '@mui/material';
 import HomePageInstructions from "./components/AdminpageManual";
 
 interface TableRowData {
@@ -102,15 +103,15 @@ const Adminpage: React.FC = () => {
     // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
-      field === "weekly_score" ||
-      field === "suro_score" ||
-      field === "flag_score"
+        field === "weekly_score" ||
+        field === "suro_score" ||
+        field === "flag_score"
         ? parseInt(value as string, 10)
         : field === "noble_limit" // nobel_limit 필드일 경우
-        ? value === true || value === "true"
-          ? 1
-          : 0 // true이면 1, 아니면 0으로 변환
-        : value; // 나머지 경우는 그대로 값 유지
+          ? value === true || value === "true"
+            ? 1
+            : 0 // true이면 1, 아니면 0으로 변환
+          : value; // 나머지 경우는 그대로 값 유지
 
     setEditedData((editedData) =>
       editedData.map((row) =>
@@ -195,7 +196,7 @@ const Adminpage: React.FC = () => {
     setSortConfig((currentSortConfig) => {
       const newDirection =
         currentSortConfig.key === key &&
-        currentSortConfig.direction === "ascending"
+          currentSortConfig.direction === "ascending"
           ? "descending"
           : "ascending";
       const sortedData = [...tableData].sort((a, b) => {
@@ -440,7 +441,7 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <div  className={styles.titleLeft}>
+        <div className={styles.titleLeft}>
           <h1>관리자 페이지</h1>
           <div>
             <button onClick={() => setIsModalOpen(true)}>ℹ️</button>
@@ -499,6 +500,15 @@ const Adminpage: React.FC = () => {
               })
             }
           />
+          <Select
+          // value={age}
+          // onChange={handleChange}
+          displayEmpty
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          <MenuItem value={10}>그리고</MenuItem>
+          <MenuItem value={20}>또는</MenuItem>
+        </Select>
           <label className={styles.filterSeparator}></label>
           <input
             className={styles.filterInput}
@@ -643,20 +653,16 @@ const Adminpage: React.FC = () => {
 
               return (
                 (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-                (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
-                (!minSuroScore || row.suro_score >= minSuroScore) &&
-                (!maxSuroScore || row.suro_score <= maxSuroScore) &&
-                (!minFlagScore || row.flag_score >= minFlagScore) &&
-                (!maxFlagScore || row.flag_score <= maxFlagScore)
+                (!minSuroScore || row.suro_score >= minSuroScore) ||
+                (!minFlagScore || row.flag_score >= minFlagScore)
               );
             })
             .map((row, index) => (
               <tr
                 key={row.id}
                 onClick={() => handleRowClick(row.id)}
-                className={`${styles.rowClickable} ${
-                  selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-                } ${index % 17 === 16 ? styles.row_17th : ""}`}
+                className={`${styles.rowClickable} ${selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+                  } ${index % 17 === 16 ? styles.row_17th : ""}`}
               >
                 {isEditMode ? (
                   <>
