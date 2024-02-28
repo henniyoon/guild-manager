@@ -21,7 +21,7 @@ interface SortConfig {
   direction: "ascending" | "descending";
 }
 interface Filter {
-  value: string;
+  value: number;
   operator: string;
 }
 
@@ -32,8 +32,8 @@ interface Filters {
 
 // 초기 상태 정의
 const initialFilters: Filters = {
-  suro_score: { value: '', operator: 'min' },
-  flag_score: { value: '', operator: 'min' },
+  suro_score: { value: 0, operator: 'min' },
+  flag_score: { value: 0, operator: 'min' },
   // 다른 필터들도 필요에 따라 추가하세요.
 };
 
@@ -400,25 +400,25 @@ const Adminpage: React.FC = () => {
 
   const getFilteredRowIds = () => {
     return tableData.filter((row) => {
-
-      const suroScore = filters.suro_score.value ? parseInt(filters.suro_score.value, 10) : null;
-      const flagScore = filters.flag_score.value ? parseInt(filters.flag_score.value, 10) : null;
-
+      const suroScore = filters.suro_score.value !== undefined ? filters.suro_score.value : undefined;
+      const flagScore = filters.flag_score.value !== undefined ? filters.flag_score.value : undefined;
+  
       if (filters.suro_score.operator === 'max') {
         if (filters.flag_score.operator === 'max') {
-          return (!suroScore || row.suro_score <= suroScore) && (!flagScore || row.flag_score <= flagScore);
+          return (suroScore === undefined || row.suro_score <= suroScore) && (flagScore === undefined || row.flag_score <= flagScore);
         } else {
-          return (!suroScore || row.suro_score <= suroScore) && (!flagScore || row.flag_score >= flagScore);
+          return (suroScore === undefined || row.suro_score <= suroScore) && (flagScore === undefined || row.flag_score >= flagScore);
         }
       } else {
         if (filters.flag_score.operator === 'max') {
-          return (!suroScore || row.suro_score >= suroScore) && (!flagScore || row.flag_score <= flagScore);
+          return (suroScore === undefined || row.suro_score >= suroScore) && (flagScore === undefined || row.flag_score <= flagScore);
         } else {
-          return (!suroScore || row.suro_score >= suroScore) && (!flagScore || row.flag_score >= flagScore);
+          return (suroScore === undefined || row.suro_score >= suroScore) && (flagScore === undefined || row.flag_score >= flagScore);
         }
       }
     });
   };
+  
 
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
   const handleSelectOrDeselectAll = () => {
@@ -466,7 +466,7 @@ const Adminpage: React.FC = () => {
             onChange={(e) =>
               setFilters({
                 ...filters,
-                suro_score: { ...filters.suro_score, value: e.target.value },
+                suro_score: { ...filters.suro_score, value: parseInt(e.target.value) },
               })
             }
           />
@@ -496,7 +496,7 @@ const Adminpage: React.FC = () => {
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, value: e.target.value },
+                flag_score: { ...filters.flag_score, value: parseInt(e.target.value) },
               })
             }
           />
