@@ -20,6 +20,22 @@ interface SortConfig {
   key: keyof TableRowData | null;
   direction: "ascending" | "descending";
 }
+interface Filter {
+  value: string;
+  operator: string;
+}
+
+interface Filters {
+  suro_score: Filter;
+  flag_score: Filter;
+}
+
+// 초기 상태 정의
+const initialFilters: Filters = {
+  suro_score: { value: '', operator: 'min' },
+  flag_score: { value: '', operator: 'min' },
+  // 다른 필터들도 필요에 따라 추가하세요.
+};
 
 function getCurrentWeek() {
   const currentDate = new Date();
@@ -44,11 +60,7 @@ const Adminpage: React.FC = () => {
     direction: "ascending",
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [filters, setFilters] = useState({
-    weekly_score: { min: "", max: "" },
-    suro_score: { min: "", max: "" },
-    flag_score: { min: "", max: "" },
-  });
+  const [filters, setFilters] = useState<Filters>(initialFilters);
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
@@ -387,34 +399,25 @@ const Adminpage: React.FC = () => {
   };
 
   const getFilteredRowIds = () => {
-    return tableData
-      .filter((row) => {
-        const minWeeklyScore = filters.weekly_score.min
-          ? parseInt(filters.weekly_score.min, 10)
-          : -Infinity;
-        const maxWeeklyScore = filters.weekly_score.max
-          ? parseInt(filters.weekly_score.max, 10)
-          : Infinity;
-        const minSuroScore = filters.suro_score.min
-          ? parseInt(filters.suro_score.min, 10)
-          : -Infinity;
-        const maxSuroScore = filters.suro_score.max
-          ? parseInt(filters.suro_score.max, 10)
-          : Infinity;
-        const minFlagScore = filters.flag_score.min
-          ? parseInt(filters.flag_score.min, 10)
-          : -Infinity;
-        const maxFlagScore = filters.flag_score.max
-          ? parseInt(filters.flag_score.max, 10)
-          : Infinity;
+    return tableData.filter((row) => {
 
-        // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
-        return (
-          (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-          (!minSuroScore || row.suro_score >= minSuroScore) ||
-          (!minFlagScore || row.flag_score >= minFlagScore)
-        );
-      })
+      const suroScore = filters.suro_score.value ? parseInt(filters.suro_score.value, 10) : null;
+      const flagScore = filters.flag_score.value ? parseInt(filters.flag_score.value, 10) : null;
+
+      if (filters.suro_score.operator === 'max') {
+        if (filters.flag_score.operator === 'max') {
+          return (!suroScore || row.suro_score <= suroScore) && (!flagScore || row.flag_score <= flagScore);
+        } else {
+          return (!suroScore || row.suro_score <= suroScore) && (!flagScore || row.flag_score >= flagScore);
+        }
+      } else {
+        if (filters.flag_score.operator === 'max') {
+          return (!suroScore || row.suro_score >= suroScore) && (!flagScore || row.flag_score <= flagScore);
+        } else {
+          return (!suroScore || row.suro_score >= suroScore) && (!flagScore || row.flag_score >= flagScore);
+        }
+      }
+    });
   };
 
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
@@ -454,70 +457,32 @@ const Adminpage: React.FC = () => {
       {/* 필터링 조건을 입력받는 UI 구성 */}
       <div className={styles.filterContainer}>
         <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>주간점수 :</label>
-          <input
-            className={styles.filterInput}
-            type="text"
-            placeholder="주간점수 최소값"
-            value={filters.weekly_score.min}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                weekly_score: { ...filters.weekly_score, min: e.target.value },
-              })
-            }
-          />
-          <div className={styles.filterSeparator}></div>
-          <input
-            className={styles.filterInput}
-            type="text"
-            placeholder="주간점수 최대값"
-            value={filters.weekly_score.max}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                weekly_score: { ...filters.weekly_score, max: e.target.value },
-              })
-            }
-          />
-        </div>
-        {/* 수로(suro_score) 필터링 입력 필드 */}
-        <div className={styles.filtermenu}>
           <label className={styles.filterLabel}>수로 : </label>
           <input
             className={styles.filterInput}
             type="number"
-            placeholder="수로 최소값"
-            value={filters.suro_score.min}
+            placeholder="수로 값"
+            value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                suro_score: { ...filters.suro_score, min: e.target.value },
+                suro_score: { ...filters.suro_score, value: e.target.value },
               })
             }
           />
-          <Select
-            // value={age}
-            // onChange={handleChange}
-            displayEmpty
-            inputProps={{ 'aria-label': 'Without label' }}
+          <select
+            className={styles.filterSelect}
+            value={filters.suro_score.operator}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                suro_score: { ...filters.suro_score, operator: e.target.value },
+              })
+            }
           >
-            <MenuItem value={10}>그리고</MenuItem>
-            <MenuItem value={20}>또는</MenuItem>
-          </Select>
-          <label className={styles.filterSeparator}></label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="수로 최대값"
-            value={filters.suro_score.max}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                suro_score: { ...filters.suro_score, max: e.target.value },
-              })
-            }
-          />
+            <option value="min">이상</option>
+            <option value="max">이하</option>
+          </select>
         </div>
 
         {/* 플래그(flag_score) 필터링 입력 필드 */}
@@ -526,28 +491,28 @@ const Adminpage: React.FC = () => {
           <input
             className={styles.filterInput}
             type="number"
-            placeholder="플래그 최소값"
-            value={filters.flag_score.min}
+            placeholder="플래그 값"
+            value={filters.flag_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, min: e.target.value },
+                flag_score: { ...filters.flag_score, value: e.target.value },
               })
             }
           />
-          <label className={styles.filterSeparator}></label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="플래그 최대값"
-            value={filters.flag_score.max}
+          <select
+            className={styles.filterSelect}
+            value={filters.flag_score.operator}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, max: e.target.value },
+                flag_score: { ...filters.flag_score, operator: e.target.value },
               })
             }
-          />
+          >
+            <option value="min">이상</option>
+            <option value="max">이하</option>
+          </select>
         </div>
       </div>
       <div className={styles.tableInfoContainer}>
