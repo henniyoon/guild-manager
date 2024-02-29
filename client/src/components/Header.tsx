@@ -1,14 +1,16 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import styles from "../styles/Header.module.css";
 
 const Header = () => {
   const { isLoggedIn, userInfo, logout } = useAuth();
+  const navigate = useNavigate(); 
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     logout();
+    navigate('/');
   };
 
   const renderAuthLinks = () => {
@@ -29,9 +31,10 @@ const Header = () => {
           <Link to="/MyPage" className={styles.link}>
             {userInfo?.username}
           </Link>
-          <button onClick={handleLogout} className={styles.link}>
+          {/* 로그아웃 Link 대신 div 사용 */}
+          <div onClick={handleLogout} className={styles.link} style={{cursor: 'pointer'}}>
             로그아웃
-          </button>
+          </div>
         </>
       );
     }
