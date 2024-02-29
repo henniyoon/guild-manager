@@ -3,7 +3,8 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { Select, MenuItem } from '@mui/material';
+import { IconButton, Select, MenuItem } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 import HomePageInstructions from "./components/AdminpageManual";
 
 interface TableRowData {
@@ -402,7 +403,7 @@ const Adminpage: React.FC = () => {
     return tableData.filter((row) => {
       const suroScore = filters.suro_score.value !== undefined ? filters.suro_score.value : undefined;
       const flagScore = filters.flag_score.value !== undefined ? filters.flag_score.value : undefined;
-  
+
       if (filters.suro_score.operator === 'max') {
         if (filters.flag_score.operator === 'max') {
           return (suroScore === undefined || row.suro_score <= suroScore) && (flagScore === undefined || row.flag_score <= flagScore);
@@ -418,7 +419,7 @@ const Adminpage: React.FC = () => {
       }
     });
   };
-  
+
 
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
   const handleSelectOrDeselectAll = () => {
@@ -443,7 +444,9 @@ const Adminpage: React.FC = () => {
         <div className={styles.titleLeft}>
           <h1>관리자 페이지</h1>
           <div>
-            <button onClick={() => setIsModalOpen(true)}>ℹ️</button>
+            <IconButton onClick={() => setIsModalOpen(true)}>
+              <InfoIcon />
+            </IconButton>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
               <HomePageInstructions />
             </Modal>
@@ -696,7 +699,7 @@ const Adminpage: React.FC = () => {
           ))}
         </tbody>
       </table>
-    </div>
+    </div >
   );
 };
 
