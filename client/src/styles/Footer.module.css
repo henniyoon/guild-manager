@@ -1,8 +1,11 @@
 .container{
-    margin-top: 24px; /* MUI spacing 3 (기본 8px * 3) */
-    padding: 32px; /* MUI spacing 4 (기본 8px * 4) */
+    height: 12vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 세로 중앙 정렬을 수행합니다. */
+    justify-content: center; /* 가로 중앙 정렬을 수행합니다. */
     text-align: center;
-    color: #757575; /* text.secondary 색상은 테마에 따라 다를 수 있으므로, 예시 색상을 사용했습니다. */
+    color: #757575;
     font-size: 12px;
 }
 

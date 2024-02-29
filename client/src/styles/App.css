@@ -1,10 +1,14 @@
 .appContainer {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 80vh;
   }
   
   .mainContent {
-    flex: 1;
-    padding: 4vh 5vw 4vh 5vw;
+    display: flex;
+    justify-content: center;
+    padding-top: 4vh;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    min-height: 75vh;
   }

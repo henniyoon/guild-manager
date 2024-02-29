@@ -182,9 +182,9 @@ const Signup: React.FC = () => {
         />
         {passwordError && <p className="error-message">{passwordError}</p>}
       </div>
-      <Button variant="contained" type="submit" className="submit-btn">
-        회원가입
-      </Button>
+      <Button variant="contained" type="submit" className="submit-btn" style={{ marginTop: '20px' }}>
+  회원가입
+</Button>
     </form>
   );
 };

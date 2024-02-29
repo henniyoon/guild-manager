@@ -2,13 +2,15 @@
 .signup-form {
   display: flex;
   flex-direction: column;
-  max-width: 400px;
-  padding: 20px;
+  padding: 30px;
+  width: 400px;
+  height: 480px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
 .signup-form div {
+  margin-right: 17px;
   margin-bottom: 15px;
 }
 
