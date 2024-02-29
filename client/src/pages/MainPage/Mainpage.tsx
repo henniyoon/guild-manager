@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Container, Box, Typography, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import SelectServer from './components/SelectServer';
 import InputBox from './components/InputBox';
 import InputBase from '@mui/material/InputBase';
@@ -39,17 +39,6 @@ const Mainpage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'top',
-        alignItems: 'center',
-        height: '60vh',
-        // background: `url("./main.png") no-repeat center center fixed`,
-        backgroundSize: 'cover',
-      }}
-    >
       <form onSubmit={handleButtonClick} style={{ width: '100%', marginTop: '15vh', marginRight: '12%' }}>
         <Grid container spacing={0} alignItems="center" justifyContent="center">
           <Grid item>
@@ -65,7 +54,6 @@ const Mainpage = () => {
           </Grid>
         </Grid>
       </form>
-    </Box>
   );
 };
 

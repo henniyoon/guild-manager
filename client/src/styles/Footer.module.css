@@ -1,3 +1,11 @@
+.container{
+    margin-top: 24px; /* MUI spacing 3 (기본 8px * 3) */
+    padding: 32px; /* MUI spacing 4 (기본 8px * 4) */
+    text-align: center;
+    color: #757575; /* text.secondary 색상은 테마에 따라 다를 수 있으므로, 예시 색상을 사용했습니다. */
+    font-size: 12px;
+}
+
 .bi-discord:hover {
     fill: #7289da; /* 예시 색상, Discord의 대표 색상 */
     transition: fill 0.2s ease-in-out; /* 부드러운 색상 변화 효과 */
