@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/SignUp.css"
+import Button from '@mui/material/Button';
 
 const Signup: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -132,13 +133,14 @@ const Signup: React.FC = () => {
           onChange={handleUsernameChange}
           required
         />
-        <button
+        <Button
+          variant="contained" 
           type="button"
           onClick={checkDuplicateUsername}
           className="check-btn"
         >
           중복 확인
-        </button>
+        </Button>
       </div>
       <div>
         <label htmlFor="email">ID:</label>
@@ -150,13 +152,14 @@ const Signup: React.FC = () => {
           required
         />
         {emailError && <p className="error-message">{emailError}</p>}
-        <button
+        <Button
+          variant="contained" 
           type="button"
           onClick={checkDuplicateEmail}
           className="check-btn"
         >
           중복 확인
-        </button>
+        </Button>
       </div>
       <div>
         <label htmlFor="password">Password:</label>
@@ -179,9 +182,9 @@ const Signup: React.FC = () => {
         />
         {passwordError && <p className="error-message">{passwordError}</p>}
       </div>
-      <button type="submit" className="submit-btn">
+      <Button variant="contained" type="submit" className="submit-btn">
         회원가입
-      </button>
+      </Button>
     </form>
   );
 };
