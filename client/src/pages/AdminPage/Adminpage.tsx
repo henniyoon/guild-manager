@@ -309,7 +309,6 @@ const Adminpage: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("업로드 성공:", data);
-        alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
         setServerDataLength(data.weekly_score_Area.length);
         updateTableDataWithOcrResults(data);
