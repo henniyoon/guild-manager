@@ -10,6 +10,7 @@ import Adminpage from './pages/AdminPage/Adminpage';
 import Loginpage from './pages/LoginPage/Loginpage';
 import SignUppage from './pages/SingUpPage/SignUppage';
 import Mypage from './pages/MyPage/Mypage';
+import Noblepage from './pages/NoblePage/Noblepage';
 
 import { Box, CssBaseline, Typography, Toolbar } from '@mui/material';
 
@@ -38,6 +39,7 @@ const App: React.FC = () => {
             <Route path="/Login" element={<Loginpage />} />
             <Route path="/SignUp" element={<SignUppage />} />
             <Route path="/Mypage" element={<Mypage />} />
+            <Route path="/Noble" element={<Noblepage />} />
           </Routes>
 
         </Box>
