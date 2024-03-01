@@ -1,4 +1,3 @@
-const WorldService = require('../services/worldService.js');
 const GuildService = require('../services/guildService.js');
 const CharacterService = require('../services/characterService.js');
 const GuildPageService = require('../services/guildPageService.js');
