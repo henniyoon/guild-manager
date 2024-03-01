@@ -3,7 +3,7 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { TextField, Select, MenuItem, IconButton } from '@mui/material';
+import { TextField, Select, MenuItem, Button, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import HomePageInstructions from "./components/AdminpageManual";
 
@@ -400,14 +400,18 @@ const Adminpage: React.FC = () => {
       });
   };
 
+  const handleReset = () => {
+    setFilters(initialFilters);
+  };
+
   const getFilteredRowIds = () => {
     return tableData.filter((row) => {
       const suroScore = filters.suro_score.value;
       const flagScore = filters.flag_score.value;
-  
+
       const suroCondition = (suroScore === undefined) || (filters.suro_score.operator === 'max' ? row.suro_score <= suroScore : row.suro_score >= suroScore);
       const flagCondition = (flagScore === undefined) || (filters.flag_score.operator === 'max' ? row.flag_score <= flagScore : row.flag_score >= flagScore);
-  
+
       if (filters.logical_operator === 'and') {
         return suroCondition && flagCondition;
       } else {
@@ -522,6 +526,9 @@ const Adminpage: React.FC = () => {
             <MenuItem value="max">이하</MenuItem>
           </Select>
         </div>
+        <Button variant="contained" onClick={handleReset}>
+          초기화
+        </Button>
       </div>
 
       <div className={styles.tableInfoContainer}>
