@@ -420,7 +420,6 @@ const Adminpage: React.FC = () => {
     });
   };
 
-
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
   const handleSelectOrDeselectAll = () => {
     // 현재 선택된 행이 하나라도 있는지 확인합니다.
@@ -536,10 +535,14 @@ const Adminpage: React.FC = () => {
         </Button>
       </div>
 
-      <div className={styles.tableInfoContainer}>
+      <div className={styles.tableInfoContainer} style={{ display: 'flex', justifyContent: 'space-between' }}>
         <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
-        <p>행 개수 : {tableData.length}</p>
+        <div>
+          <p>행 개수 : {tableData.length}</p>
+          <p>선택된 행 개수: {selectedRowIds.length}</p>
+        </div>
       </div>
+
       <div className={styles.buttonContainer}>
         <button className={styles.buttonStyle} onClick={testclick}>
           길드원 불러오기
