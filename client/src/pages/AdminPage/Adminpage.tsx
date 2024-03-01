@@ -459,11 +459,12 @@ const Adminpage: React.FC = () => {
       </div>
 
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div style={{ display: 'flex', marginTop: '5px' }}>
+      <div style={{ display: 'flex', marginTop: '30px' }}>
         <div>
           <TextField
             label="수로 점수"
             variant="outlined"
+            style={{ marginRight: '5px' }}
             value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
@@ -473,6 +474,7 @@ const Adminpage: React.FC = () => {
             }
           />
           <Select
+            style={{ marginRight: '5px' }}
             value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
@@ -488,6 +490,7 @@ const Adminpage: React.FC = () => {
 
         <div>
           <Select
+            style={{ marginRight: '5px' }}
             value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
@@ -503,6 +506,7 @@ const Adminpage: React.FC = () => {
 
         <div>
           <TextField
+            style={{ marginRight: '5px' }}
             label="플래그 점수"
             variant="outlined"
             value={filters.flag_score.value}
@@ -514,6 +518,7 @@ const Adminpage: React.FC = () => {
             }
           />
           <Select
+            style={{ marginRight: '20px' }}
             value={filters.flag_score.operator}
             onChange={(e) =>
               setFilters({
