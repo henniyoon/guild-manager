@@ -3,7 +3,7 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { IconButton, Select, MenuItem } from '@mui/material';
+import { TextField, Select, MenuItem, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import HomePageInstructions from "./components/AdminpageManual";
 
@@ -457,14 +457,13 @@ const Adminpage: React.FC = () => {
           onDateChange={setSelectedDate}
         />
       </div>
+
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div className={styles.filterContainer}>
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>수로 : </label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="수로 값"
+      <div style={{ display: 'flex', marginTop: '5px' }}>
+        <div>
+          <TextField
+            label="수로 점수"
+            variant="outlined"
             value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
@@ -473,8 +472,7 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <select
-            className={styles.filterSelect}
+          <Select
             value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
@@ -483,18 +481,27 @@ const Adminpage: React.FC = () => {
               })
             }
           >
-            <option value="min">이상</option>
-            <option value="max">이하</option>
-          </select>
+            <MenuItem value="min">이상</MenuItem>
+            <MenuItem value="max">이하</MenuItem>
+          </Select>
         </div>
 
-        {/* 플래그(flag_score) 필터링 입력 필드 */}
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>플래그 : </label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="플래그 값"
+        <div>
+          <Select
+          // value={filters.suro_score.operator}
+          // onChange={(e) =>
+
+          // }
+          >
+            <MenuItem value="and">그리고</MenuItem>
+            <MenuItem value="or">또는</MenuItem>
+          </Select>
+        </div>
+
+        <div>
+          <TextField
+            label="플래그 점수"
+            variant="outlined"
             value={filters.flag_score.value}
             onChange={(e) =>
               setFilters({
@@ -503,8 +510,7 @@ const Adminpage: React.FC = () => {
               })
             }
           />
-          <select
-            className={styles.filterSelect}
+          <Select
             value={filters.flag_score.operator}
             onChange={(e) =>
               setFilters({
@@ -513,11 +519,12 @@ const Adminpage: React.FC = () => {
               })
             }
           >
-            <option value="min">이상</option>
-            <option value="max">이하</option>
-          </select>
+            <MenuItem value="min">이상</MenuItem>
+            <MenuItem value="max">이하</MenuItem>
+          </Select>
         </div>
       </div>
+
       <div className={styles.tableInfoContainer}>
         <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
         <p>행 개수 : {tableData.length}</p>
