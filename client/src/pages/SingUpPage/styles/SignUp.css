@@ -1,0 +1,48 @@
+/* SignUp.css */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  width: 400px;
+  height: 480px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.signup-form div {
+  margin-right: 17px;
+  margin-bottom: 15px;
+}
+
+.signup-form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.signup-form input[type="text"],
+.signup-form input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.signup-form .check-btn {
+  margin-top: 10px;
+  padding: 5px 7px;
+  border: none;
+  border-radius: 4px;
+  background-color: #dad9d9ac;
+  color: black;
+  cursor: pointer;
+}
+
+.signup-form .check-btn:hover {
+  background-color: rgba(168, 168, 168, 0.777);
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 // import Button from '../../components/Button';
 import { Button, Container, Grid, Typography, Card, CardMedia, CardContent, Paper } from '@mui/material';
+import styles from './styles/Guildpage.module.css'
 
 interface GuildData {
   id: number;
@@ -73,7 +74,8 @@ const Guildpage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className={styles.container}>
+    <div>
       {guildData && (
         <div>
           <Grid container spacing={0} alignItems="center">
@@ -120,8 +122,8 @@ const Guildpage: React.FC = () => {
           ))}
         </Grid>
       )}
-
-    </>
+</div>
+    </div>
   );
 };
 
