@@ -3,9 +3,9 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import HomePageInstructions from "./components/AdminpageManual";
+import { TextField, Select, MenuItem, Button, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import IconButton from '@mui/material/IconButton';
+import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
 
 interface TableRowData {
@@ -22,6 +22,23 @@ interface SortConfig {
   key: keyof TableRowData | null;
   direction: "ascending" | "descending";
 }
+interface Filter {
+  value: number;
+  operator: string;
+}
+
+interface Filters {
+  suro_score: Filter;
+  flag_score: Filter;
+  logical_operator: string;
+}
+
+// 초기 상태 정의
+const initialFilters: Filters = {
+  suro_score: { value: 0, operator: 'min' },
+  flag_score: { value: 0, operator: 'min' },
+  logical_operator: 'and',
+};
 
 
 const Adminpage: React.FC = () => {
@@ -35,11 +52,7 @@ const Adminpage: React.FC = () => {
     direction: "ascending",
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [filters, setFilters] = useState({
-    weekly_score: { min: "", max: "" },
-    suro_score: { min: "", max: "" },
-    flag_score: { min: "", max: "" },
-  });
+  const [filters, setFilters] = useState<Filters>(initialFilters);
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
@@ -94,15 +107,15 @@ const Adminpage: React.FC = () => {
     // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
-      field === "weekly_score" ||
-      field === "suro_score" ||
-      field === "flag_score"
+        field === "weekly_score" ||
+        field === "suro_score" ||
+        field === "flag_score"
         ? parseInt(value as string, 10)
         : field === "noble_limit" // nobel_limit 필드일 경우
-        ? value === true || value === "true"
-          ? 1
-          : 0 // true이면 1, 아니면 0으로 변환
-        : value; // 나머지 경우는 그대로 값 유지
+          ? value === true || value === "true"
+            ? 1
+            : 0 // true이면 1, 아니면 0으로 변환
+          : value; // 나머지 경우는 그대로 값 유지
 
     setEditedData((editedData) =>
       editedData.map((row) =>
@@ -187,7 +200,7 @@ const Adminpage: React.FC = () => {
     setSortConfig((currentSortConfig) => {
       const newDirection =
         currentSortConfig.key === key &&
-        currentSortConfig.direction === "ascending"
+          currentSortConfig.direction === "ascending"
           ? "descending"
           : "ascending";
       const sortedData = [...tableData].sort((a, b) => {
@@ -376,39 +389,24 @@ const Adminpage: React.FC = () => {
       });
   };
 
-  const getFilteredRowIds = () => {
-    return tableData
-      .filter((row) => {
-        const minWeeklyScore = filters.weekly_score.min
-          ? parseInt(filters.weekly_score.min, 10)
-          : -Infinity;
-        const maxWeeklyScore = filters.weekly_score.max
-          ? parseInt(filters.weekly_score.max, 10)
-          : Infinity;
-        const minSuroScore = filters.suro_score.min
-          ? parseInt(filters.suro_score.min, 10)
-          : -Infinity;
-        const maxSuroScore = filters.suro_score.max
-          ? parseInt(filters.suro_score.max, 10)
-          : Infinity;
-        const minFlagScore = filters.flag_score.min
-          ? parseInt(filters.flag_score.min, 10)
-          : -Infinity;
-        const maxFlagScore = filters.flag_score.max
-          ? parseInt(filters.flag_score.max, 10)
-          : Infinity;
+  const handleReset = () => {
+    setFilters(initialFilters);
+  };
 
-        // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
-        return (
-          (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-          (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
-          (!minSuroScore || row.suro_score >= minSuroScore) &&
-          (!maxSuroScore || row.suro_score <= maxSuroScore) &&
-          (!minFlagScore || row.flag_score >= minFlagScore) &&
-          (!maxFlagScore || row.flag_score <= maxFlagScore)
-        );
-      })
-      .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
+  const getFilteredRowIds = () => {
+    return tableData.filter((row) => {
+      const suroScore = filters.suro_score.value;
+      const flagScore = filters.flag_score.value;
+
+      const suroCondition = (suroScore === undefined) || (filters.suro_score.operator === 'max' ? row.suro_score <= suroScore : row.suro_score >= suroScore);
+      const flagCondition = (flagScore === undefined) || (filters.flag_score.operator === 'max' ? row.flag_score <= flagScore : row.flag_score >= flagScore);
+
+      if (filters.logical_operator === 'and') {
+        return suroCondition && flagCondition;
+      } else {
+        return suroCondition || flagCondition;
+      }
+    });
   };
 
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
@@ -419,7 +417,7 @@ const Adminpage: React.FC = () => {
       setSelectedRowIds([]);
     } else {
       // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
-      const filteredRowIds = getFilteredRowIds();
+      const filteredRowIds = getFilteredRowIds().map((row) => row.id);
       setSelectedRowIds(filteredRowIds);
     }
   };
@@ -431,7 +429,7 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <div  className={styles.titleLeft}>
+        <div className={styles.titleLeft}>
           <h1>관리자 페이지</h1>
           <div>
             <IconButton onClick={() => setIsModalOpen(true)} title="info">
@@ -447,100 +445,93 @@ const Adminpage: React.FC = () => {
           onDateChange={setSelectedDate}
         />
       </div>
+
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div className={styles.filterContainer}>
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>주간점수 :</label>
-          <input
-            className={styles.filterInput}
-            type="text"
-            placeholder="주간점수 최소값"
-            value={filters.weekly_score.min}
+      <div style={{ display: 'flex', marginTop: '30px' }}>
+        <div>
+          <TextField
+            label="수로 점수"
+            variant="outlined"
+            style={{ marginRight: '5px' }}
+            value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                weekly_score: { ...filters.weekly_score, min: e.target.value },
+                suro_score: { ...filters.suro_score, value: parseInt(e.target.value) },
               })
             }
           />
-          <div className={styles.filterSeparator}></div>
-          <input
-            className={styles.filterInput}
-            type="text"
-            placeholder="주간점수 최대값"
-            value={filters.weekly_score.max}
+          <Select
+            style={{ marginRight: '5px' }}
+            value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                weekly_score: { ...filters.weekly_score, max: e.target.value },
+                suro_score: { ...filters.suro_score, operator: e.target.value },
               })
             }
-          />
-        </div>
-        {/* 수로(suro_score) 필터링 입력 필드 */}
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>수로 : </label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="수로 최소값"
-            value={filters.suro_score.min}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                suro_score: { ...filters.suro_score, min: e.target.value },
-              })
-            }
-          />
-          <label className={styles.filterSeparator}></label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="수로 최대값"
-            value={filters.suro_score.max}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                suro_score: { ...filters.suro_score, max: e.target.value },
-              })
-            }
-          />
+          >
+            <MenuItem value="min">이상</MenuItem>
+            <MenuItem value="max">이하</MenuItem>
+          </Select>
         </div>
 
-        {/* 플래그(flag_score) 필터링 입력 필드 */}
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>플래그 : </label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="플래그 최소값"
-            value={filters.flag_score.min}
+        <div>
+          <Select
+            style={{ marginRight: '5px' }}
+            value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, min: e.target.value },
+                logical_operator: e.target.value
               })
             }
-          />
-          <label className={styles.filterSeparator}></label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="플래그 최대값"
-            value={filters.flag_score.max}
+          >
+            <MenuItem value="and">그리고</MenuItem>
+            <MenuItem value="or">또는</MenuItem>
+          </Select>
+        </div>
+
+        <div>
+          <TextField
+            style={{ marginRight: '5px' }}
+            label="플래그 점수"
+            variant="outlined"
+            value={filters.flag_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, max: e.target.value },
+                flag_score: { ...filters.flag_score, value: parseInt(e.target.value) },
               })
             }
           />
+          <Select
+            style={{ marginRight: '20px' }}
+            value={filters.flag_score.operator}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                flag_score: { ...filters.flag_score, operator: e.target.value },
+              })
+            }
+          >
+            <MenuItem value="min">이상</MenuItem>
+            <MenuItem value="max">이하</MenuItem>
+          </Select>
+        </div>
+        <Button variant="contained" onClick={handleReset}>
+          초기화
+        </Button>
+      </div>
+
+      <div className={styles.tableInfoContainer} style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
+        <div>
+          <p>행 개수 : {tableData.length}</p>
+          <p>선택된 행 개수: {selectedRowIds.length}</p>
         </div>
       </div>
-      <div className={styles.tableInfoContainer}>
-        <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
-        <p>행 개수 : {tableData.length}</p>
-      </div>
+
       <div className={styles.buttonContainer}>
         <button className={styles.buttonStyle} onClick={testclick}>
           길드원 불러오기
@@ -613,143 +604,112 @@ const Adminpage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {tableData
-            .filter((row) => {
-              const minWeeklyScore = filters.weekly_score.min
-                ? parseInt(filters.weekly_score.min, 10)
-                : -Infinity;
-              const maxWeeklyScore = filters.weekly_score.max
-                ? parseInt(filters.weekly_score.max, 10)
-                : Infinity;
-              const minSuroScore = filters.suro_score.min
-                ? parseInt(filters.suro_score.min, 10)
-                : -Infinity;
-              const maxSuroScore = filters.suro_score.max
-                ? parseInt(filters.suro_score.max, 10)
-                : Infinity;
-              const minFlagScore = filters.flag_score.min
-                ? parseInt(filters.flag_score.min, 10)
-                : -Infinity;
-              const maxFlagScore = filters.flag_score.max
-                ? parseInt(filters.flag_score.max, 10)
-                : Infinity;
-
-              return (
-                (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-                (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
-                (!minSuroScore || row.suro_score >= minSuroScore) &&
-                (!maxSuroScore || row.suro_score <= maxSuroScore) &&
-                (!minFlagScore || row.flag_score >= minFlagScore) &&
-                (!maxFlagScore || row.flag_score <= maxFlagScore)
-              );
-            })
-            .map((row, index) => (
-              <tr
-                key={row.id}
-                onClick={() => handleRowClick(row.id)}
-                className={`${styles.rowClickable} ${
-                  selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+          {getFilteredRowIds().map((row, index) => (
+            <tr
+              key={row.id}
+              onClick={() => handleRowClick(row.id)}
+              className={`${styles.rowClickable} ${selectedRowIds.includes(row.id) ? styles.rowSelected : ""
                 } ${index % 17 === 16 ? styles.row_17th : ""}`}
-              >
-                {isEditMode ? (
-                  <>
-                    <td className={styles.td1}>
-                      {row.character_name === "" ? (
-                        row.character_name
-                      ) : (
-                        <input
-                          title="character_name"
-                          className={styles.editInput}
-                          type="text"
-                          defaultValue={row.character_name}
-                          onChange={(e) =>
-                            handleInputChange(
-                              row.id,
-                              "character_name",
-                              e.target.value
-                            )
-                          }
-                        />
-                      )}
-                    </td>
-                    <td className={styles.td2}>
+            >
+              {isEditMode ? (
+                <>
+                  <td className={styles.td1}>
+                    {row.character_name === "" ? (
+                      row.character_name
+                    ) : (
                       <input
-                        title="weekly_score"
+                        title="character_name"
                         className={styles.editInput}
-                        type="number"
-                        defaultValue={row.weekly_score}
+                        type="text"
+                        defaultValue={row.character_name}
                         onChange={(e) =>
                           handleInputChange(
                             row.id,
-                            "weekly_score",
+                            "character_name",
                             e.target.value
                           )
                         }
                       />
-                    </td>
-                    <td className={styles.td3}>
-                      <input
-                        title="suro_score"
-                        className={styles.editInput}
-                        type="number"
-                        defaultValue={row.suro_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "suro_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className={styles.td4}>
-                      <input
-                        title="flag_score"
-                        className={styles.editInput}
-                        type="number"
-                        defaultValue={row.flag_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "flag_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className={styles.td5}>
-                      <input
-                        title="noble_limit"
-                        className={styles.customCheckbox}
-                        type="checkbox"
-                        defaultChecked={row.noble_limit}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "noble_limit",
-                            e.target.checked.toString()
-                          )
-                        }
-                      />
-                    </td>
-                  </>
-                ) : (
-                  // 비편집 모드에서의 행 렌더링
-                  <>
-                    <td className={styles.td1}>{row.character_name}</td>
-                    <td className={styles.td2}>{row.weekly_score}</td>
-                    <td className={styles.td3}>{row.suro_score}</td>
-                    <td className={styles.td4}>{row.flag_score}</td>
-                    <td className={styles.td5}>
-                      {row.noble_limit ? "🔴" : "🟢"}
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
+                    )}
+                  </td>
+                  <td className={styles.td2}>
+                    <input
+                      title="weekly_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.weekly_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "weekly_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td3}>
+                    <input
+                      title="suro_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.suro_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "suro_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td4}>
+                    <input
+                      title="flag_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.flag_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "flag_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td5}>
+                    <input
+                      title="noble_limit"
+                      className={styles.customCheckbox}
+                      type="checkbox"
+                      defaultChecked={row.noble_limit}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "noble_limit",
+                          e.target.checked.toString()
+                        )
+                      }
+                    />
+                  </td>
+                </>
+              ) : (
+                // 비편집 모드에서의 행 렌더링
+                <>
+                  <td className={styles.td1}>{row.character_name}</td>
+                  <td className={styles.td2}>{row.weekly_score}</td>
+                  <td className={styles.td3}>{row.suro_score}</td>
+                  <td className={styles.td4}>{row.flag_score}</td>
+                  <td className={styles.td5}>
+                    {row.noble_limit ? "🔴" : "🟢"}
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
         </tbody>
       </table>
-    </div>
+    </div >
   );
 };
 
