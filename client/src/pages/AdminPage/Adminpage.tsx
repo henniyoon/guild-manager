@@ -4,6 +4,9 @@ import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
 import HomePageInstructions from "./components/AdminpageManual";
+import InfoIcon from '@mui/icons-material/Info';
+import IconButton from '@mui/material/IconButton';
+import getCurrentWeek from "./components/getCurrentWeek";
 
 interface TableRowData {
   id: number;
@@ -20,18 +23,7 @@ interface SortConfig {
   direction: "ascending" | "descending";
 }
 
-function getCurrentWeek() {
-  const currentDate = new Date();
-  const firstDayOfYear = new Date(currentDate.getFullYear(), 0, 1);
-  // .getTime()을 사용하여 Date 객체를 밀리초 단위의 숫자로 변환
-  const pastDaysOfYear =
-    (currentDate.getTime() - firstDayOfYear.getTime()) / 86400000;
-  // 첫째 날이 일요일이 아니라면 +1을 하지 않고, 대신 첫째 날의 getDay() 값을 빼줍니다.
-  const currentWeek = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay()) / 7);
-  return `${currentDate.getFullYear()}-W${currentWeek
-    .toString()
-    .padStart(2, "0")}`;
-}
+
 const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -317,7 +309,6 @@ const Adminpage: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("업로드 성공:", data);
-        alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
         setServerDataLength(data.weekly_score_Area.length);
         updateTableDataWithOcrResults(data);
@@ -443,7 +434,9 @@ const Adminpage: React.FC = () => {
         <div  className={styles.titleLeft}>
           <h1>관리자 페이지</h1>
           <div>
-            <button onClick={() => setIsModalOpen(true)}>ℹ️</button>
+            <IconButton onClick={() => setIsModalOpen(true)} title="info">
+              <InfoIcon />
+            </IconButton>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
               <HomePageInstructions />
             </Modal>
