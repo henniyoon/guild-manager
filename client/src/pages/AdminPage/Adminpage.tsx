@@ -29,13 +29,14 @@ interface Filter {
 interface Filters {
   suro_score: Filter;
   flag_score: Filter;
+  logical_operator: string;
 }
 
 // 초기 상태 정의
 const initialFilters: Filters = {
   suro_score: { value: 0, operator: 'min' },
   flag_score: { value: 0, operator: 'min' },
-  // 다른 필터들도 필요에 따라 추가하세요.
+  logical_operator: 'and',
 };
 
 function getCurrentWeek() {
@@ -401,21 +402,16 @@ const Adminpage: React.FC = () => {
 
   const getFilteredRowIds = () => {
     return tableData.filter((row) => {
-      const suroScore = filters.suro_score.value !== undefined ? filters.suro_score.value : undefined;
-      const flagScore = filters.flag_score.value !== undefined ? filters.flag_score.value : undefined;
-
-      if (filters.suro_score.operator === 'max') {
-        if (filters.flag_score.operator === 'max') {
-          return (suroScore === undefined || row.suro_score <= suroScore) && (flagScore === undefined || row.flag_score <= flagScore);
-        } else {
-          return (suroScore === undefined || row.suro_score <= suroScore) && (flagScore === undefined || row.flag_score >= flagScore);
-        }
+      const suroScore = filters.suro_score.value;
+      const flagScore = filters.flag_score.value;
+  
+      const suroCondition = (suroScore === undefined) || (filters.suro_score.operator === 'max' ? row.suro_score <= suroScore : row.suro_score >= suroScore);
+      const flagCondition = (flagScore === undefined) || (filters.flag_score.operator === 'max' ? row.flag_score <= flagScore : row.flag_score >= flagScore);
+  
+      if (filters.logical_operator === 'and') {
+        return suroCondition && flagCondition;
       } else {
-        if (filters.flag_score.operator === 'max') {
-          return (suroScore === undefined || row.suro_score >= suroScore) && (flagScore === undefined || row.flag_score <= flagScore);
-        } else {
-          return (suroScore === undefined || row.suro_score >= suroScore) && (flagScore === undefined || row.flag_score >= flagScore);
-        }
+        return suroCondition || flagCondition;
       }
     });
   };
@@ -488,10 +484,13 @@ const Adminpage: React.FC = () => {
 
         <div>
           <Select
-          // value={filters.suro_score.operator}
-          // onChange={(e) =>
-
-          // }
+            value={filters.logical_operator}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                logical_operator: e.target.value
+              })
+            }
           >
             <MenuItem value="and">그리고</MenuItem>
             <MenuItem value="or">또는</MenuItem>
