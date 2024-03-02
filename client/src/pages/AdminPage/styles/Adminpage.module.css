@@ -186,7 +186,12 @@ th {
   /* margin: 10px; 체크박스 주위의 여백 조절 */
 }
 
-.titleLeft{
+.titleH1{
   display: flex;
   align-items: flex-end;
+  margin-left: 5vw;
+}
+
+.titleBlank{
+  width: 10px;
 }

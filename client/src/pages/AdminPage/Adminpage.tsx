@@ -464,7 +464,8 @@ const Adminpage: React.FC = () => {
   return (
     <div>
       <div className={styles.titleContainer}>
-        <div className={styles.titleLeft}>
+      <div className={styles.titleBlank}></div>
+        <div className={styles.titleH1}>
           <h1>관리자 페이지</h1>
           <div>
             <IconButton onClick={() => setIsModalOpen(true)} title="info">
