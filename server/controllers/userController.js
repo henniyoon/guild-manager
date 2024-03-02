@@ -11,7 +11,7 @@ async function getUserInfoController(req, res) {
     try {
         // 토큰 검증 및 디코딩
         const decoded = AuthService.verifyToken(token);
-
+        console.log("decode:", decoded);
         const userId = decoded.id;
         const user = await UserService.getUser(userId);
         const guildId = user.guild_id;

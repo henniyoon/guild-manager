@@ -8,6 +8,14 @@ import InfoIcon from '@mui/icons-material/Info';
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
 
+interface UserInfo {
+  username: string;
+  email: string;
+  guildName: string;
+  worldName: string;
+  role: string;
+}
+
 interface TableRowData {
   id: number;
   character_id: number;
@@ -42,6 +50,8 @@ const initialFilters: Filters = {
 
 
 const Adminpage: React.FC = () => {
+  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
@@ -58,41 +68,68 @@ const Adminpage: React.FC = () => {
   const [serverDataLength, setServerDataLength] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 데이터를 불러오는 함수
-  const fetchTableData = () => {
-    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-    const token = localStorage.getItem("token");
+  // 토큰이 변경될 때마다 localStorage에 반영
+useEffect(() => {
+  localStorage.setItem("token", token || "");
+}, [token]);
 
-    fetch(url, {
+// 데이터를 불러오는 함수
+const fetchTableData = async () => {
+  try {
+    const currentToken = localStorage.getItem("token");
+
+    // 첫 번째 API 호출
+    const response = await fetch("/myInfo", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${currentToken}`,
         "Content-Type": "application/json",
       },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // 데이터를 character_name 기준으로 오름차순 정렬합니다.
-        // localeCompare 대신 기본 비교 연산자를 사용합니다.
-        const sortedData = data.sort(
-          (a: { character_name: number }, b: { character_name: number }) => {
-            if (a.character_name < b.character_name) return -1;
-            if (a.character_name > b.character_name) return 1;
-            return 0;
-          }
-        );
-        setTableData(sortedData);
-        setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("토큰이 만료되었습니다. 다시 로그인 해주세요.");
-      });
-  };
+    });
 
-  useEffect(() => {
-    fetchTableData();
-  }, [selectedDate]);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("userInfo: ", data);
+    setUserInfo(data);
+
+    // 두 번째 API 호출
+    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
+    const secondResponse = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Info": encodeURIComponent(JSON.stringify(data)),
+      },
+    });
+
+    if (!secondResponse.ok) {
+      throw new Error(`HTTP error! Status: ${secondResponse.status}`);
+    }
+
+    const secondData = await secondResponse.json();
+    const sortedData = secondData.sort(
+      (a: { character_name: number }, b: { character_name: number }) => {
+        if (a.character_name < b.character_name) return -1;
+        if (a.character_name > b.character_name) return 1;
+        return 0;
+      }
+    );
+
+    setTableData(sortedData);
+    setEditedData(sortedData);
+  } catch (error) {
+    console.error("데이터를 불러오는 데 실패했습니다:", error);
+    alert("해당 길드의 관리자가 아닙니다.");
+  }
+};
+
+useEffect(() => {
+  fetchTableData();
+}, [selectedDate]);
+
 
   // 편집 모드 전환 함수
   const toggleEditMode = () => {
@@ -216,15 +253,12 @@ const Adminpage: React.FC = () => {
 
   // ? 길드원 채워넣는 로직
   const testclick = () => {
-    const token = localStorage.token;
-    console.log(selectedDate);
-
     // test 엔드포인트로 POST 요청을 보내 데이터 업데이트를 수행합니다.
     fetch("/test", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        "User-Info": encodeURIComponent(JSON.stringify(userInfo)),
       },
       body: JSON.stringify({ selectedDate: selectedDate }),
     })
