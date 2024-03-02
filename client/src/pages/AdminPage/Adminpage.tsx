@@ -482,7 +482,7 @@ const Adminpage: React.FC = () => {
       </div>
 
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div style={{ display: "flex", marginTop: "30px" }}>
+      <div style={{ display: "flex", marginTop: "30px", justifyContent: "center"}}>
         <div>
           <TextField
             label="수로 점수"
@@ -516,7 +516,7 @@ const Adminpage: React.FC = () => {
 
         <div>
           <Select
-            style={{ marginRight: "5px" }}
+            style={{ marginRight: "5px", width: "110px"}}
             value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
@@ -618,7 +618,7 @@ const Adminpage: React.FC = () => {
           선택된 행 삭제
         </button>
         <button className={styles.buttonStyle} onClick={handleNobleLimitUpdate}>
-          노블 제한 설정
+          선택된 행 노블제한
         </button>
         <button className={styles.buttonStyle} onClick={toggleEditMode}>
           {isEditMode ? "취소" : "수정"}
