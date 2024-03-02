@@ -45,7 +45,7 @@ const Header = () => {
       <Link to="/" className={styles.logoLink}>
         <img src="/logo.png" className={styles.logoImage} alt="Guild Manager Logo" />
         <div style={{ marginLeft: "5px" }}>
-          <div className={styles.boldText}>메소</div>
+          <div className={styles.boldText} style={{fontSize: "24px"}}>메소</div>
           <div className={styles.boldText}>메이플길드관리소</div>
         </div>
       </Link>
