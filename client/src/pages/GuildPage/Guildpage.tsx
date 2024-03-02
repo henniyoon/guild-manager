@@ -109,7 +109,7 @@ const Guildpage: React.FC = () => {
             <Grid item style={{ marginLeft: 10 }}>
               <Typography variant="body1" style={{ fontSize: '14px' }}>{worldName}</Typography>
             </Grid>
-            <Button variant="outlined" style={{ marginLeft: '20px' }} onClick={AdminButtonClick}>노블제한</Button>
+            <Button variant="outlined" style={{ marginLeft: '20px' }} onClick={AdminButtonClick}> 관리자 페이지 </Button>
             <Grid item xs={12} md={12}>
               <Typography variant="body1">마스터: {guildData.master_name}</Typography>
               <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
