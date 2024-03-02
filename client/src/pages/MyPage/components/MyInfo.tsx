@@ -183,7 +183,9 @@ const MyInfo: React.FC = () => {
                             </Typography>
                         </Box>
                     </Modal>
-
+                    <p style={{ marginBottom: '10px', color: 'red' }}>
+                        해당 월드에서 7일 이내 스타포스 강화, 잠재능력 재설정, 큐브 사용 내역이 있어야만 인증 가능합니다.
+                    </p>
                     <TextField
                         label="API KEY"
                         variant="outlined"
