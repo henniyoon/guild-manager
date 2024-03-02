@@ -3,8 +3,8 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { TextField, Select, MenuItem, Button, IconButton } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
+import { TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
 
@@ -35,11 +35,10 @@ interface Filters {
 
 // 초기 상태 정의
 const initialFilters: Filters = {
-  suro_score: { value: 0, operator: 'min' },
-  flag_score: { value: 0, operator: 'min' },
-  logical_operator: 'and',
+  suro_score: { value: 0, operator: "min" },
+  flag_score: { value: 0, operator: "min" },
+  logical_operator: "and",
 };
-
 
 const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
@@ -107,15 +106,15 @@ const Adminpage: React.FC = () => {
     // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
-        field === "weekly_score" ||
-        field === "suro_score" ||
-        field === "flag_score"
+      field === "weekly_score" ||
+      field === "suro_score" ||
+      field === "flag_score"
         ? parseInt(value as string, 10)
         : field === "noble_limit" // nobel_limit 필드일 경우
-          ? value === true || value === "true"
-            ? 1
-            : 0 // true이면 1, 아니면 0으로 변환
-          : value; // 나머지 경우는 그대로 값 유지
+        ? value === true || value === "true"
+          ? 1
+          : 0 // true이면 1, 아니면 0으로 변환
+        : value; // 나머지 경우는 그대로 값 유지
 
     setEditedData((editedData) =>
       editedData.map((row) =>
@@ -200,7 +199,7 @@ const Adminpage: React.FC = () => {
     setSortConfig((currentSortConfig) => {
       const newDirection =
         currentSortConfig.key === key &&
-          currentSortConfig.direction === "ascending"
+        currentSortConfig.direction === "ascending"
           ? "descending"
           : "ascending";
       const sortedData = [...tableData].sort((a, b) => {
@@ -398,10 +397,18 @@ const Adminpage: React.FC = () => {
       const suroScore = filters.suro_score.value;
       const flagScore = filters.flag_score.value;
 
-      const suroCondition = (suroScore === undefined) || (filters.suro_score.operator === 'max' ? row.suro_score <= suroScore : row.suro_score >= suroScore);
-      const flagCondition = (flagScore === undefined) || (filters.flag_score.operator === 'max' ? row.flag_score <= flagScore : row.flag_score >= flagScore);
+      const suroCondition =
+        suroScore === undefined ||
+        (filters.suro_score.operator === "max"
+          ? row.suro_score <= suroScore
+          : row.suro_score >= suroScore);
+      const flagCondition =
+        flagScore === undefined ||
+        (filters.flag_score.operator === "max"
+          ? row.flag_score <= flagScore
+          : row.flag_score >= flagScore);
 
-      if (filters.logical_operator === 'and') {
+      if (filters.logical_operator === "and") {
         return suroCondition && flagCondition;
       } else {
         return suroCondition || flagCondition;
@@ -426,6 +433,34 @@ const Adminpage: React.FC = () => {
   const selectDeselectButtonText =
     selectedRowIds.length > 0 ? "선택 해제" : "모두 선택";
 
+  const handleNobleLimitUpdate = () => {
+    if (selectedRowIds.length === 0) {
+      alert("업데이트할 행을 선택해주세요.");
+      return;
+    }
+
+    fetch("/updateNobleLimit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ selectedRowIds }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("noble_limit 값이 성공적으로 업데이트되었습니다.");
+          fetchTableData(); // 데이터를 다시 불러옵니다.
+        } else {
+          alert("업데이트에 실패했습니다.");
+        }
+      })
+      .catch((error) => {
+        console.error("업데이트 중 에러 발생:", error);
+        alert("업데이트 중 에러가 발생했습니다.");
+      });
+  };
+
   return (
     <div>
       <div className={styles.titleContainer}>
@@ -447,22 +482,25 @@ const Adminpage: React.FC = () => {
       </div>
 
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div style={{ display: 'flex', marginTop: '30px' }}>
+      <div style={{ display: "flex", marginTop: "30px" }}>
         <div>
           <TextField
             label="수로 점수"
             variant="outlined"
-            style={{ marginRight: '5px' }}
+            style={{ marginRight: "5px" }}
             value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                suro_score: { ...filters.suro_score, value: parseInt(e.target.value) },
+                suro_score: {
+                  ...filters.suro_score,
+                  value: parseInt(e.target.value),
+                },
               })
             }
           />
           <Select
-            style={{ marginRight: '5px' }}
+            style={{ marginRight: "5px" }}
             value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
@@ -478,12 +516,12 @@ const Adminpage: React.FC = () => {
 
         <div>
           <Select
-            style={{ marginRight: '5px' }}
+            style={{ marginRight: "5px" }}
             value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                logical_operator: e.target.value
+                logical_operator: e.target.value,
               })
             }
           >
@@ -494,19 +532,22 @@ const Adminpage: React.FC = () => {
 
         <div>
           <TextField
-            style={{ marginRight: '5px' }}
+            style={{ marginRight: "5px" }}
             label="플래그 점수"
             variant="outlined"
             value={filters.flag_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, value: parseInt(e.target.value) },
+                flag_score: {
+                  ...filters.flag_score,
+                  value: parseInt(e.target.value),
+                },
               })
             }
           />
           <Select
-            style={{ marginRight: '20px' }}
+            style={{ marginRight: "20px" }}
             value={filters.flag_score.operator}
             onChange={(e) =>
               setFilters({
@@ -524,7 +565,10 @@ const Adminpage: React.FC = () => {
         </Button>
       </div>
 
-      <div className={styles.tableInfoContainer} style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        className={styles.tableInfoContainer}
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
         <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
         <div>
           <p>행 개수 : {tableData.length}</p>
@@ -573,6 +617,9 @@ const Adminpage: React.FC = () => {
         >
           선택된 행 삭제
         </button>
+        <button className={styles.buttonStyle} onClick={handleNobleLimitUpdate}>
+          노블 제한 설정
+        </button>
         <button className={styles.buttonStyle} onClick={toggleEditMode}>
           {isEditMode ? "취소" : "수정"}
         </button>
@@ -608,8 +655,9 @@ const Adminpage: React.FC = () => {
             <tr
               key={row.id}
               onClick={() => handleRowClick(row.id)}
-              className={`${styles.rowClickable} ${selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-                } ${index % 17 === 16 ? styles.row_17th : ""}`}
+              className={`${styles.rowClickable} ${
+                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+              } ${index % 17 === 16 ? styles.row_17th : ""}`}
             >
               {isEditMode ? (
                 <>
@@ -654,11 +702,7 @@ const Adminpage: React.FC = () => {
                       type="number"
                       defaultValue={row.suro_score}
                       onChange={(e) =>
-                        handleInputChange(
-                          row.id,
-                          "suro_score",
-                          e.target.value
-                        )
+                        handleInputChange(row.id, "suro_score", e.target.value)
                       }
                     />
                   </td>
@@ -669,11 +713,7 @@ const Adminpage: React.FC = () => {
                       type="number"
                       defaultValue={row.flag_score}
                       onChange={(e) =>
-                        handleInputChange(
-                          row.id,
-                          "flag_score",
-                          e.target.value
-                        )
+                        handleInputChange(row.id, "flag_score", e.target.value)
                       }
                     />
                   </td>
@@ -709,7 +749,7 @@ const Adminpage: React.FC = () => {
           ))}
         </tbody>
       </table>
-    </div >
+    </div>
   );
 };
 
