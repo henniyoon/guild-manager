@@ -96,62 +96,71 @@ const Guildpage: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div>
-        {guildData && (
-          <div>
-            <Grid container spacing={0} alignItems="center">
-              <Grid item>
-                <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
-              </Grid>
-              <Grid item style={{ marginLeft: 5 }}>
-                <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
-              </Grid>
-              <Grid item style={{ marginLeft: 10 }}>
-                <Typography variant="body1" style={{ fontSize: '14px' }}>{worldName}</Typography>
-              </Grid>
-              <Button variant="outlined" style={{ marginLeft: '20px' }} onClick={AdminButtonClick}>노블제한</Button>
-              <Grid item xs={12} md={12}>
-                <Typography variant="body1">마스터: {guildData.master_name}</Typography>
-                <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
-                <Typography variant="body1">노블: {guildData.noblesse_skill_level}</Typography>
-              </Grid>
-              <TextField
-                type="text"
-                placeholder="길드원 검색"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-              {filteredCharacterData && filteredCharacterData.length > 0 ? (
-                <Grid container spacing={4} justifyContent="center">
-                  {filteredCharacterData.map((character, index) => (
-                    <Grid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
-                      <Card 
-                        variant="outlined"
-                        onClick={() => handleMemberClick(character)}
-                      >
-                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                          <img
-                            src={character.image}
-                            alt="Character Image"
-                            style={{ width: 'auto', height: '100%' }}
-                          />
-                          <Typography variant="subtitle1" style={{ fontSize: '14px' }}>{character.name}</Typography>
-                          <Typography variant="body2">Lv.{character.level}</Typography>
-                          <Typography variant="body2">{character.class}</Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              ) : (
-                <Typography variant="body2">검색 결과가 없습니다.</Typography>
-              )}
+    <Container>
+      {guildData && (
+        <div>
+          <Grid container spacing={0} alignItems="center">
+            <Grid item>
+              <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
             </Grid>
-          </div>
-        )}
-      </div>
-    </div>
+            <Grid item style={{ marginLeft: 5 }}>
+              <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
+            </Grid>
+            <Grid item style={{ marginLeft: 10 }}>
+              <Typography variant="body1" style={{ fontSize: '14px' }}>{worldName}</Typography>
+            </Grid>
+            <Button variant="outlined" style={{ marginLeft: '20px' }} onClick={AdminButtonClick}>노블제한</Button>
+            <Grid item xs={12} md={12}>
+              <Typography variant="body1">마스터: {guildData.master_name}</Typography>
+              <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
+              <Typography variant="body1">노블: {guildData.noblesse_skill_level}</Typography>
+            </Grid>
+            <TextField
+              type="text"
+              placeholder="길드원 검색"
+              value={searchQuery}
+              style={{ marginTop: '10px', marginBottom: '10px' }}
+              size="small"
+              onChange={handleSearchChange}
+            />
+          </Grid>
+
+          {filteredCharacterData && filteredCharacterData.length > 0 ? (
+            <Grid container spacing={4} justifyContent="center">
+              {filteredCharacterData.map((character, index) => (
+                <Grid item key={index} xs={12} sm={6} md={4} lg={3} xl={2}>
+                  <Card
+                    variant="outlined"
+                    onClick={() => handleMemberClick(character)}
+                  >
+                    <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <img
+                        src={character.image || '/null_avatar.png'}
+                        alt="Character Image"
+                        style={{ width: 'auto', height: '100%' }}
+                      />
+                      <Typography variant="subtitle1" style={{ fontSize: '14px' }}>{character.name}</Typography>
+                      <Typography variant="body2">
+                        {character.level !== null
+                          ? `Lv.${character.level}`
+                          : <span style={{ fontSize: '12px' }}>2023년 12월 21일 이후 접속 기록이 없습니다.</span>}
+                      </Typography>
+                      <Typography variant="body2">
+                        {character.class !== null ? character.class : ''}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+              <Typography variant="body2">검색 결과가 없습니다.</Typography>
+            </div>
+          )}
+        </div>
+      )}
+    </Container >
   );
 };
 
