@@ -5,19 +5,18 @@ const AuthService = require('../services/authService.js');
 
 const getRecordsController = async (req, res) => {
   const week = req.query.week;
-  const token = req.headers.authorization?.split(" ")[1]; // "Bearer TOKEN" 형식 가정
-  console.log("getRecordToken: ", token);
-  if (!token) {
-    return res.status(401).send("토큰이 필요합니다.");
+  // 헤더에서 User-Info 추출
+  const userInfoHeader = req.get('User-Info');
+  // JSON 형태로 전달된 경우 파싱
+  const userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
+  // 사용할 데이터
+  const { username, email, guildName, worldName, role } = userInfo;
+
+  if (!userInfo) {
+    return res.status(401).send("길드 관리자가 아닙니다.");
   }
 
   try {
-    // 토큰 검증 및 디코딩
-    const decoded = AuthService.verifyToken(token);
-    console.log("getRecordDecodedToken: ", decoded);
-    // 길드 정보 조회
-    const guildName = decoded.guild_name;
-    const worldName = decoded.world_name;
     const guildInfo = await GuildService.getGuild(guildName, worldName);
 
     if (!guildInfo) {
@@ -43,7 +42,7 @@ const getRecordsController = async (req, res) => {
       })
     );
     const response = charactersRecords.flat(); // flat()을 사용하여 중첩 배열을 단일 배열로 평탄화
-    
+
     res.json(response);
   } catch (error) {
     // 오류 처리
@@ -103,56 +102,47 @@ const deleteRecordsController = async (req, res) => {
 
 // admin 페이지 캐릭터 채우는 로직
 const fillCharactersController = async (req, res) => {
-  // Authorization 헤더에서 토큰 추출
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1]; // Bearer 키워드를 제거합니다.
+  const userInfoHeader = req.get('User-Info');
+  // JSON 형태로 전달된 경우 파싱
+  const userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
+  // 사용할 데이터
+  const { username, email, guildName, worldName, role } = userInfo;
   const week = req.body.selectedDate;
-
-  if (token == null) {
-    return res.sendStatus(401); // 토큰이 없는 경우 401 Unauthorized 응답을 보냅니다.
+  console.log("userInfo: ", userInfo);
+  if (userInfo == null) {
+    return res.sendStatus(401);
   }
 
-  // 토큰을 해독하여 사용자 정보를 추출합니다.
   try {
-    const decodedToken = AuthService.verifyToken(token);
-    // 추출한 사용자 정보를 이용하여 DB를 조회합니다.
-    const worldName = decodedToken.world_name;
-    const guildName = decodedToken.guild_name;
+    // Guild 모델을 사용하여 조건에 맞는 길드를 조회합니다.
+    const guild = await GuildService.getGuildId(guildName, worldName);
 
-    try {
-      // Guild 모델을 사용하여 조건에 맞는 길드를 조회합니다.
-      const guild = await GuildService.getGuildId(guildName, worldName);
+    if (guild) {
+      // 해당 길드 ID에 속한 모든 길드원을 조회합니다.
+      const characters = await CharacterService.getCharactersByGuild(guildName, worldName);
 
-      if (guild) {
-        // 해당 길드 ID에 속한 모든 길드원을 조회합니다.
-        const characters = await CharacterService.getCharactersByGuild(guildName, worldName);
+      const characterIds = characters.map((character) => character.id);
 
-        const characterIds = characters.map((character) => character.id);
-
-        // records 테이블에서 각 character_id와 week에 대해 조회 또는 생성
-        const recordsPromises = characterIds.map((characterId) => {
-          return new Promise(async (resolve) => {
-            const record = await RecordService.findOrCreateRecords(characterId, week);
-            resolve(record);
-          });
+      // records 테이블에서 각 character_id와 week에 대해 조회 또는 생성
+      const recordsPromises = characterIds.map((characterId) => {
+        return new Promise(async (resolve) => {
+          const record = await RecordService.findOrCreateRecords(characterId, week);
+          resolve(record);
         });
-        
-        const records = await Promise.all(recordsPromises);
-        
-        // 생성되거나 찾아진 레코드의 정보를 응답으로 보냅니다.
-        res.json(records);
-      } else {
-        // 해당 조건에 맞는 길드가 없는 경우
-        res.status(404).send("Guild not found");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).send("Internal Server Error");
+      });
+
+      const records = await Promise.all(recordsPromises);
+
+      // 생성되거나 찾아진 레코드의 정보를 응답으로 보냅니다.
+      res.json(records);
+    } else {
+      // 해당 조건에 맞는 길드가 없는 경우
+      res.status(404).send("Guild not found");
     }
   } catch (error) {
-    // 토큰 검증 실패 시 403 Forbidden 응답을 보냅니다.
-    res.sendStatus(403);
-  };
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 module.exports = {
