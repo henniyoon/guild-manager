@@ -26,7 +26,8 @@ const Modal: FC<ModalProps> = ({ isOpen, onClose, children }) => {
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center', 
-      backgroundColor: 'rgba(0,0,0,0.5)' 
+      backgroundColor: 'rgba(0,0,0,0.5)', 
+      zIndex: 1
     }}>
       <div onClick={stopPropagation} style={{ 
         backgroundColor: 'white', 

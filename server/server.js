@@ -216,6 +216,21 @@ app.get("/Graphpage/:memberName", async (req, res) => {
   }
 });
 
+app.post('/updateNobleLimit', async (req, res) => {
+  const { selectedRowIds } = req.body;
+
+  try {
+    await Record.update(
+      { noble_limit: 1 },
+      { where: { id: selectedRowIds } }
+    );
+    res.json({ success: true, message: "noble_limit 업데이트 성공" });
+  } catch (error) {
+    console.error("noble_limit 업데이트 에러:", error);
+    res.status(500).json({ success: false, message: "서버 에러" });
+  }
+});
+
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 // 클라이언트 리액트 앱 라우팅 처리
 app.get("*", (req, res) => {
