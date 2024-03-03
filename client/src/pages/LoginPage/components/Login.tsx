@@ -61,7 +61,7 @@ const Login: React.FC<LoginProps> = () => {
       <div>
         <label htmlFor="email">ID:</label>
         <input
-          type="email"
+          type="text"
           id="email"
           value={email}
           onChange={handleEmailChange}

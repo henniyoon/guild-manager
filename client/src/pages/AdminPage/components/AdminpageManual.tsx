@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 
 const AdminPageManual: FC = () => (
   <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.6', maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-    <h1 style={{ textAlign: 'center' }}>관리자 페이지 이용 방법</h1>
+    <h1 style={{ textAlign: 'center', marginBottom: '10px'}}>관리자 페이지 이용 방법</h1>
     <style>
       {`
         .manual-list > li {
@@ -48,7 +48,7 @@ const AdminPageManual: FC = () => (
       <li>
         <strong>데이터 확인</strong>
         <ol className="sub-list">
-          <li>스크린샷 추출 데이터 수와 불러온 길드원 수를 비교합니다...</li>
+          <li>'행 추가', '선택된 행 삭제' 버튼을 사용하여 스크린샷 추출 데이터 수와 불러온 길드원 수를 비교합니다.</li>
         </ol>
       </li>
       <li>

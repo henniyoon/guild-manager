@@ -11,7 +11,7 @@ import styles from "./styles/Mainpage.module.css";
 const Mainpage = () => {
   const navigate = useNavigate();
   const [worldName, setSelectedServer] = useState("스카니아");
-  const [guildName, setInputValue] = useState("별빛");
+  const [guildName, setInputValue] = useState("");
 
   const handleButtonClick = async (e: FormEvent) => {
     e.preventDefault();

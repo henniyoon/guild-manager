@@ -167,6 +167,7 @@ th {
   padding: 10px; /* 여백 추가 */
   background-color: #f5f5f5;
   border-radius: 8px;
+  margin-top: 20px;
   margin-bottom: 20px;
   padding-left: 3%;
   padding-right: 3%;
@@ -185,7 +186,12 @@ th {
   /* margin: 10px; 체크박스 주위의 여백 조절 */
 }
 
-.titleLeft{
+.titleH1{
   display: flex;
   align-items: flex-end;
+  margin-left: 5vw;
+}
+
+.titleBlank{
+  width: 10px;
 }
