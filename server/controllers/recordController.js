@@ -7,9 +7,21 @@ const getRecordsController = async (req, res) => {
   const week = req.query.week;
   // 헤더에서 User-Info 추출
   const userInfoHeader = req.get('User-Info');
-  // JSON 형태로 전달된 경우 파싱
-  const userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
-  // 사용할 데이터
+
+  if (!userInfoHeader) {
+    return res.status(400).send("User-Info 헤더가 누락되었습니다.");
+  }
+
+  let userInfo;
+  try {
+    // JSON 형태로 전달된 경우 안전하게 파싱
+    userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
+  } catch (error) {
+    // JSON 파싱 실패 처리
+    return res.status(400).send("User-Info 헤더의 JSON 형식이 잘못되었습니다.");
+  }
+
+  // 사용할 데이터 추출
   const { username, email, guildName, worldName, role } = userInfo;
 
   if (!userInfo) {
@@ -23,29 +35,25 @@ const getRecordsController = async (req, res) => {
       return res.status(404).send("해당하는 길드를 찾을 수 없습니다.");
     }
 
-    // 길드에 속한 캐릭터들 조회
     const characters = await CharacterService.getCharactersByGuild(guildName, worldName);
-    // characters 배열을 id를 키로 하는 객체로 변환하여 검색을 빠르게 함
     const charactersMap = characters.reduce((acc, character) => {
       acc[character.id] = character;
       return acc;
     }, {});
 
-    // 각 캐릭터에 대한 records 데이터 조회 및 캐릭터 이름 추가
     const charactersRecords = await Promise.all(
       characters.map(async (character) => {
         const records = await RecordService.getRecordsByCharacterId(character.id, week);
         return records.map((record) => ({
           ...record.toJSON(),
-          character_name: character.name, // 캐릭터 이름 추가
+          character_name: character.name,
         }));
       })
     );
-    const response = charactersRecords.flat(); // flat()을 사용하여 중첩 배열을 단일 배열로 평탄화
+    const response = charactersRecords.flat();
 
     res.json(response);
   } catch (error) {
-    // 오류 처리
     if (error.name === "TokenExpiredError") {
       console.error("토큰이 만료되었습니다:", error);
       return res.status(401).send("토큰이 만료되었습니다. 다시 로그인해주세요.");
@@ -58,6 +66,7 @@ const getRecordsController = async (req, res) => {
     }
   }
 };
+
 
 const addRecordController = async (req, res) => {
   try {
@@ -103,27 +112,35 @@ const deleteRecordsController = async (req, res) => {
 // admin 페이지 캐릭터 채우는 로직
 const fillCharactersController = async (req, res) => {
   const userInfoHeader = req.get('User-Info');
-  // JSON 형태로 전달된 경우 파싱
-  const userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
-  // 사용할 데이터
-  const { username, email, guildName, worldName, role } = userInfo;
+
+  if (!userInfoHeader) {
+    return res.status(400).send("User-Info 헤더가 누락되었습니다.");
+  }
+
+  let userInfo;
+  try {
+    // JSON 형태로 전달된 경우 안전하게 파싱
+    userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
+  } catch (error) {
+    // JSON 파싱 실패 처리
+    return res.status(400).send("User-Info 헤더의 JSON 형식이 잘못되었습니다.");
+  }
+
+  // 사용할 데이터 추출
+  const { guildName, worldName } = userInfo;
   const week = req.body.selectedDate;
-  console.log("userInfo: ", userInfo);
-  if (userInfo == null) {
+
+  if (!userInfo) {
     return res.sendStatus(401);
   }
 
   try {
-    // Guild 모델을 사용하여 조건에 맞는 길드를 조회합니다.
     const guild = await GuildService.getGuildId(guildName, worldName);
 
     if (guild) {
-      // 해당 길드 ID에 속한 모든 길드원을 조회합니다.
       const characters = await CharacterService.getCharactersByGuild(guildName, worldName);
-
       const characterIds = characters.map((character) => character.id);
 
-      // records 테이블에서 각 character_id와 week에 대해 조회 또는 생성
       const recordsPromises = characterIds.map((characterId) => {
         return new Promise(async (resolve) => {
           const record = await RecordService.findOrCreateRecords(characterId, week);
@@ -132,11 +149,8 @@ const fillCharactersController = async (req, res) => {
       });
 
       const records = await Promise.all(recordsPromises);
-
-      // 생성되거나 찾아진 레코드의 정보를 응답으로 보냅니다.
       res.json(records);
     } else {
-      // 해당 조건에 맞는 길드가 없는 경우
       res.status(404).send("Guild not found");
     }
   } catch (error) {
@@ -144,6 +158,7 @@ const fillCharactersController = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   addRecordController,
