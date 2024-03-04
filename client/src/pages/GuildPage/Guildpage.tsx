@@ -113,9 +113,7 @@ const Guildpage: React.FC = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
       const data = await response.json();
-      console.log("data: ", data);
       return data; // 데이터 반환
     } catch (error) {
       console.error("데이터를 불러오는 데 실패했습니다:", error);
@@ -125,7 +123,7 @@ const Guildpage: React.FC = () => {
   const AdminButtonClick = async() => {
     try {
       const userInfo = await fetchUserInfo(); // fetchUserInfo가 완료될 때까지 대기
-      console.log(userInfo);
+    
       if (!userInfo) {
         alert("로그인이 필요합니다");
       } else if (
@@ -133,7 +131,7 @@ const Guildpage: React.FC = () => {
         userInfo.worldName == worldName &&
         (userInfo.role == "부마스터" || userInfo.role == "마스터")
       ) {
-        navigate(`/Adminpage`);
+        navigate("/Adminpage", { state: { userInfo: userInfo } });
       } else {
         alert("해당 길드의 관리자가 아닙니다.");
       }
