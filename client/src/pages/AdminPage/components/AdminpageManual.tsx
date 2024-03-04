@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 
 const AdminPageManual: FC = () => (
   <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.6', maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-    <h1 style={{ textAlign: 'center' }}>관리자 페이지 이용 방법</h1>
+    <h1 style={{ textAlign: 'center', marginBottom: '10px'}}>관리자 페이지 이용 방법</h1>
     <style>
       {`
         .manual-list > li {
@@ -38,15 +38,17 @@ const AdminPageManual: FC = () => (
               <li>메이플 해상도: 1366 x 768</li>
               <li>창의 왼쪽 상단에 길드컨텐츠 창이 오도록 배치</li>
               <li>닉네임 오름차순 정렬 후 1페이지부터 캡쳐</li>
+              <img src="/SampleAdminImage.png" alt="sample" style={{ width: '300px', height: 'auto' }} />
             </ul>
           </li>
           <li>모든 이미지를 한 번에 첨부합니다.</li>
+          <li>완료 메세지가 나타날 때까지 기다립니다.</li>
         </ol>
       </li>
       <li>
         <strong>데이터 확인</strong>
         <ol className="sub-list">
-          <li>스크린샷 추출 데이터 수와 불러온 길드원 수를 비교합니다...</li>
+          <li>'행 추가', '선택된 행 삭제' 버튼을 사용하여 스크린샷 추출 데이터 수와 불러온 길드원 수를 비교합니다.</li>
         </ol>
       </li>
       <li>

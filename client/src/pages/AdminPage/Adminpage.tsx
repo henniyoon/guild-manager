@@ -3,10 +3,18 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
+import { TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
-import InfoIcon from '@mui/icons-material/Info';
-import IconButton from '@mui/material/IconButton';
 import getCurrentWeek from "./components/getCurrentWeek";
+
+interface UserInfo {
+  username: string;
+  email: string;
+  guildName: string;
+  worldName: string;
+  role: string;
+}
 
 interface TableRowData {
   id: number;
@@ -22,9 +30,27 @@ interface SortConfig {
   key: keyof TableRowData | null;
   direction: "ascending" | "descending";
 }
+interface Filter {
+  value: number;
+  operator: string;
+}
 
+interface Filters {
+  suro_score: Filter;
+  flag_score: Filter;
+  logical_operator: string;
+}
+
+// 초기 상태 정의
+const initialFilters: Filters = {
+  suro_score: { value: 0, operator: "min" },
+  flag_score: { value: 0, operator: "min" },
+  logical_operator: "and",
+};
 
 const Adminpage: React.FC = () => {
+  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
@@ -35,51 +61,74 @@ const Adminpage: React.FC = () => {
     direction: "ascending",
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [filters, setFilters] = useState({
-    weekly_score: { min: "", max: "" },
-    suro_score: { min: "", max: "" },
-    flag_score: { min: "", max: "" },
-  });
+  const [filters, setFilters] = useState<Filters>(initialFilters);
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 데이터를 불러오는 함수
-  const fetchTableData = () => {
-    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-    const token = localStorage.getItem("token");
+  // 토큰이 변경될 때마다 localStorage에 반영
+useEffect(() => {
+  localStorage.setItem("token", token || "");
+}, [token]);
 
-    fetch(url, {
+// 데이터를 불러오는 함수
+const fetchTableData = async () => {
+  try {
+    const currentToken = localStorage.getItem("token");
+
+    // 첫 번째 API 호출
+    const response = await fetch("/myInfo", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${currentToken}`,
         "Content-Type": "application/json",
       },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // 데이터를 character_name 기준으로 오름차순 정렬합니다.
-        // localeCompare 대신 기본 비교 연산자를 사용합니다.
-        const sortedData = data.sort(
-          (a: { character_name: number }, b: { character_name: number }) => {
-            if (a.character_name < b.character_name) return -1;
-            if (a.character_name > b.character_name) return 1;
-            return 0;
-          }
-        );
-        setTableData(sortedData);
-        setEditedData(sortedData); // EditedData도 정렬된 데이터로 초기화합니다.
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("토큰이 만료되었습니다. 다시 로그인 해주세요.");
-      });
-  };
+    });
 
-  useEffect(() => {
-    fetchTableData();
-  }, [selectedDate]);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("userInfo: ", data);
+    setUserInfo(data);
+
+    // 두 번째 API 호출
+    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
+    const secondResponse = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Info": encodeURIComponent(JSON.stringify(data)),
+      },
+    });
+
+    if (!secondResponse.ok) {
+      throw new Error(`HTTP error! Status: ${secondResponse.status}`);
+    }
+
+    const secondData = await secondResponse.json();
+    const sortedData = secondData.sort(
+      (a: { character_name: number }, b: { character_name: number }) => {
+        if (a.character_name < b.character_name) return -1;
+        if (a.character_name > b.character_name) return 1;
+        return 0;
+      }
+    );
+
+    setTableData(sortedData);
+    setEditedData(sortedData);
+  } catch (error) {
+    console.error("데이터를 불러오는 데 실패했습니다:", error);
+    alert("해당 길드의 관리자가 아닙니다.");
+  }
+};
+
+useEffect(() => {
+  fetchTableData();
+}, [selectedDate]);
+
 
   // 편집 모드 전환 함수
   const toggleEditMode = () => {
@@ -203,15 +252,12 @@ const Adminpage: React.FC = () => {
 
   // ? 길드원 채워넣는 로직
   const testclick = () => {
-    const token = localStorage.token;
-    console.log(selectedDate);
-
     // test 엔드포인트로 POST 요청을 보내 데이터 업데이트를 수행합니다.
     fetch("/test", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        "User-Info": encodeURIComponent(JSON.stringify(userInfo)),
       },
       body: JSON.stringify({ selectedDate: selectedDate }),
     })
@@ -309,7 +355,6 @@ const Adminpage: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("업로드 성공:", data);
-        alert("파일 업로드 성공!");
         // OCR 결과를 테이블 데이터에 반영하는 함수 호출
         setServerDataLength(data.weekly_score_Area.length);
         updateTableDataWithOcrResults(data);
@@ -377,39 +422,32 @@ const Adminpage: React.FC = () => {
       });
   };
 
-  const getFilteredRowIds = () => {
-    return tableData
-      .filter((row) => {
-        const minWeeklyScore = filters.weekly_score.min
-          ? parseInt(filters.weekly_score.min, 10)
-          : -Infinity;
-        const maxWeeklyScore = filters.weekly_score.max
-          ? parseInt(filters.weekly_score.max, 10)
-          : Infinity;
-        const minSuroScore = filters.suro_score.min
-          ? parseInt(filters.suro_score.min, 10)
-          : -Infinity;
-        const maxSuroScore = filters.suro_score.max
-          ? parseInt(filters.suro_score.max, 10)
-          : Infinity;
-        const minFlagScore = filters.flag_score.min
-          ? parseInt(filters.flag_score.min, 10)
-          : -Infinity;
-        const maxFlagScore = filters.flag_score.max
-          ? parseInt(filters.flag_score.max, 10)
-          : Infinity;
+  const handleReset = () => {
+    setFilters(initialFilters);
+  };
 
-        // 여기까지가 기존 코드에서 사용된 필터링 조건입니다.
-        return (
-          (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-          (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
-          (!minSuroScore || row.suro_score >= minSuroScore) &&
-          (!maxSuroScore || row.suro_score <= maxSuroScore) &&
-          (!minFlagScore || row.flag_score >= minFlagScore) &&
-          (!maxFlagScore || row.flag_score <= maxFlagScore)
-        );
-      })
-      .map((row) => row.id); // 필터링된 행의 id 값을 추출합니다.
+  const getFilteredRowIds = () => {
+    return tableData.filter((row) => {
+      const suroScore = filters.suro_score.value;
+      const flagScore = filters.flag_score.value;
+
+      const suroCondition =
+        suroScore === undefined ||
+        (filters.suro_score.operator === "max"
+          ? row.suro_score <= suroScore
+          : row.suro_score >= suroScore);
+      const flagCondition =
+        flagScore === undefined ||
+        (filters.flag_score.operator === "max"
+          ? row.flag_score <= flagScore
+          : row.flag_score >= flagScore);
+
+      if (filters.logical_operator === "and") {
+        return suroCondition && flagCondition;
+      } else {
+        return suroCondition || flagCondition;
+      }
+    });
   };
 
   // 모두 선택 또는 선택 해제 버튼 클릭 핸들러
@@ -420,7 +458,7 @@ const Adminpage: React.FC = () => {
       setSelectedRowIds([]);
     } else {
       // 선택된 행이 없다면 필터링된 모든 행을 선택합니다.
-      const filteredRowIds = getFilteredRowIds();
+      const filteredRowIds = getFilteredRowIds().map((row) => row.id);
       setSelectedRowIds(filteredRowIds);
     }
   };
@@ -429,10 +467,39 @@ const Adminpage: React.FC = () => {
   const selectDeselectButtonText =
     selectedRowIds.length > 0 ? "선택 해제" : "모두 선택";
 
+  const handleNobleLimitUpdate = () => {
+    if (selectedRowIds.length === 0) {
+      alert("업데이트할 행을 선택해주세요.");
+      return;
+    }
+
+    fetch("/updateNobleLimit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ selectedRowIds }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("noble_limit 값이 성공적으로 업데이트되었습니다.");
+          fetchTableData(); // 데이터를 다시 불러옵니다.
+        } else {
+          alert("업데이트에 실패했습니다.");
+        }
+      })
+      .catch((error) => {
+        console.error("업데이트 중 에러 발생:", error);
+        alert("업데이트 중 에러가 발생했습니다.");
+      });
+  };
+
   return (
     <div>
       <div className={styles.titleContainer}>
-        <div  className={styles.titleLeft}>
+      <div className={styles.titleBlank}></div>
+        <div className={styles.titleH1}>
           <h1>관리자 페이지</h1>
           <div>
             <IconButton onClick={() => setIsModalOpen(true)} title="info">
@@ -448,100 +515,102 @@ const Adminpage: React.FC = () => {
           onDateChange={setSelectedDate}
         />
       </div>
+
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div className={styles.filterContainer}>
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>주간점수 :</label>
-          <input
-            className={styles.filterInput}
-            type="text"
-            placeholder="주간점수 최소값"
-            value={filters.weekly_score.min}
+      <div style={{ display: "flex", marginTop: "30px", justifyContent: "center"}}>
+        <div>
+          <TextField
+            label="수로 점수"
+            variant="outlined"
+            style={{ marginRight: "5px" }}
+            value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                weekly_score: { ...filters.weekly_score, min: e.target.value },
+                suro_score: {
+                  ...filters.suro_score,
+                  value: parseInt(e.target.value),
+                },
               })
             }
           />
-          <div className={styles.filterSeparator}></div>
-          <input
-            className={styles.filterInput}
-            type="text"
-            placeholder="주간점수 최대값"
-            value={filters.weekly_score.max}
+          <Select
+            style={{ marginRight: "5px" }}
+            value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                weekly_score: { ...filters.weekly_score, max: e.target.value },
+                suro_score: { ...filters.suro_score, operator: e.target.value },
               })
             }
-          />
-        </div>
-        {/* 수로(suro_score) 필터링 입력 필드 */}
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>수로 : </label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="수로 최소값"
-            value={filters.suro_score.min}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                suro_score: { ...filters.suro_score, min: e.target.value },
-              })
-            }
-          />
-          <label className={styles.filterSeparator}></label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="수로 최대값"
-            value={filters.suro_score.max}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                suro_score: { ...filters.suro_score, max: e.target.value },
-              })
-            }
-          />
+          >
+            <MenuItem value="min">이상</MenuItem>
+            <MenuItem value="max">이하</MenuItem>
+          </Select>
         </div>
 
-        {/* 플래그(flag_score) 필터링 입력 필드 */}
-        <div className={styles.filtermenu}>
-          <label className={styles.filterLabel}>플래그 : </label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="플래그 최소값"
-            value={filters.flag_score.min}
+        <div>
+          <Select
+            style={{ marginRight: "5px", width: "110px"}}
+            value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, min: e.target.value },
+                logical_operator: e.target.value,
               })
             }
-          />
-          <label className={styles.filterSeparator}></label>
-          <input
-            className={styles.filterInput}
-            type="number"
-            placeholder="플래그 최대값"
-            value={filters.flag_score.max}
+          >
+            <MenuItem value="and">그리고</MenuItem>
+            <MenuItem value="or">또는</MenuItem>
+          </Select>
+        </div>
+
+        <div>
+          <TextField
+            style={{ marginRight: "5px" }}
+            label="플래그 점수"
+            variant="outlined"
+            value={filters.flag_score.value}
             onChange={(e) =>
               setFilters({
                 ...filters,
-                flag_score: { ...filters.flag_score, max: e.target.value },
+                flag_score: {
+                  ...filters.flag_score,
+                  value: parseInt(e.target.value),
+                },
               })
             }
           />
+          <Select
+            style={{ marginRight: "20px" }}
+            value={filters.flag_score.operator}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                flag_score: { ...filters.flag_score, operator: e.target.value },
+              })
+            }
+          >
+            <MenuItem value="min">이상</MenuItem>
+            <MenuItem value="max">이하</MenuItem>
+          </Select>
+        </div>
+        <Button variant="contained" onClick={handleReset}>
+          초기화
+        </Button>
+      </div>
+
+      <div
+        className={styles.tableInfoContainer}
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
+        <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
+        <div>
+          <p>행 개수 : {tableData.length}</p>
+          <p>선택된 행 개수: {selectedRowIds.length}</p>
         </div>
       </div>
-      <div className={styles.tableInfoContainer}>
-        <p>스크린샷 추출 데이터 수 : {serverDataLength}</p>
-        <p>행 개수 : {tableData.length}</p>
-      </div>
+
       <div className={styles.buttonContainer}>
         <button className={styles.buttonStyle} onClick={testclick}>
           길드원 불러오기
@@ -583,6 +652,9 @@ const Adminpage: React.FC = () => {
         >
           선택된 행 삭제
         </button>
+        <button className={styles.buttonStyle} onClick={handleNobleLimitUpdate}>
+          선택된 행 노블제한
+        </button>
         <button className={styles.buttonStyle} onClick={toggleEditMode}>
           {isEditMode ? "취소" : "수정"}
         </button>
@@ -614,140 +686,102 @@ const Adminpage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {tableData
-            .filter((row) => {
-              const minWeeklyScore = filters.weekly_score.min
-                ? parseInt(filters.weekly_score.min, 10)
-                : -Infinity;
-              const maxWeeklyScore = filters.weekly_score.max
-                ? parseInt(filters.weekly_score.max, 10)
-                : Infinity;
-              const minSuroScore = filters.suro_score.min
-                ? parseInt(filters.suro_score.min, 10)
-                : -Infinity;
-              const maxSuroScore = filters.suro_score.max
-                ? parseInt(filters.suro_score.max, 10)
-                : Infinity;
-              const minFlagScore = filters.flag_score.min
-                ? parseInt(filters.flag_score.min, 10)
-                : -Infinity;
-              const maxFlagScore = filters.flag_score.max
-                ? parseInt(filters.flag_score.max, 10)
-                : Infinity;
-
-              return (
-                (!minWeeklyScore || row.weekly_score >= minWeeklyScore) &&
-                (!maxWeeklyScore || row.weekly_score <= maxWeeklyScore) &&
-                (!minSuroScore || row.suro_score >= minSuroScore) &&
-                (!maxSuroScore || row.suro_score <= maxSuroScore) &&
-                (!minFlagScore || row.flag_score >= minFlagScore) &&
-                (!maxFlagScore || row.flag_score <= maxFlagScore)
-              );
-            })
-            .map((row, index) => (
-              <tr
-                key={row.id}
-                onClick={() => handleRowClick(row.id)}
-                className={`${styles.rowClickable} ${
-                  selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-                } ${index % 17 === 16 ? styles.row_17th : ""}`}
-              >
-                {isEditMode ? (
-                  <>
-                    <td className={styles.td1}>
-                      {row.character_name === "" ? (
-                        row.character_name
-                      ) : (
-                        <input
-                          title="character_name"
-                          className={styles.editInput}
-                          type="text"
-                          defaultValue={row.character_name}
-                          onChange={(e) =>
-                            handleInputChange(
-                              row.id,
-                              "character_name",
-                              e.target.value
-                            )
-                          }
-                        />
-                      )}
-                    </td>
-                    <td className={styles.td2}>
+          {getFilteredRowIds().map((row, index) => (
+            <tr
+              key={row.id}
+              onClick={() => handleRowClick(row.id)}
+              className={`${styles.rowClickable} ${
+                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+              } ${index % 17 === 16 ? styles.row_17th : ""}`}
+            >
+              {isEditMode ? (
+                <>
+                  <td className={styles.td1}>
+                    {row.character_name === "" ? (
+                      row.character_name
+                    ) : (
                       <input
-                        title="weekly_score"
+                        title="character_name"
                         className={styles.editInput}
-                        type="number"
-                        defaultValue={row.weekly_score}
+                        type="text"
+                        defaultValue={row.character_name}
                         onChange={(e) =>
                           handleInputChange(
                             row.id,
-                            "weekly_score",
+                            "character_name",
                             e.target.value
                           )
                         }
                       />
-                    </td>
-                    <td className={styles.td3}>
-                      <input
-                        title="suro_score"
-                        className={styles.editInput}
-                        type="number"
-                        defaultValue={row.suro_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "suro_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className={styles.td4}>
-                      <input
-                        title="flag_score"
-                        className={styles.editInput}
-                        type="number"
-                        defaultValue={row.flag_score}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "flag_score",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    <td className={styles.td5}>
-                      <input
-                        title="noble_limit"
-                        className={styles.customCheckbox}
-                        type="checkbox"
-                        defaultChecked={row.noble_limit}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "noble_limit",
-                            e.target.checked.toString()
-                          )
-                        }
-                      />
-                    </td>
-                  </>
-                ) : (
-                  // 비편집 모드에서의 행 렌더링
-                  <>
-                    <td className={styles.td1}>{row.character_name}</td>
-                    <td className={styles.td2}>{row.weekly_score}</td>
-                    <td className={styles.td3}>{row.suro_score}</td>
-                    <td className={styles.td4}>{row.flag_score}</td>
-                    <td className={styles.td5}>
-                      {row.noble_limit ? "🔴" : "🟢"}
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
+                    )}
+                  </td>
+                  <td className={styles.td2}>
+                    <input
+                      title="weekly_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.weekly_score}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "weekly_score",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className={styles.td3}>
+                    <input
+                      title="suro_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.suro_score}
+                      onChange={(e) =>
+                        handleInputChange(row.id, "suro_score", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className={styles.td4}>
+                    <input
+                      title="flag_score"
+                      className={styles.editInput}
+                      type="number"
+                      defaultValue={row.flag_score}
+                      onChange={(e) =>
+                        handleInputChange(row.id, "flag_score", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className={styles.td5}>
+                    <input
+                      title="noble_limit"
+                      className={styles.customCheckbox}
+                      type="checkbox"
+                      defaultChecked={row.noble_limit}
+                      onChange={(e) =>
+                        handleInputChange(
+                          row.id,
+                          "noble_limit",
+                          e.target.checked.toString()
+                        )
+                      }
+                    />
+                  </td>
+                </>
+              ) : (
+                // 비편집 모드에서의 행 렌더링
+                <>
+                  <td className={styles.td1}>{row.character_name}</td>
+                  <td className={styles.td2}>{row.weekly_score}</td>
+                  <td className={styles.td3}>{row.suro_score}</td>
+                  <td className={styles.td4}>{row.flag_score}</td>
+                  <td className={styles.td5}>
+                    {row.noble_limit ? "🔴" : "🟢"}
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

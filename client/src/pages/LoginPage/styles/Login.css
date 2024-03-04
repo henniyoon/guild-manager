@@ -1,0 +1,39 @@
+.login-form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 300px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .login-form div {
+    margin-bottom: 15px;
+  }
+  
+  .login-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .login-form input[type="text"],
+  .login-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* 입력 필드의 패딩이 너비에 포함되도록 */
+  }
+  
+  .login-form .MuiButton-root { /* Material UI 버튼 스타일 조정 */
+    margin-top: 20px; /* 버튼과 입력 필드 사이의 간격 */
+  }
+  
+  .error-message {
+    color: #d32f2f;
+    margin-top: 10px;
+  }
+  

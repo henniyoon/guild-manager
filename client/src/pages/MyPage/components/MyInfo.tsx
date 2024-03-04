@@ -10,8 +10,6 @@ interface UserInfo {
     role: string;
 }
 
-const token = localStorage.getItem("token");
-
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -25,6 +23,7 @@ const style = {
 };
 
 const MyInfo: React.FC = () => {
+    const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [id, setId] = useState('');
     const [apiKey, setApiKey] = useState('');
@@ -35,13 +34,20 @@ const MyInfo: React.FC = () => {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    // 토큰이 변경될 때마다 localStorage에 반영
+    useEffect(() => {
+        localStorage.setItem("token", token || ""); // 또는 null 대신에 기본값으로 빈 문자열을 사용할 수 있습니다.
+    }, [token]);
+
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
+                const currentToken = localStorage.getItem("token");
+
                 const response = await fetch("/myInfo", {
                     method: "GET",
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${currentToken}`,
                         "Content-Type": "application/json",
                     },
                 });
@@ -56,8 +62,9 @@ const MyInfo: React.FC = () => {
                 console.error("데이터를 불러오는 데 실패했습니다:", error);
             }
         };
+
         fetchUserInfo();
-    }, []); // 빈 의존성 배열을 사용하여 한 번만 호출되도록 설정
+    }, [token]);
 
     const setRoleMaster = async () => {
         fetch("/role/master", {
@@ -176,7 +183,9 @@ const MyInfo: React.FC = () => {
                             </Typography>
                         </Box>
                     </Modal>
-
+                    <p style={{ marginBottom: '10px', color: 'red' }}>
+                        해당 월드에서 7일 이내 스타포스 강화, 잠재능력 재설정, 큐브 사용 내역이 있어야만 인증 가능합니다.
+                    </p>
                     <TextField
                         label="API KEY"
                         variant="outlined"

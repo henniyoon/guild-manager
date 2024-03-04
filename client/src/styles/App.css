@@ -1,0 +1,15 @@
+.appContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+  }
+  
+  .mainContent {
+    display: flex;
+    justify-content: center;
+    padding-top: 4vh;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    min-height: 75vh;
+    width: 90vw ;
+  }

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 // import * as React from 'react';
 import Button from '@mui/material/Button';
+import '../styles/Login.css';
 
 interface LoginProps {
   // 필요한 경우 추가 props 정의
@@ -56,12 +57,11 @@ const Login: React.FC<LoginProps> = () => {
   };
 
   return (
-    
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="login-form">
       <div>
-        <label htmlFor="email">이메일:</label>
+        <label htmlFor="email">ID:</label>
         <input
-          type="email"
+          type="text"
           id="email"
           value={email}
           onChange={handleEmailChange}

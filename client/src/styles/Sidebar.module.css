@@ -1,0 +1,22 @@
+/* Sidebar.module.css */
+.sidebar {
+    width: 15vw;
+    height: 100vh;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background-color: violet;
+  }
+  
+  .list {
+    padding: 0;
+  }
+  
+  .listItem {
+    display: flex;
+    padding: 8px 16px; /* ListItem에 적용할 패딩 */
+  }
+  
+  .icon {
+    margin-right: 16px; /* 아이콘과 텍스트 사이의 간격 */
+  }
+  

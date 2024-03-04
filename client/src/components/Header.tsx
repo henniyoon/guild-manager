@@ -1,58 +1,57 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import AppBar from '@mui/material/AppBar';
-import { Toolbar, Button, Typography } from '@mui/material';
-import styles from '../styles/Header.module.css';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+import styles from "../styles/Header.module.css";
 
-const Header: React.FC = () => {
+const Header = () => {
   const { isLoggedIn, userInfo, logout } = useAuth();
+  const navigate = useNavigate(); 
+
   const handleLogout = () => {
-    // 로그아웃 시 토큰을 제거하는 로직 추가
-    // 예를 들어, localStorage에서 토큰을 삭제하는 경우
-    localStorage.removeItem('token');
-    logout(); // 다른 로그아웃 로직 실행 (예: 세션 초기화 등)
+    localStorage.removeItem("token");
+    logout();
+    navigate('/');
   };
-  
+
   const renderAuthLinks = () => {
     if (!isLoggedIn) {
       return (
         <>
-          <Button component={Link} to="/SignUp" color="inherit" className={styles.link}>
+          <Link to="/SignUp" className={styles.link}>
             회원가입
-          </Button>
-          <Button component={Link} to="/Login" color="inherit" className={styles.link}>
+          </Link>
+          <Link to="/Login" className={styles.link}>
             로그인
-          </Button>
+          </Link>
         </>
       );
     } else {
       return (
         <>
-          <Button component={Link} to="/MyPage" color="inherit" className={styles.link}>
+          <Link to="/MyPage" className={styles.link}>
             {userInfo?.username}
-          </Button>
-          <Button color="inherit" onClick={handleLogout} className={styles.link}>
+          </Link>
+          {/* 로그아웃 Link 대신 div 사용 */}
+          <div onClick={handleLogout} className={styles.link} style={{cursor: 'pointer'}}>
             로그아웃
-          </Button>
+          </div>
         </>
       );
     }
   };
 
-  const drawerWidth = 240;
-
   return (
-    <AppBar 
-    position="fixed"
-    sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
-    >
-      <Toolbar>
-        
-        <div className={styles.grow} />
-        <div className={styles.authLinks}>{renderAuthLinks()}</div>
-      </Toolbar>
-    </AppBar>
+    <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+        <img src="/logo.png" className={styles.logoImage} alt="Guild Manager Logo" />
+        <div style={{ marginLeft: "5px" }}>
+          <div className={styles.boldText} style={{fontSize: "24px"}}>메소</div>
+          <div className={styles.boldText}>메이플길드관리소</div>
+        </div>
+      </Link>
+      <div className={styles.grow} />
+      <div className={styles.authLinks}>{renderAuthLinks()}</div>
+    </div>
   );
 };
 

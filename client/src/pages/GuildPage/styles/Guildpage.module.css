@@ -27,3 +27,7 @@
 .card {
     background-color: #d8d8d8;
 }
+
+.container{
+    display: flex;
+}
