@@ -119,14 +119,17 @@ const fillCharactersController = async (req, res) => {
 
   let userInfo;
   try {
-    // JSON 형태로 전달된 경우 안전하게 파싱
     userInfo = JSON.parse(decodeURIComponent(userInfoHeader));
   } catch (error) {
-    // JSON 파싱 실패 처리
     return res.status(400).send("User-Info 헤더의 JSON 형식이 잘못되었습니다.");
   }
 
-  // 사용할 데이터 추출
+  // userInfo가 null이거나 undefined인 경우를 검사
+  if (!userInfo) {
+    return res.status(400).send("User-Info 정보가 없습니다.");
+  }
+
+  // 이 시점에서 userInfo는 null이 아니므로 안전하게 구조 분해 할당을 사용할 수 있습니다.
   const { guildName, worldName } = userInfo;
   const week = req.body.selectedDate;
 
