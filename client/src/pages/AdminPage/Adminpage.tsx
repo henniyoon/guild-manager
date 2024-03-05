@@ -67,7 +67,7 @@ const Adminpage: React.FC = () => {
   const [serverDataLength, setServerDataLength] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 토큰이 변경될 때마다 localStorage에 반영
+// 토큰이 변경될 때마다 localStorage에 반영
 useEffect(() => {
   localStorage.setItem("token", token || "");
 }, [token]);

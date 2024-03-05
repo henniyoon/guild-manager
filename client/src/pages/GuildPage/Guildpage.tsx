@@ -3,6 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, Grid, Typography, Card, CardContent, TextField } from '@mui/material';
 import styles from './styles/Guildpage.module.css';
 
+interface UserInfo {
+  username: string;
+  email: string;
+  guildName: string;
+  worldName: string;
+  role: string;
+}
+
 interface GuildData {
   id: number;
   master_name: string;
@@ -22,12 +30,19 @@ interface CharacterData {
 }
 
 const Guildpage: React.FC = () => {
+  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const { worldName, guildName } = useParams();
   const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [characterData, setCharacterData] = useState<CharacterData[] | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredCharacterData, setFilteredCharacterData] = useState<CharacterData[] | null>(null);
   const navigate = useNavigate();
+
+  // 토큰이 변경될 때마다 localStorage에 반영
+  useEffect(() => {
+    localStorage.setItem("token", token || ""); // 또는 null 대신에 기본값으로 빈 문자열을 사용할 수 있습니다.
+  }, [token]);
 
   useEffect(() => {
     const fetchGuildData = async () => {
@@ -83,8 +98,46 @@ const Guildpage: React.FC = () => {
     }
   }, [searchQuery, characterData]);
 
-  const AdminButtonClick = () => {
-    navigate(`/Adminpage/${worldName}/${guildName}`);
+  const fetchUserInfo = async () => {
+    try {
+      const currentToken = localStorage.getItem("token");
+
+      const response = await fetch("/myInfo", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data; // 데이터 반환
+    } catch (error) {
+      console.error("데이터를 불러오는 데 실패했습니다:", error);
+    }
+  };
+
+  const AdminButtonClick = async() => {
+    try {
+      const userInfo = await fetchUserInfo(); // fetchUserInfo가 완료될 때까지 대기
+    
+      if (!userInfo) {
+        alert("로그인이 필요합니다");
+      } else if (
+        userInfo.guildName == guildName &&
+        userInfo.worldName == worldName &&
+        (userInfo.role == "부마스터" || userInfo.role == "마스터")
+      ) {
+        navigate("/Adminpage", { state: { userInfo: userInfo } });
+      } else {
+        alert("해당 길드의 관리자가 아닙니다.");
+      }
+    } catch (error) {
+      
+    }
   };
 
   const handleMemberClick = (character: CharacterData) => {
