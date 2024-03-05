@@ -83,6 +83,10 @@ const Adminpage: React.FC = () => {
   const [weeklyScoreTotal, setWeeklyScoreTotal] = useState(0);
   const [suroScoreTotal, setSuroScoreTotal] = useState(0);
   const [flagScoreTotal, setFlagScoreTotal] = useState(0);
+  const [isHidden, setIsHidden] = useState(false);
+  const toggleDisplay = () => {
+    setIsHidden(!isHidden);
+  };
 
   // 토큰이 변경될 때마다 localStorage에 반영
   useEffect(() => {
@@ -750,6 +754,9 @@ const Adminpage: React.FC = () => {
             ref={fileInputRef} // React Ref 사용
           />
         </>
+        <button className={styles.buttonStyle} onClick={toggleDisplay}>
+          {isHidden ? '본캐릭명 보이기' : '본캐릭명 숨기기'}
+        </button>
         <button
           className={styles.buttonStyle}
           onClick={handleSelectOrDeselectAll}
@@ -788,7 +795,7 @@ const Adminpage: React.FC = () => {
               닉네임
             </th>
             <th
-              className={styles.th1}
+              className={`${styles.th1} ${isHidden ? styles.hidden : ''}`}
               onClick={() => sortData("main_character_name")}
             >
               본캐릭명
@@ -819,43 +826,9 @@ const Adminpage: React.FC = () => {
                 <>
                   <td className={styles.td1}>
                     {row.character_name}
-                    {/* {row.character_name === "" ? (
-                      row.character_name
-                    ) : (
-                      <input
-                        title="character_name"
-                        className={styles.editInput}
-                        type="text"
-                        defaultValue={row.character_name}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "character_name",
-                            e.target.value
-                          )
-                        }
-                      />
-                    )} */}
                   </td>
-                  <td className={styles.td1}>
+                  <td className={`${styles.th1} ${isHidden ? styles.hidden : ''}`}>
                     {row.main_character_name}
-                    {/* {row.main_character_name === "" ? (
-                      row.main_character_name
-                    ) : (
-                      <input
-                        title="main_character_name"
-                        className={styles.editInput}
-                        type="text"
-                        defaultValue={row.main_character_name}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            "main_character_name",
-                            e.target.value
-                          )
-                        }
-                      />
-                    )} */}
                   </td>
                   <td className={styles.td2}>
                     <input
@@ -914,7 +887,7 @@ const Adminpage: React.FC = () => {
                 // 비편집 모드에서의 행 렌더링
                 <>
                   <td className={styles.td1}>{row.character_name}</td>
-                  <td className={styles.td1}>{row.main_character_name}</td>
+                  <td className={`${styles.th1} ${isHidden ? styles.hidden : ''}`}>{row.main_character_name}</td>
                   <td className={styles.td2}>{row.weekly_score}</td>
                   <td className={styles.td3}>{row.suro_score.toLocaleString()}</td>
                   <td className={styles.td4}>{row.flag_score}</td>

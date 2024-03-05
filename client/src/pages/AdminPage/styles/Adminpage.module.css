@@ -204,3 +204,7 @@ th {
 .titleBlank {
   width: 10px;
 }
+
+.hidden {
+  display: none;
+}
