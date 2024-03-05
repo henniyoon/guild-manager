@@ -45,6 +45,7 @@ interface Filter {
 }
 
 interface Filters {
+  character_name: string;
   suro_score: Filter;
   flag_score: Filter;
   logical_operator: string;
@@ -52,6 +53,7 @@ interface Filters {
 
 // 초기 상태 정의
 const initialFilters: Filters = {
+  character_name: "",
   suro_score: { value: 0, operator: "min" },
   flag_score: { value: 0, operator: "min" },
   logical_operator: "and",
@@ -72,7 +74,7 @@ const Adminpage: React.FC = () => {
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [filters, setFilters] = useState<Filters>(initialFilters);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  // const [searchQuery, setSearchQuery] = useState<string>('');
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
@@ -174,7 +176,6 @@ const Adminpage: React.FC = () => {
   useEffect(() => {
     fetchTableData();
   }, [selectedDate]);
-
 
   // 편집 모드 전환 함수
   const toggleEditMode = () => {
@@ -480,14 +481,14 @@ const Adminpage: React.FC = () => {
     setFilters(initialFilters);
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
   const getFilteredRowIds = () => {
     return tableData.filter((row) => {
+      const characterName = filters.character_name.toLowerCase(); // 대소문자 구분 없애기 위해 소문자로 변경
       const suroScore = filters.suro_score.value;
       const flagScore = filters.flag_score.value;
+
+      const characterNameCondition =
+        characterName === "" || row.character_name.toLowerCase().includes(characterName);
 
       const suroCondition =
         suroScore === undefined ||
@@ -501,9 +502,9 @@ const Adminpage: React.FC = () => {
           : row.flag_score >= flagScore);
 
       if (filters.logical_operator === "and") {
-        return suroCondition && flagCondition;
+        return suroCondition && flagCondition && characterNameCondition;
       } else {
-        return suroCondition || flagCondition;
+        return suroCondition || flagCondition && characterNameCondition;
       }
     });
   };
@@ -555,71 +556,79 @@ const Adminpage: React.FC = () => {
 
   return (
     <div>
-      <div className={styles.titleContainer}>
-        <div className={styles.titleBlank}></div>
-        <div className={styles.titleH1}>
-          <h1>관리자 페이지</h1>
-          <div>
-            <IconButton onClick={() => setIsModalOpen(true)} title="info">
-              <InfoIcon />
-            </IconButton>
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-              <HomePageInstructions />
-            </Modal>
-          </div>
-        </div>
-        <SelectWeek
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-        />
-      </div>
-
       {guildData && (
         <Grid container spacing={0} alignItems="center">
-          <Grid item>
-            <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
-          </Grid>
-          <Grid item style={{ marginLeft: 5 }}>
-            <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
-          </Grid>
-          <Grid item style={{ marginLeft: 10 }}>
-            <Typography variant="body1" style={{ fontSize: '14px' }}>{worldName}</Typography>
+          <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
+            <div>
+              <div>
+                <Typography variant="body1" style={{ fontSize: '14px', marginLeft: 20 }}>{worldName}</Typography>
+              </div>
+              <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
+                <Grid item>
+                  <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
+                </Grid>
+                <Grid item style={{ marginLeft: 5 }}>
+                  <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
+                </Grid>
+                <Grid item style={{ marginLeft: 10 }}>
+                  <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                    관리자 페이지
+                    <IconButton onClick={() => setIsModalOpen(true)} title="info">
+                      <InfoIcon />
+                    </IconButton>
+                  </Typography>
+                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <HomePageInstructions />
+                  </Modal>
+                </Grid>
+                <Grid item>
+                  <SelectWeek
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                  />
+                </Grid>
+              </Grid>
+            </div>
           </Grid>
 
-          <Grid item xs={12} md={12} container>
+          <Grid item xs={12} md={12} container style={{ marginBottom: 10 }}>
             {/* 마스터, 길드원, 노블 정보 */}
-            <Grid item xs={4} md={4}>
+            <Grid item xs={2} md={2}>
               <Typography variant="body1">마스터: {guildData.master_name}</Typography>
               <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
               <Typography variant="body1">노블: {guildData.noblesse_skill_level}</Typography>
             </Grid>
-
             {/* 주간 미션 포인트, 지하 수로 점수, 플래그 레이스 점수 정보 */}
-            <Grid item xs={4} md={4}>
+            <Grid item xs={3} md={3}>
               <Typography variant="body1">주간 미션: {weeklyScoreTotal.toLocaleString()}점</Typography>
               <Typography variant="body1">지하 수로: {suroScoreTotal.toLocaleString()}점</Typography>
               <Typography variant="body1">플래그 레이스: {flagScoreTotal.toLocaleString()}점</Typography>
             </Grid>
           </Grid>
-          {/* <TextField
-            type="text"
-            placeholder="길드원 검색"
-            value={searchQuery}
-            style={{ marginTop: '10px', marginBottom: '10px' }}
-            size="small"
-            onChange={handleSearchChange}
-          /> */}
         </Grid>
-      )
-      }
+      )}
 
       {/* 필터링 조건을 입력받는 UI 구성 */}
+      <TextField
+        type="text"
+        label="길드원 검색"
+        value={filters.character_name}
+        style={{ marginTop: '10px', marginBottom: '10px' }}
+        size="small"
+        onChange={(e) =>
+          setFilters({
+            ...filters,
+            character_name: e.target.value
+          })
+        }
+      />
       <div style={{ display: "flex", marginTop: "30px", justifyContent: "center" }}>
         <div>
           <TextField
             label="수로 점수"
             variant="outlined"
             style={{ marginRight: "5px" }}
+            size="small"
             value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
@@ -633,6 +642,7 @@ const Adminpage: React.FC = () => {
           />
           <Select
             style={{ marginRight: "5px" }}
+            size="small"
             value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
@@ -649,6 +659,7 @@ const Adminpage: React.FC = () => {
         <div>
           <Select
             style={{ marginRight: "5px", width: "110px" }}
+            size="small"
             value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
@@ -665,6 +676,7 @@ const Adminpage: React.FC = () => {
         <div>
           <TextField
             style={{ marginRight: "5px" }}
+            size="small"
             label="플래그 점수"
             variant="outlined"
             value={filters.flag_score.value}
@@ -680,6 +692,7 @@ const Adminpage: React.FC = () => {
           />
           <Select
             style={{ marginRight: "20px" }}
+            size="small"
             value={filters.flag_score.operator}
             onChange={(e) =>
               setFilters({
@@ -692,7 +705,7 @@ const Adminpage: React.FC = () => {
             <MenuItem value="max">이하</MenuItem>
           </Select>
         </div>
-        <Button variant="contained" onClick={handleReset}>
+        <Button variant="contained" size="small" onClick={handleReset}>
           초기화
         </Button>
       </div>
