@@ -29,6 +29,7 @@ interface TableRowData {
   id: number;
   character_id: number;
   character_name: string;
+  main_character_name: string;
   weekly_score: number;
   suro_score: number;
   flag_score: number;
@@ -137,9 +138,8 @@ const Adminpage: React.FC = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
       const data = await response.json();
-      console.log("userInfo: ", data);
+
       setUserInfo(data);
 
       // 두 번째 API 호출
@@ -157,6 +157,8 @@ const Adminpage: React.FC = () => {
       }
 
       const secondData = await secondResponse.json();
+      console.log("secondData: ", secondData);
+
       const sortedData = secondData.sort(
         (a: { character_name: number }, b: { character_name: number }) => {
           if (a.character_name < b.character_name) return -1;
@@ -349,6 +351,7 @@ const Adminpage: React.FC = () => {
         id: Math.max(...newData.map((row) => row.id)) + 1 + addedCount, // 고유한 ID 생성
         character_id: 0,
         character_name: "",
+        main_character_name: "",
         weekly_score: 0,
         suro_score: 0,
         flag_score: 0,
@@ -456,6 +459,7 @@ const Adminpage: React.FC = () => {
       id: number;
       character_id: number;
       character_name: string;
+      main_character_name: string;
       noble_limit: boolean;
     }[]
   ) => {
@@ -500,7 +504,7 @@ const Adminpage: React.FC = () => {
         (filters.flag_score.operator === "max"
           ? row.flag_score <= flagScore
           : row.flag_score >= flagScore);
-      
+
       if (filters.logical_operator === "and") {
         return (suroCondition && flagCondition) && characterNameCondition;
       } else {
@@ -781,6 +785,12 @@ const Adminpage: React.FC = () => {
             >
               닉네임
             </th>
+            <th
+              className={styles.th1}
+              onClick={() => sortData("main_character_name")}
+            >
+              본캐릭명
+            </th>
             <th className={styles.th2} onClick={() => sortData("weekly_score")}>
               주간점수
             </th>
@@ -818,6 +828,25 @@ const Adminpage: React.FC = () => {
                           handleInputChange(
                             row.id,
                             "character_name",
+                            e.target.value
+                          )
+                        }
+                      />
+                    )}
+                  </td>
+                  <td className={styles.td1}>
+                    {row.main_character_name === "" ? (
+                      row.main_character_name
+                    ) : (
+                      <input
+                        title="main_character_name"
+                        className={styles.editInput}
+                        type="text"
+                        defaultValue={row.main_character_name}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            "main_character_name",
                             e.target.value
                           )
                         }
@@ -881,9 +910,10 @@ const Adminpage: React.FC = () => {
                 // 비편집 모드에서의 행 렌더링
                 <>
                   <td className={styles.td1}>{row.character_name}</td>
+                  <td className={styles.td1}>{row.main_character_name}</td>
                   <td className={styles.td2}>{row.weekly_score}</td>
-                  <td className={styles.td3}>{row.suro_score}</td>
-                  <td className={styles.td4}>{row.flag_score}</td>
+                  <td className={styles.td3}>{row.suro_score.toLocaleString()}</td>
+                  <td className={styles.td4}>{row.flag_score.toLocaleString()}</td>
                   <td className={styles.td5}>
                     {row.noble_limit ? "🔴" : "🟢"}
                   </td>
