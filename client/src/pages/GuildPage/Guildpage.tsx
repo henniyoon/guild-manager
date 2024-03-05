@@ -131,7 +131,7 @@ const Guildpage: React.FC = () => {
         userInfo.worldName == worldName &&
         (userInfo.role == "부마스터" || userInfo.role == "마스터")
       ) {
-        navigate("/Adminpage", { state: { userInfo: userInfo } });
+        navigate(`/Adminpage/${worldName}/${guildName}`);
       } else {
         alert("해당 길드의 관리자가 아닙니다.");
       }

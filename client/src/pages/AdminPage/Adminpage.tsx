@@ -3,7 +3,7 @@ import styles from "./styles/Adminpage.module.css";
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
+import { Grid, Typography, TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
@@ -14,6 +14,15 @@ interface UserInfo {
   guildName: string;
   worldName: string;
   role: string;
+}
+
+interface GuildData {
+  id: number;
+  master_name: string;
+  member_count: number;
+  level: number;
+  noblesse_skill_level: number;
+  guild_mark_custom: string;
 }
 
 interface TableRowData {
@@ -36,6 +45,7 @@ interface Filter {
 }
 
 interface Filters {
+  character_name: string;
   suro_score: Filter;
   flag_score: Filter;
   logical_operator: string;
@@ -43,6 +53,7 @@ interface Filters {
 
 // 초기 상태 정의
 const initialFilters: Filters = {
+  character_name: "",
   suro_score: { value: 0, operator: "min" },
   flag_score: { value: 0, operator: "min" },
   logical_operator: "and",
@@ -51,6 +62,7 @@ const initialFilters: Filters = {
 const Adminpage: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [guildData, setGuildData] = useState<GuildData | null>(null);
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
@@ -62,73 +74,108 @@ const Adminpage: React.FC = () => {
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [filters, setFilters] = useState<Filters>(initialFilters);
+  // const [searchQuery, setSearchQuery] = useState<string>('');
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [weeklyScoreTotal, setWeeklyScoreTotal] = useState(0);
+  const [suroScoreTotal, setSuroScoreTotal] = useState(0);
+  const [flagScoreTotal, setFlagScoreTotal] = useState(0);
 
-// 토큰이 변경될 때마다 localStorage에 반영
-useEffect(() => {
-  localStorage.setItem("token", token || "");
-}, [token]);
+  // 토큰이 변경될 때마다 localStorage에 반영
+  useEffect(() => {
+    localStorage.setItem("token", token || "");
+  }, [token]);
 
-// 데이터를 불러오는 함수
-const fetchTableData = async () => {
-  try {
-    const currentToken = localStorage.getItem("token");
+  // tableData가 변경될 때마다 useEffect 실행
+  useEffect(() => {
+    // 각 점수의 합을 계산하여 상태 업데이트
+    const newWeeklyScoreTotal = tableData.reduce((total, rowData) => total + rowData.weekly_score, 0);
+    const newSuroScoreTotal = tableData.reduce((total, rowData) => total + rowData.suro_score, 0);
+    const newFlagScoreTotal = tableData.reduce((total, rowData) => total + rowData.flag_score, 0);
 
-    // 첫 번째 API 호출
-    const response = await fetch("/myInfo", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${currentToken}`,
-        "Content-Type": "application/json",
-      },
-    });
+    setWeeklyScoreTotal(newWeeklyScoreTotal);
+    setSuroScoreTotal(newSuroScoreTotal);
+    setFlagScoreTotal(newFlagScoreTotal);
+  }, [tableData]);  // tableData가 변경될 때만 useEffect가 실행
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+  useEffect(() => {
+    const fetchGuildData = async () => {
+      try {
+        const response = await fetch(`/Guild/${worldName}/${guildName}`);
 
-    const data = await response.json();
-    console.log("userInfo: ", data);
-    setUserInfo(data);
-
-    // 두 번째 API 호출
-    const url = `/records?week=${encodeURIComponent(selectedDate)}`;
-    const secondResponse = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Info": encodeURIComponent(JSON.stringify(data)),
-      },
-    });
-
-    if (!secondResponse.ok) {
-      throw new Error(`HTTP error! Status: ${secondResponse.status}`);
-    }
-
-    const secondData = await secondResponse.json();
-    const sortedData = secondData.sort(
-      (a: { character_name: number }, b: { character_name: number }) => {
-        if (a.character_name < b.character_name) return -1;
-        if (a.character_name > b.character_name) return 1;
-        return 0;
+        if (response.ok) {
+          const data = await response.json();
+          console.log('서버로부터 받은 데이터:', data);
+          setGuildData(data);
+        } else {
+          console.error('서버에서 에러 응답 받음:', response.status);
+        }
+      } catch (error) {
+        console.error('데이터 가져오기 중 오류 발생:', error);
       }
-    );
+    };
 
-    setTableData(sortedData);
-    setEditedData(sortedData);
-  } catch (error) {
-    console.error("데이터를 불러오는 데 실패했습니다:", error);
-    alert("해당 길드의 관리자가 아닙니다.");
-  }
-};
+    fetchGuildData();
+  }, [worldName, guildName]);
 
-useEffect(() => {
-  fetchTableData();
-}, [selectedDate]);
+  // 데이터를 불러오는 함수
+  const fetchTableData = async () => {
+    try {
+      const currentToken = localStorage.getItem("token");
 
+      // 첫 번째 API 호출
+      const response = await fetch("/myInfo", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("userInfo: ", data);
+      setUserInfo(data);
+
+      // 두 번째 API 호출
+      const url = `/records?week=${encodeURIComponent(selectedDate)}`;
+      const secondResponse = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Info": encodeURIComponent(JSON.stringify(data)),
+        },
+      });
+
+      if (!secondResponse.ok) {
+        throw new Error(`HTTP error! Status: ${secondResponse.status}`);
+      }
+
+      const secondData = await secondResponse.json();
+      const sortedData = secondData.sort(
+        (a: { character_name: number }, b: { character_name: number }) => {
+          if (a.character_name < b.character_name) return -1;
+          if (a.character_name > b.character_name) return 1;
+          return 0;
+        }
+      );
+
+      setTableData(sortedData);
+      setEditedData(sortedData);
+    } catch (error) {
+      console.error("데이터를 불러오는 데 실패했습니다:", error);
+      alert("해당 길드의 관리자가 아닙니다.");
+    }
+  };
+
+  useEffect(() => {
+    fetchTableData();
+  }, [selectedDate]);
 
   // 편집 모드 전환 함수
   const toggleEditMode = () => {
@@ -143,15 +190,15 @@ useEffect(() => {
     // noble_limit 필드에 대한 처리 추가
     const parsedValue =
       field === "character_id" ||
-      field === "weekly_score" ||
-      field === "suro_score" ||
-      field === "flag_score"
+        field === "weekly_score" ||
+        field === "suro_score" ||
+        field === "flag_score"
         ? parseInt(value as string, 10)
         : field === "noble_limit" // nobel_limit 필드일 경우
-        ? value === true || value === "true"
-          ? 1
-          : 0 // true이면 1, 아니면 0으로 변환
-        : value; // 나머지 경우는 그대로 값 유지
+          ? value === true || value === "true"
+            ? 1
+            : 0 // true이면 1, 아니면 0으로 변환
+          : value; // 나머지 경우는 그대로 값 유지
 
     setEditedData((editedData) =>
       editedData.map((row) =>
@@ -236,7 +283,7 @@ useEffect(() => {
     setSortConfig((currentSortConfig) => {
       const newDirection =
         currentSortConfig.key === key &&
-        currentSortConfig.direction === "ascending"
+          currentSortConfig.direction === "ascending"
           ? "descending"
           : "ascending";
       const sortedData = [...tableData].sort((a, b) => {
@@ -365,6 +412,14 @@ useEffect(() => {
       });
   };
 
+  // 문자열을 숫자로 변환하는 함수
+  const convertToNumber = (value: string | undefined): number | undefined => {
+    if (!value) return undefined;
+
+    const parsedValue = parseFloat(value);
+    return isNaN(parsedValue) ? 0 : parsedValue;
+  };
+
   // OCR 결과를 테이블 데이터에 반영하고, 서버로 전송하는 함수
   const updateTableDataWithOcrResults = (ocrData: {
     flag_score_Area?: never[] | undefined;
@@ -380,9 +435,9 @@ useEffect(() => {
     // 새로운 테이블 데이터를 생성합니다.
     const newTableData = tableData.map((row, index) => ({
       ...row,
-      weekly_score: weekly_score_Area[index] ?? row.weekly_score,
-      suro_score: suro_score_Area[index] ?? row.suro_score,
-      flag_score: flag_score_Area[index] ?? row.flag_score,
+      weekly_score: convertToNumber(weekly_score_Area[index]) ?? row.weekly_score,
+      suro_score: convertToNumber(suro_score_Area[index]) ?? row.suro_score,
+      flag_score: convertToNumber(flag_score_Area[index]) ?? row.flag_score,
     }));
 
     // 상태를 업데이트합니다.
@@ -395,9 +450,9 @@ useEffect(() => {
   // 모든 데이터를 서버로 전송하는 함수
   const sendAllDataToServer = (
     updatedData: {
-      weekly_score: any;
-      suro_score: any;
-      flag_score: any;
+      weekly_score: number;
+      suro_score: number;
+      flag_score: number;
       id: number;
       character_id: number;
       character_name: string;
@@ -428,8 +483,12 @@ useEffect(() => {
 
   const getFilteredRowIds = () => {
     return tableData.filter((row) => {
+      const characterName = filters.character_name.toLowerCase(); // 대소문자 구분 없애기 위해 소문자로 변경
       const suroScore = filters.suro_score.value;
       const flagScore = filters.flag_score.value;
+
+      const characterNameCondition =
+        characterName === "" || row.character_name.toLowerCase().includes(characterName);
 
       const suroCondition =
         suroScore === undefined ||
@@ -443,9 +502,9 @@ useEffect(() => {
           : row.flag_score >= flagScore);
 
       if (filters.logical_operator === "and") {
-        return suroCondition && flagCondition;
+        return suroCondition && flagCondition && characterNameCondition;
       } else {
-        return suroCondition || flagCondition;
+        return suroCondition || flagCondition && characterNameCondition;
       }
     });
   };
@@ -497,32 +556,79 @@ useEffect(() => {
 
   return (
     <div>
-      <div className={styles.titleContainer}>
-      <div className={styles.titleBlank}></div>
-        <div className={styles.titleH1}>
-          <h1>관리자 페이지</h1>
-          <div>
-            <IconButton onClick={() => setIsModalOpen(true)} title="info">
-              <InfoIcon />
-            </IconButton>
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-              <HomePageInstructions />
-            </Modal>
-          </div>
-        </div>
-        <SelectWeek
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-        />
-      </div>
+      {guildData && (
+        <Grid container spacing={0} alignItems="center">
+          <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
+            <div>
+              <div>
+                <Typography variant="body1" style={{ fontSize: '14px', marginLeft: 20 }}>{worldName}</Typography>
+              </div>
+              <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
+                <Grid item>
+                  <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
+                </Grid>
+                <Grid item style={{ marginLeft: 5 }}>
+                  <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
+                </Grid>
+                <Grid item style={{ marginLeft: 10 }}>
+                  <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                    관리자 페이지
+                    <IconButton onClick={() => setIsModalOpen(true)} title="info">
+                      <InfoIcon />
+                    </IconButton>
+                  </Typography>
+                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <HomePageInstructions />
+                  </Modal>
+                </Grid>
+                <Grid item>
+                  <SelectWeek
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                  />
+                </Grid>
+              </Grid>
+            </div>
+          </Grid>
+
+          <Grid item xs={12} md={12} container style={{ marginBottom: 10 }}>
+            {/* 마스터, 길드원, 노블 정보 */}
+            <Grid item xs={2} md={2}>
+              <Typography variant="body1">마스터: {guildData.master_name}</Typography>
+              <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
+              <Typography variant="body1">노블: {guildData.noblesse_skill_level}</Typography>
+            </Grid>
+            {/* 주간 미션 포인트, 지하 수로 점수, 플래그 레이스 점수 정보 */}
+            <Grid item xs={3} md={3}>
+              <Typography variant="body1">주간 미션: {weeklyScoreTotal.toLocaleString()}점</Typography>
+              <Typography variant="body1">지하 수로: {suroScoreTotal.toLocaleString()}점</Typography>
+              <Typography variant="body1">플래그 레이스: {flagScoreTotal.toLocaleString()}점</Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      )}
 
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <div style={{ display: "flex", marginTop: "30px", justifyContent: "center"}}>
+      <div style={{ display: "flex", marginTop: "30px", justifyContent: "center" }}>
         <div>
+          <TextField
+            label="닉네임"
+            variant="outlined"
+            style={{ marginRight: "5px" }}
+            size="small"
+            value={filters.character_name}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                character_name: e.target.value
+              })
+            }
+          />
           <TextField
             label="수로 점수"
             variant="outlined"
             style={{ marginRight: "5px" }}
+            size="small"
             value={filters.suro_score.value}
             onChange={(e) =>
               setFilters({
@@ -536,6 +642,7 @@ useEffect(() => {
           />
           <Select
             style={{ marginRight: "5px" }}
+            size="small"
             value={filters.suro_score.operator}
             onChange={(e) =>
               setFilters({
@@ -551,7 +658,8 @@ useEffect(() => {
 
         <div>
           <Select
-            style={{ marginRight: "5px", width: "110px"}}
+            style={{ marginRight: "5px", width: "110px" }}
+            size="small"
             value={filters.logical_operator}
             onChange={(e) =>
               setFilters({
@@ -568,6 +676,7 @@ useEffect(() => {
         <div>
           <TextField
             style={{ marginRight: "5px" }}
+            size="small"
             label="플래그 점수"
             variant="outlined"
             value={filters.flag_score.value}
@@ -583,6 +692,7 @@ useEffect(() => {
           />
           <Select
             style={{ marginRight: "20px" }}
+            size="small"
             value={filters.flag_score.operator}
             onChange={(e) =>
               setFilters({
@@ -595,7 +705,7 @@ useEffect(() => {
             <MenuItem value="max">이하</MenuItem>
           </Select>
         </div>
-        <Button variant="contained" onClick={handleReset}>
+        <Button variant="contained" size="small" onClick={handleReset}>
           초기화
         </Button>
       </div>
@@ -690,9 +800,8 @@ useEffect(() => {
             <tr
               key={row.id}
               onClick={() => handleRowClick(row.id)}
-              className={`${styles.rowClickable} ${
-                selectedRowIds.includes(row.id) ? styles.rowSelected : ""
-              } ${index % 17 === 16 ? styles.row_17th : ""}`}
+              className={`${styles.rowClickable} ${selectedRowIds.includes(row.id) ? styles.rowSelected : ""
+                } ${index % 17 === 16 ? styles.row_17th : ""}`}
             >
               {isEditMode ? (
                 <>
@@ -784,7 +893,7 @@ useEffect(() => {
           ))}
         </tbody>
       </table>
-    </div>
+    </div >
   );
 };
 
