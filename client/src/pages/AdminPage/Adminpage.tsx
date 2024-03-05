@@ -492,7 +492,9 @@ const Adminpage: React.FC = () => {
       const flagScore = filters.flag_score.value;
 
       const characterNameCondition =
-        characterName === "" || row.character_name.toLowerCase().includes(characterName);
+        characterName === "" ||
+        row.character_name.toLowerCase().includes(characterName) ||
+        (row.main_character_name && row.main_character_name.toLowerCase().includes(characterName));
 
       const suroCondition =
         suroScore === undefined ||
@@ -816,7 +818,8 @@ const Adminpage: React.FC = () => {
               {isEditMode ? (
                 <>
                   <td className={styles.td1}>
-                    {row.character_name === "" ? (
+                    {row.character_name}
+                    {/* {row.character_name === "" ? (
                       row.character_name
                     ) : (
                       <input
@@ -832,10 +835,11 @@ const Adminpage: React.FC = () => {
                           )
                         }
                       />
-                    )}
+                    )} */}
                   </td>
                   <td className={styles.td1}>
-                    {row.main_character_name === "" ? (
+                    {row.main_character_name}
+                    {/* {row.main_character_name === "" ? (
                       row.main_character_name
                     ) : (
                       <input
@@ -851,7 +855,7 @@ const Adminpage: React.FC = () => {
                           )
                         }
                       />
-                    )}
+                    )} */}
                   </td>
                   <td className={styles.td2}>
                     <input
@@ -913,7 +917,7 @@ const Adminpage: React.FC = () => {
                   <td className={styles.td1}>{row.main_character_name}</td>
                   <td className={styles.td2}>{row.weekly_score}</td>
                   <td className={styles.td3}>{row.suro_score.toLocaleString()}</td>
-                  <td className={styles.td4}>{row.flag_score.toLocaleString()}</td>
+                  <td className={styles.td4}>{row.flag_score}</td>
                   <td className={styles.td5}>
                     {row.noble_limit ? "🔴" : "🟢"}
                   </td>
