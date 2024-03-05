@@ -46,6 +46,7 @@ const getRecordsController = async (req, res) => {
         return records.map((record) => ({
           ...record.toJSON(),
           character_name: character.name,
+          main_character_name: character.main_character_name,
         }));
       })
     );
