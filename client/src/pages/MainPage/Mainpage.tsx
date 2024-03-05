@@ -1,10 +1,8 @@
 import React, { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Grid } from "@mui/material";
+import { Grid, CircularProgress, IconButton } from "@mui/material";
 import SelectServer from "./components/SelectServer";
 import InputBox from "./components/InputBox";
-import InputBase from "@mui/material/InputBase";
-import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import styles from "./styles/Mainpage.module.css";
 
@@ -12,11 +10,15 @@ const Mainpage = () => {
   const navigate = useNavigate();
   const [worldName, setSelectedServer] = useState("스카니아");
   const [guildName, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleButtonClick = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
+      // 로딩 시작
+      setIsLoading(true);
+
       // 서버에 데이터를 전송하는 fetch 사용
       await fetch(
         `/GuildPage/${encodeURIComponent(worldName)}/${encodeURIComponent(
@@ -35,6 +37,9 @@ const Mainpage = () => {
         }
       );
 
+      // 로딩 종료
+      setIsLoading(false);
+
       // 성공적으로 요청이 완료되면 페이지 이동
       navigate(
         `/GuildPage/${encodeURIComponent(worldName)}/${encodeURIComponent(
@@ -44,6 +49,9 @@ const Mainpage = () => {
     } catch (error) {
       // 에러 처리
       console.error("Error submitting data:", error);
+
+      // 에러가 발생한 경우에도 로딩 종료
+      setIsLoading(false);
     }
   };
 
@@ -72,9 +80,14 @@ const Mainpage = () => {
               </IconButton>
             </Grid>
           </Grid>
+          <div className={styles.caution}>⚠️매일 API 갱신 후 첫 접속은 오래 걸릴 수 있습니다.</div>
+          {isLoading && (
+            <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              <CircularProgress />
+            </div>
+          )}
         </form>
       </div>
-      <div className={styles.caution}>⚠️매일 API 갱신 후 첫 접속은 오래 걸릴 수 있습니다.</div>
     </div>
   );
 };
