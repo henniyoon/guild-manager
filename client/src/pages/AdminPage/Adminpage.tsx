@@ -609,21 +609,21 @@ const Adminpage: React.FC = () => {
       )}
 
       {/* 필터링 조건을 입력받는 UI 구성 */}
-      <TextField
-        type="text"
-        label="길드원 검색"
-        value={filters.character_name}
-        style={{ marginTop: '10px', marginBottom: '10px' }}
-        size="small"
-        onChange={(e) =>
-          setFilters({
-            ...filters,
-            character_name: e.target.value
-          })
-        }
-      />
       <div style={{ display: "flex", marginTop: "30px", justifyContent: "center" }}>
         <div>
+          <TextField
+            label="닉네임"
+            variant="outlined"
+            style={{ marginRight: "5px" }}
+            size="small"
+            value={filters.character_name}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                character_name: e.target.value
+              })
+            }
+          />
           <TextField
             label="수로 점수"
             variant="outlined"
