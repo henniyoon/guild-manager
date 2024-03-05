@@ -1,7 +1,6 @@
 const GuildService = require('../services/guildService.js');
 const CharacterService = require('../services/characterService.js');
 const RecordService = require('../services/recordService.js');
-const AuthService = require('../services/authService.js');
 
 const getRecordsController = async (req, res) => {
   const week = req.query.week;
