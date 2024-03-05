@@ -500,11 +500,11 @@ const Adminpage: React.FC = () => {
         (filters.flag_score.operator === "max"
           ? row.flag_score <= flagScore
           : row.flag_score >= flagScore);
-
+      
       if (filters.logical_operator === "and") {
-        return suroCondition && flagCondition && characterNameCondition;
+        return (suroCondition && flagCondition) && characterNameCondition;
       } else {
-        return suroCondition || flagCondition && characterNameCondition;
+        return (suroCondition || flagCondition) && characterNameCondition;
       }
     });
   };
