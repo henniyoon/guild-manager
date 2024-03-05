@@ -25,7 +25,7 @@ const App: React.FC = () => {
           />
           <Route path="/Graphpage/:memberName" element={<Graphpage />} />
           <Route
-            path="/Adminpage"
+            path="/Adminpage/:worldName/:guildName"
             element={<Adminpage />}
           />
           <Route path="/Login" element={<Loginpage />} />
