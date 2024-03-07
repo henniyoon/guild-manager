@@ -8,7 +8,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
-import { Modal } from '@mui/material';
+import { Button, Dialog, DialogTitle } from '@mui/material';
+import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
@@ -87,7 +88,7 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
     const [minDate, setMinDate] = useState(dayjs());
     const [maxDate, setMaxDate] = useState(dayjs());
     const [hoveredDay, setHoveredDay] = useState<Dayjs | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // 추가
+    const [isCalendarOpen, setCalendarOpen] = useState(false);
 
     useEffect(() => {
         const today = dayjs();
@@ -98,24 +99,28 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
         setMaxDate(next7Days);
     }, []);
 
+    const openCalendar = () => {
+        setCalendarOpen(true);
+    };
+
+    const closeCalendar = () => {
+        setCalendarOpen(false);
+    };
+
     return (
-        <div>
-            <button onClick={() => setIsModalOpen(true)}>Open Week Picker</button>
-            <Modal
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
+        <div style={{ marginLeft: '20px' }}>
+            <Button variant='outlined' style={{ textAlign: 'center' }} onClick={openCalendar}>
+                <CalendarMonthTwoToneIcon style={{ fontSize: '16px', marginRight: '5px' }}/>
+                {dayjs(selectedDate).year()}년 {dayjs(selectedDate).week()}주차
+            </Button>
+
+            <Dialog open={isCalendarOpen} onClose={closeCalendar}>
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={koLocale.name || 'ko'}>
                     <DateCalendar
                         value={selectedDate}
                         onChange={(newValue) => {
                             onDateChange(newValue);
-                            setIsModalOpen(false); // 날짜 선택 시 팝업 닫기
+                            closeCalendar();
                         }}
                         showDaysOutsideCurrentMonth
                         displayWeekNumber
@@ -131,12 +136,12 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
                         }}
                         maxDate={maxDate}
                         minDate={minDate}
-                        sx={{ maxWidth: '300px', width: '100%' }}
+                        sx={{ margin: '30px', marginBottom: '0px' }}
                     />
                 </LocalizationProvider>
-            </Modal>
+            </Dialog>
         </div>
     );
-}
+};
 
 export default WeekPicker;

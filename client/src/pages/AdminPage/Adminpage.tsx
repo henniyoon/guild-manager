@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { Grid, Typography, TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
+import { Grid, Box, Typography, TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
@@ -577,53 +577,58 @@ const Adminpage: React.FC = () => {
     <div>
       {guildData && (
         <Grid container spacing={0} alignItems="center">
-          <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
-            <div>
+          <div>
+            <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
               <div>
-                <Typography variant="body1" style={{ fontSize: '14px', marginLeft: 20 }}>{worldName}</Typography>
+                <div>
+                  <Typography variant="body1" style={{ fontSize: '14px', marginLeft: 20 }}>{worldName}</Typography>
+                </div>
+                <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
+                  <Grid item>
+                    <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
+                  </Grid>
+                  <Grid item style={{ marginLeft: 5 }}>
+                    <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
+                  </Grid>
+                  <Grid item style={{ marginLeft: 10 }}>
+                    <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                      관리자 페이지
+                      <IconButton onClick={() => setIsModalOpen(true)} title="info">
+                        <InfoIcon />
+                      </IconButton>
+                    </Typography>
+                    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                      <HomePageInstructions />
+                    </Modal>
+                  </Grid>
+                  <Grid item>
+                    <WeekPicker
+                      selectedDate={selectedDate}
+                      onDateChange={setSelectedDate}
+                    />
+                  </Grid>
+                </Grid>
               </div>
-              <Grid container spacing={0} alignItems="center" style={{ marginBottom: 10 }}>
-                <Grid item>
-                  <img src={`data:image/png;base64,${guildData.guild_mark_custom}`} width="34" height="34" alt="Guild Mark" />
-                </Grid>
-                <Grid item style={{ marginLeft: 5 }}>
-                  <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>{guildName}</Typography>
-                </Grid>
-                <Grid item style={{ marginLeft: 10 }}>
-                  <Typography variant="h4" style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                    관리자 페이지
-                    <IconButton onClick={() => setIsModalOpen(true)} title="info">
-                      <InfoIcon />
-                    </IconButton>
-                  </Typography>
-                  <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                    <HomePageInstructions />
-                  </Modal>
-                </Grid>
-                <Grid item>
-                  <WeekPicker
-                    selectedDate={selectedDate}
-                    onDateChange={setSelectedDate}
-                  />
-                </Grid>
-              </Grid>
-            </div>
-          </Grid>
+            </Grid>
 
-          <Grid item xs={12} md={12} container style={{ marginBottom: 10 }}>
-            {/* 마스터, 길드원, 노블 정보 */}
-            <Grid item xs={2} md={2}>
-              <Typography variant="body1">마스터: {guildData.master_name}</Typography>
-              <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
-              <Typography variant="body1">노블: {guildData.noblesse_skill_level}</Typography>
+            {/* 오른쪽 그리드 with WeekPicker */}
+            <Grid item xs={12} md={12} container style={{ marginBottom: 10, alignItems: 'center' }}>
+              {/* 마스터, 길드원, 노블 정보 */}
+              <Grid item xs={4} md={4}>
+                <Box borderRight={1} borderColor='gray.300'>
+                  <Typography variant="body1">마스터: {guildData.master_name}</Typography>
+                  <Typography variant="body1">길드원: {guildData.member_count}명</Typography>
+                  <Typography variant="body1">노블: {guildData.noblesse_skill_level}</Typography>
+                </Box>
+              </Grid>
+              {/* 주간 미션 포인트, 지하 수로 점수, 플래그 레이스 점수 정보 */}
+              <Grid item xs={7} md={7} style={{ marginLeft: '30px' }}>
+                <Typography variant="body1">주간 미션: {weeklyScoreTotal.toLocaleString()}점</Typography>
+                <Typography variant="body1">지하 수로: {suroScoreTotal.toLocaleString()}점</Typography>
+                <Typography variant="body1">플래그 레이스: {flagScoreTotal.toLocaleString()}점</Typography>
+              </Grid>
             </Grid>
-            {/* 주간 미션 포인트, 지하 수로 점수, 플래그 레이스 점수 정보 */}
-            <Grid item xs={3} md={3}>
-              <Typography variant="body1">주간 미션: {weeklyScoreTotal.toLocaleString()}점</Typography>
-              <Typography variant="body1">지하 수로: {suroScoreTotal.toLocaleString()}점</Typography>
-              <Typography variant="body1">플래그 레이스: {flagScoreTotal.toLocaleString()}점</Typography>
-            </Grid>
-          </Grid>
+          </div>
         </Grid>
       )}
 
