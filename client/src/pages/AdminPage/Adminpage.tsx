@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles/Adminpage.module.css";
+import dayjs, { Dayjs } from 'dayjs';
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
@@ -7,6 +8,7 @@ import { Grid, Typography, TextField, Select, MenuItem, Button, IconButton } fro
 import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
+import WeekPicker from "./components/WeekPicker";
 
 interface UserInfo {
   username: string;
@@ -67,7 +69,13 @@ const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>(getCurrentWeek());
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+  // selectedDate를 yyyy-WWW 형식으로 포맷팅하는 함수
+  const getFormattedDate = () => {
+    return selectedDate
+      ? `${selectedDate.year()}-W${selectedDate.week().toString().padStart(2, '0')}`
+      : '';
+  };
   const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
@@ -75,7 +83,6 @@ const Adminpage: React.FC = () => {
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [filters, setFilters] = useState<Filters>(initialFilters);
-  // const [searchQuery, setSearchQuery] = useState<string>('');
   const { worldName, guildName } = useParams();
   const [dataLength, setDataLength] = useState<number>(0);
   const [serverDataLength, setServerDataLength] = useState<number>(0);
@@ -147,7 +154,9 @@ const Adminpage: React.FC = () => {
       setUserInfo(data);
 
       // 두 번째 API 호출
-      const url = `/records?week=${encodeURIComponent(selectedDate)}`;
+      const url = `/records?week=${getFormattedDate()}`;
+
+
       const secondResponse = await fetch(url, {
         method: "GET",
         headers: {
@@ -312,7 +321,7 @@ const Adminpage: React.FC = () => {
         "Content-Type": "application/json",
         "User-Info": encodeURIComponent(JSON.stringify(userInfo)),
       },
-      body: JSON.stringify({ selectedDate: selectedDate }),
+      body: JSON.stringify({ selectedDate: getFormattedDate() }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -592,7 +601,7 @@ const Adminpage: React.FC = () => {
                   </Modal>
                 </Grid>
                 <Grid item>
-                  <SelectWeek
+                  <WeekPicker
                     selectedDate={selectedDate}
                     onDateChange={setSelectedDate}
                   />

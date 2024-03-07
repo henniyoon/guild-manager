@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import koLocale from 'dayjs/locale/ko';
-import updateLocale from 'dayjs/plugin/updateLocale'
+import updateLocale from 'dayjs/plugin/updateLocale';
 import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -10,10 +10,10 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 
 dayjs.extend(weekOfYear);
-dayjs.extend(updateLocale)
+dayjs.extend(updateLocale);
 dayjs.updateLocale('ko', {
     weekStart: 1,
-})
+});
 
 interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
     isSelected: boolean;
@@ -21,7 +21,7 @@ interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
 }
 
 const CustomPickersDay = styled(PickersDay, {
-    shouldForwardProp: (prop) => prop !== 'isSelected' && prop !== 'isHovered'
+    shouldForwardProp: (prop) => prop !== 'isSelected' && prop !== 'isHovered',
 })<CustomPickerDayProps>(({ theme, isSelected, isHovered, day }) => ({
     borderRadius: 0,
     ...(isSelected && {
@@ -72,17 +72,20 @@ function Day(
             disableMargin
             isSelected={isInSameWeek(day, selectedDay)}
             isHovered={isInSameWeek(day, hoveredDay)}
-            >
+        >
         </CustomPickersDay>
-        
     );
 }
 
-export default function WeekPicker() {
+interface WeekPickerProps {
+    selectedDate: Dayjs | null;
+    onDateChange: (newDate: Dayjs | null) => void;
+}
+
+const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) => {
     const [minDate, setMinDate] = useState(dayjs());
     const [maxDate, setMaxDate] = useState(dayjs());
-    const [hoveredDay, setHoveredDay] = React.useState<Dayjs | null>(null);
-    const [value, setValue] = React.useState<Dayjs | null>(dayjs());
+    const [hoveredDay, setHoveredDay] = useState<Dayjs | null>(null);
 
     useEffect(() => {
         const today = dayjs();
@@ -94,28 +97,31 @@ export default function WeekPicker() {
     }, []);
 
     return (
-        <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale={koLocale.name || 'ko'}
-        >
-            <DateCalendar
-                value={value}
-                onChange={(newValue) => setValue(newValue)}
-                showDaysOutsideCurrentMonth
-                displayWeekNumber
-                slots={{ day: Day }}
-                slotProps={{
-                    day: (ownerState: { day: Dayjs }) => ({
-                        selectedDay: value,
-                        hoveredDay,
-                        weekNumber: ownerState.day.week(),
-                        onPointerEnter: () => setHoveredDay(ownerState.day),
-                        onPointerLeave: () => setHoveredDay(null),
-                    }),
-                }}
-                maxDate={maxDate}
-                minDate={minDate}
-            />
-        </LocalizationProvider>
+        <div>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={koLocale.name || 'ko'}>
+                <DateCalendar
+                    value={selectedDate}
+                    onChange={(newValue) => {
+                        onDateChange(newValue);
+                    }}
+                    showDaysOutsideCurrentMonth
+                    displayWeekNumber
+                    slots={{ day: Day }}
+                    slotProps={{
+                        day: (ownerState: { day: Dayjs }) => ({
+                            selectedDay: selectedDate,
+                            hoveredDay,
+                            weekNumber: ownerState.day.week(),
+                            onPointerEnter: () => setHoveredDay(ownerState.day),
+                            onPointerLeave: () => setHoveredDay(null),
+                        }),
+                    }}
+                    maxDate={maxDate}
+                    minDate={minDate}
+                />
+            </LocalizationProvider>
+        </div>
     );
 }
+
+export default WeekPicker;
