@@ -8,6 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
+import { Modal } from '@mui/material';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
@@ -86,6 +87,7 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
     const [minDate, setMinDate] = useState(dayjs());
     const [maxDate, setMaxDate] = useState(dayjs());
     const [hoveredDay, setHoveredDay] = useState<Dayjs | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false); // 추가
 
     useEffect(() => {
         const today = dayjs();
@@ -98,28 +100,41 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
 
     return (
         <div>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={koLocale.name || 'ko'}>
-                <DateCalendar
-                    value={selectedDate}
-                    onChange={(newValue) => {
-                        onDateChange(newValue);
-                    }}
-                    showDaysOutsideCurrentMonth
-                    displayWeekNumber
-                    slots={{ day: Day }}
-                    slotProps={{
-                        day: (ownerState: { day: Dayjs }) => ({
-                            selectedDay: selectedDate,
-                            hoveredDay,
-                            weekNumber: ownerState.day.week(),
-                            onPointerEnter: () => setHoveredDay(ownerState.day),
-                            onPointerLeave: () => setHoveredDay(null),
-                        }),
-                    }}
-                    maxDate={maxDate}
-                    minDate={minDate}
-                />
-            </LocalizationProvider>
+            <button onClick={() => setIsModalOpen(true)}>Open Week Picker</button>
+            <Modal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={koLocale.name || 'ko'}>
+                    <DateCalendar
+                        value={selectedDate}
+                        onChange={(newValue) => {
+                            onDateChange(newValue);
+                            setIsModalOpen(false); // 날짜 선택 시 팝업 닫기
+                        }}
+                        showDaysOutsideCurrentMonth
+                        displayWeekNumber
+                        slots={{ day: Day }}
+                        slotProps={{
+                            day: (ownerState: { day: Dayjs }) => ({
+                                selectedDay: selectedDate,
+                                hoveredDay,
+                                weekNumber: ownerState.day.week(),
+                                onPointerEnter: () => setHoveredDay(ownerState.day),
+                                onPointerLeave: () => setHoveredDay(null),
+                            }),
+                        }}
+                        maxDate={maxDate}
+                        minDate={minDate}
+                        sx={{ maxWidth: '300px', width: '100%' }}
+                    />
+                </LocalizationProvider>
+            </Modal>
         </div>
     );
 }
