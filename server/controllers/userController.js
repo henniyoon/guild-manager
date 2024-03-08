@@ -51,7 +51,7 @@ async function getUserInfoController(req, res) {
 }
 
 async function setUserRoleMasterController(req, res) {
-    const { apiKey, guildName, worldName } = req.body;
+    const { apiKey, historyType, guildName, worldName } = req.body;
     const token = req.headers.authorization?.split(" ")[1]; // "Bearer TOKEN" 형식 가정
     if (!token) {
         return res.status(401).send("토큰이 필요합니다.");
@@ -61,7 +61,7 @@ async function setUserRoleMasterController(req, res) {
         // 토큰 검증 및 디코딩
         const decoded = AuthService.verifyToken(token);
         const userId = decoded.id;
-        const verify = await UserService.setUserRoleMaster(apiKey, userId, guildName, worldName);
+        const verify = await UserService.setUserRoleMaster(apiKey, historyType, userId, guildName, worldName);
         // console.log(verify);
         if (verify.success) {
             return res.status(200).send("길드 관리자 인증 성공");

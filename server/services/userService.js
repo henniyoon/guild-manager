@@ -1,6 +1,5 @@
 const User = require('../models/User.js');
 const APIService = require('./apiService.js');
-const WorldService = require('./worldService.js');
 const GuildService = require('./guildService.js');
 const characterService = require('./characterService.js');
 
@@ -13,9 +12,9 @@ async function getUser(id) {
     return null;
 }
 
-async function verifyAdmin(apiKey, guildName, worldName) {
+async function verifyAdmin(apiKey, historyType, guildName, worldName) {
     try {
-        const userCharacters = await APIService.getHistoryCharacterNames(apiKey);
+        const userCharacters = await APIService.getHistoryCharacterNames(apiKey, historyType);
         const character = await characterService.getCharacter(userCharacters);
         const mainCharacter = character.main_character_name;
 
@@ -37,9 +36,9 @@ async function verifyAdmin(apiKey, guildName, worldName) {
     }
 }
 
-async function setUserRoleMaster(apikey, id, guildName, worldName) {
+async function setUserRoleMaster(apikey, historyType, id, guildName, worldName) {
     const guildId = await GuildService.getGuildId(guildName, worldName);
-    const verify = await verifyAdmin(apikey, guildName, worldName);
+    const verify = await verifyAdmin(apikey, historyType, guildName, worldName);
     if (verify) {
         await User.update({
             guild_id: guildId,
@@ -57,7 +56,6 @@ async function setUserRoleMaster(apikey, id, guildName, worldName) {
 
 async function setUserRoleSubMaster(id, guildName, worldName) {
     const guildId = await GuildService.getGuildId(guildName, worldName);
-    console.log("guildId: ", guildId);
     try {
         await User.update({
             guild_id: guildId,
