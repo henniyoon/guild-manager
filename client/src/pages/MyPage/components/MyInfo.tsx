@@ -192,23 +192,18 @@ const MyInfo: React.FC = () => {
 
                     <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px', marginBottom: '10px', alignItems: 'center' }}>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                            <FormControl variant="outlined" style={{ marginRight: '5px' }}>
-                                <InputLabel htmlFor="history-type" style={{ background: '#fff', padding: '0 5px', zIndex: 1 }}>
-                                    인증 수단
-                                </InputLabel>
-                                <Select
-                                    variant="outlined"
-                                    style={{ marginRight: '5px' }}
-                                    value={historyType}
-                                    onChange={(e) => setHistoryType(e.target.value)}
-                                    labelId="history-type-label"
-                                    id="history-type"
-                                >
-                                    <MenuItem value="potential">잠재능력 재설정</MenuItem>
-                                    <MenuItem value="cube">큐브</MenuItem>
-                                    <MenuItem value="starforce">스타포스</MenuItem>
-                                </Select>
-                            </FormControl>
+                            <Select
+                                variant="outlined"
+                                style={{ marginRight: '5px' }}
+                                value={historyType}
+                                onChange={(e) => setHistoryType(e.target.value)}
+                                labelId="history-type-label"
+                                id="history-type"
+                            >
+                                <MenuItem value="potential">잠재능력 재설정</MenuItem>
+                                <MenuItem value="cube">큐브</MenuItem>
+                                <MenuItem value="starforce">스타포스</MenuItem>
+                            </Select>
                             <TextField
                                 label="API KEY"
                                 variant="outlined"
