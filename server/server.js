@@ -5,6 +5,7 @@ const sequelize = require("./db.js");
 require("./models/modelAssociations.js");
 const Character = require("./models/Character.js");
 const Record = require("./models/Record.js");
+const Guild = require("./models/Guild.js");
 const { Op } = require("sequelize");
 const multer = require("multer");
 const sharp = require("sharp");
@@ -230,6 +231,51 @@ app.post('/updateNobleLimit', async (req, res) => {
     res.status(500).json({ success: false, message: "서버 에러" });
   }
 });
+
+app.get('/nobleCheck', async (req, res) => {
+  const { world_id, name } = req.query;
+  // 'week' 파라미터를 배열로 처리합니다. 이미 배열로 받는 로직이 구현되어 있음.
+  let weeks = req.query.weeks;
+  if (!Array.isArray(weeks)) {
+    weeks = [weeks];
+  }
+console.log('weeks : ',weeks)
+  try {
+    const guild = await Guild.findOne({
+      where: { world_id, name },
+    });
+
+    if (!guild) {
+      return res.status(404).json({ success: false, message: '길드를 찾을 수 없습니다.' });
+    }
+
+    let charactersByWeek = {};
+
+    // 배열의 모든 요소에 대해 반복하여 각 주차별 데이터 조회
+    for (const week of weeks) {
+      const charactersWithNobleLimit = await Character.findAll({
+        include: [{
+          model: Record,
+          as: 'records',
+          where: { week, noble_limit: true },
+          attributes: [],
+        }],
+        where: { guild_id: guild.id },
+        attributes: ['name'],
+      });
+
+      // 캐릭터 이름 추출
+      charactersByWeek[week] = charactersWithNobleLimit.map(c => c.name);
+    }
+
+    res.json({ success: true, message: '조회 성공', charactersByWeek });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.', error: error.message });
+  }
+});
+
+
 
 // ! 이 코드는 다른 라우터들보다 아래에 위치하여야 합니다.
 // 클라이언트 리액트 앱 라우팅 처리
