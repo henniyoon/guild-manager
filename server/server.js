@@ -244,26 +244,25 @@ app.get('/nobleCheck', async (req, res) => {
           return res.status(404).json({ success: false, message: '길드를 찾을 수 없습니다.' });
       }
 
-      // 해당 주와 noble_limit=1인 레코드 조회
-      const records = await Record.findAll({
-          where: {
-              week: week,
-              noble_limit: true,
-          },
+      // 특정 길드에 속한 캐릭터들 중 특정 주에 noble_limit=1인 레코드를 한 번의 조회로 가져옵니다.
+      const charactersWithNobleLimit = await Character.findAll({
           include: [{
-              model: Character,
-              as: 'character',
-              required: true,
-              where: { guild_id: guild.id },
-              attributes: ['name'], // 캐릭터 이름만 포함
+              model: Record,
+              as: 'records',
+              where: {
+                  week: week,
+                  noble_limit: true,
+              },
+              attributes: [],
           }],
-          attributes: [], // Record 테이블에서는 특정 필드를 반환하지 않음
+          where: { guild_id: guild.id },
+          attributes: ['name'],
       });
 
-      // 조회된 레코드에서 캐릭터 이름 추출
-      const characterNamesWithNobleLimit = records.map(record => record.character.name);
+      // 캐릭터 이름 추출
+      const characterNames = charactersWithNobleLimit.map(c => c.name);
 
-      res.json({ success: true, message: '노블 제한 캐릭터 이름 조회 성공', characterNames: characterNamesWithNobleLimit });
+      res.json({ success: true, message: '조회 성공', characterNames });
   } catch (error) {
       console.error('Error:', error);
       res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.', error: error.message });
