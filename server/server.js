@@ -5,6 +5,7 @@ const sequelize = require("./db.js");
 require("./models/modelAssociations.js");
 const Character = require("./models/Character.js");
 const Record = require("./models/Record.js");
+const Guild = require("./models/Guild.js");
 const { Op } = require("sequelize");
 const multer = require("multer");
 const sharp = require("sharp");
@@ -228,6 +229,44 @@ app.post('/updateNobleLimit', async (req, res) => {
   } catch (error) {
     console.error("noble_limit 업데이트 에러:", error);
     res.status(500).json({ success: false, message: "서버 에러" });
+  }
+});
+
+app.get('/nobleCheck', async (req, res) => {
+  const { world_id, name, week } = req.query;
+
+  try {
+      const guild = await Guild.findOne({
+          where: { world_id, name },
+      });
+
+      if (!guild) {
+          return res.status(404).json({ success: false, message: '길드를 찾을 수 없습니다.' });
+      }
+
+      // 해당 주와 noble_limit=1인 레코드 조회
+      const records = await Record.findAll({
+          where: {
+              week: week,
+              noble_limit: true,
+          },
+          include: [{
+              model: Character,
+              as: 'character',
+              required: true,
+              where: { guild_id: guild.id },
+              attributes: ['name'], // 캐릭터 이름만 포함
+          }],
+          attributes: [], // Record 테이블에서는 특정 필드를 반환하지 않음
+      });
+
+      // 조회된 레코드에서 캐릭터 이름 추출
+      const characterNamesWithNobleLimit = records.map(record => record.character.name);
+
+      res.json({ success: true, message: '노블 제한 캐릭터 이름 조회 성공', characterNames: characterNamesWithNobleLimit });
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.', error: error.message });
   }
 });
 
