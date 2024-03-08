@@ -2,6 +2,7 @@ const TimeService = require('./timeService.js');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const { deflate } = require('zlib');
 const configPath = path.join(__dirname, '../config/config.json');
 const configData = fs.readFileSync(configPath, 'utf-8');
 const config = JSON.parse(configData);
@@ -75,42 +76,48 @@ async function getMainCharacterName(worldName, ocid) {
 }
 
 // 유저의 api Key를 제공 받아 본캐 찾기
-async function getHistoryCharacterNames(apiKey) {
+async function getHistoryCharacterNames(apiKey, historyType) {
     try {
         const characterNames = [];
 
         const today = new Date();
         today.setHours(today.getHours() + 9);  // 시간 보정
 
-        // 7일치만 조회
-        for (let i = 0; i < 7; i++) {
+        // 30일치만 조회
+        for (let i = 0; i < 30; i++) {
             const apiDate = new Date(today);
             apiDate.setDate(today.getDate() - i);
             const formattedApiDate = apiDate.toISOString().split('T')[0];
 
-            // 잠재능력 재설정 내역
-            const potentialHistoryUrl = `${API_BASE_URL}/history/potential?count=10&date=${formattedApiDate}`;
-            const potentialHistory = await getApiResponse(potentialHistoryUrl, apiKey);
-            if (potentialHistory && potentialHistory.potential_history && potentialHistory.potential_history[0]) {
-                characterNames.push(potentialHistory.potential_history[0].character_name);
+            let historyUrl;
+
+            switch (historyType) {
+                case 'potential':
+                    historyUrl = `${API_BASE_URL}/history/potential?count=10&date=${formattedApiDate}`;
+                    break;
+                case 'cube':
+                    historyUrl = `${API_BASE_URL}/history/cube?count=10&date=${formattedApiDate}`;
+                    break;
+                case 'starforce':
+                    historyUrl = `${API_BASE_URL}/history/starforce?count=10&date=${formattedApiDate}`
+                    break;
+                default:
+                    console.error('올바르지 않은 타입입니다.');
+                    return;
             }
 
-            // 큐브 사용 내역
-            const cubeHistoryUrl = `${API_BASE_URL}/history/cube?count=10&date=${formattedApiDate}`;
-            const cubeHistory = await getApiResponse(cubeHistoryUrl, apiKey);
-            if (cubeHistory && cubeHistory.cube_history && cubeHistory.cube_history[0]) {
-                characterNames.push(cubeHistory.cube_history[0].character_name);
-            }
+            const historyResponse = await getApiResponse(historyUrl, apiKey);
 
-            // 스타포스 강화 내역
-            const starforceHistoryUrl = `${API_BASE_URL}/history/starforce?count=10&date=${formattedApiDate}`
-            const starforceHistory = await getApiResponse(starforceHistoryUrl, apiKey);
-            if (starforceHistory && starforceHistory.starforce_history && starforceHistory.starforce_history[0]) {
-                characterNames.push(starforceHistory.starforce_history[0].character_name);
+            if (historyResponse && historyResponse[`${historyType}_history`] && historyResponse[`${historyType}_history`][0]) {
+                characterNames.push(historyResponse[`${historyType}_history`][0].character_name);
+            }
+            // 만일 characterNames 배열에 3개 이상의 데이터가 들어가면 루프를 중단
+            if (characterNames.length >= 3) {
+                break;
             }
         }
         const uniqueCharacterNames = [...new Set(characterNames)];
-
+        
         return uniqueCharacterNames;
     } catch (error) {
         console.error('API 조회 에러:', error);
