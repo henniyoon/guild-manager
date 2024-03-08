@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, Button, Box, TextField, Typography, Modal, IconButton } from "@mui/material";
+import { Link, Button, Box, TextField, FormControl, InputLabel, Select, MenuItem, Typography, Modal, IconButton } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
+import SelectServer from "../../MainPage/components/SelectServer";
 
 interface UserInfo {
     username: string;
@@ -27,8 +28,9 @@ const MyInfo: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [id, setId] = useState('');
     const [apiKey, setApiKey] = useState('');
-    const [worldName, setWorldName] = useState('');
+    const [worldName, setWorldName] = useState('스카니아');
     const [guildName, setGuildName] = useState('');
+    const [historyType, setHistoryType] = useState('cube');
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => setOpen(true);
@@ -73,7 +75,7 @@ const MyInfo: React.FC = () => {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ apiKey, guildName, worldName }),
+            body: JSON.stringify({ apiKey, historyType, guildName, worldName }),
         })
             .then((response) => response.text())
             .then((data) => {
@@ -139,14 +141,15 @@ const MyInfo: React.FC = () => {
                 <Typography variant="body1" style={{ marginBottom: '5px' }}>길드명 : {userInfo?.guildName}</Typography>
                 <Typography variant="body1" style={{ marginBottom: '5px' }}>권한 : {userInfo?.role}</Typography>
                 {userInfo?.role === "마스터" && (
-                    <form>
+                    <form style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <TextField
                             label="등록할 회원 ID"
                             variant="outlined"
+                            style={{ marginRight: '5px' }}
                             value={id}
                             onChange={(e) => setId(e.target.value)}
                         />
-                        <Button variant="contained" color="primary" onClick={setRoleSubMaster}>
+                        <Button variant="contained" color="primary" size="large" onClick={setRoleSubMaster}>
                             길드 부마스터 등록
                         </Button>
                     </form>
@@ -155,7 +158,7 @@ const MyInfo: React.FC = () => {
 
             <Box>
                 <form>
-                    <Typography variant="h5" style={{ marginBottom: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="h5" style={{ marginBottom: '10px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
                         길드 관리자 인증
                         <IconButton onClick={handleOpen}>
                             <InfoIcon />
@@ -184,27 +187,50 @@ const MyInfo: React.FC = () => {
                         </Box>
                     </Modal>
                     <p style={{ marginBottom: '10px', color: 'red' }}>
-                        해당 월드에서 7일 이내 스타포스 강화, 잠재능력 재설정, 큐브 사용 내역이 있어야만 인증 가능합니다.
+                        해당 월드에서 30일 이내 스타포스 강화, 잠재능력 재설정, 큐브 사용 내역이 있어야만 인증 가능합니다.
                     </p>
-                    <TextField
-                        label="API KEY"
-                        variant="outlined"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                    />
-                    <TextField
-                        label="월드명"
-                        variant="outlined"
-                        value={worldName}
-                        onChange={(e) => setWorldName(e.target.value)}
-                    />
-                    <TextField
-                        label="길드명"
-                        variant="outlined"
-                        value={guildName}
-                        onChange={(e) => setGuildName(e.target.value)}
-                    />
-                    <Button variant="contained" type="button" onClick={setRoleMaster}>권한 받기</Button>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px', marginBottom: '10px', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                            <Select
+                                variant="outlined"
+                                style={{ marginRight: '5px' }}
+                                value={historyType}
+                                onChange={(e) => setHistoryType(e.target.value)}
+                                labelId="history-type-label"
+                                id="history-type"
+                            >
+                                <MenuItem value="potential">잠재능력 재설정</MenuItem>
+                                <MenuItem value="cube">큐브</MenuItem>
+                                <MenuItem value="starforce">스타포스</MenuItem>
+                            </Select>
+                            <TextField
+                                label="API KEY"
+                                variant="outlined"
+                                style={{ marginRight: '5px' }}
+                                value={apiKey}
+                                onChange={(e) => setApiKey(e.target.value)}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '10px', width: '100%' }}>
+                            <SelectServer
+                                value={worldName}
+                                onChange={setWorldName}
+                            />
+                            <TextField
+                                label="길드명"
+                                variant="outlined"
+                                style={{ marginLeft: '5px', marginRight: '5px' }}
+                                value={guildName}
+                                onChange={(e) => setGuildName(e.target.value)}
+                            />
+                            <Button variant="contained" type="button" size="large" onClick={setRoleMaster}>
+                                권한 받기
+                            </Button>
+                        </div>
+                    </div>
+
                 </form>
             </Box>
         </Box>
