@@ -12,9 +12,7 @@ function findNewAndRemovedMembers(preGuildMembers, updatedGuildMembers) {
 async function createOrUpdateGuildPage(guildName, worldName) {
     const apiDate = new Date(APIService.apiDate());
     const guildExists = await GuildService.getGuild(guildName, worldName);
-    console.log("guildExists.master_name", guildExists.master_name);
     const subMasterNames = await ScrapingService.scrapeSubMaster(worldName, guildName);
-    console.log("subMasterNamse: ", subMasterNames);
     
     let guildRole = '';
 
