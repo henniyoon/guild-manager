@@ -26,6 +26,11 @@ const Characters = sequelize.define('Characters', {
       key: 'id',
     },
   },
+  guild_role: {     // 길드 직위
+    type: DataTypes.STRING(12),
+    allowNull: false,
+    defaultValue: '길드원',
+  },
   name: {           // 캐릭터명  
     type: DataTypes.STRING(12),
     allowNull: true,
