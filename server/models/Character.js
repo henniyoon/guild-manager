@@ -3,7 +3,7 @@ const sequelize = require('../db.js');
 const Guild = require('./Guild.js');
 const World = require('./World.js');
 
-const Characters = sequelize.define('Characters', {
+const Character = sequelize.define('Characters', {
   id: {         // index
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -67,4 +67,4 @@ const Characters = sequelize.define('Characters', {
   engine: 'InnoDB',
 });
 
-module.exports = Characters;
+module.exports = Character;
