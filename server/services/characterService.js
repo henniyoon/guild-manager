@@ -1,3 +1,4 @@
+const sequelize = require('../db.js');
 const Guild = require('../models/Guild.js');
 const Character = require('../models/Character.js');
 const WorldService = require('./worldService.js');
@@ -52,7 +53,7 @@ async function createCharacter(guildName, worldName, characterName, guildRole) {
         };
 
         const createdCharacter = await Character.create(character);
-
+        
         return createdCharacter;
     } catch (error) {
         console.error('에러 발생:', error);
@@ -101,8 +102,10 @@ async function updateCharacter(characterName, guildRole) {
             image: apiData.character_image,
             last_updated: apiDate,
         };
-
-        return await Character.update(updatedCharacter, { where: { ocid: character.ocid } });
+        
+        const update = await character.update(updatedCharacter);
+ 
+        return update;
     } catch (error) {
         console.error('에러 발생:', error);
         console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
