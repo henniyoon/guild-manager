@@ -32,7 +32,7 @@ async function fetchGuildUrl(worldName, guildName) {
     }
 }
 
-async function scrapeGuild(worldName, guildName) {
+async function scrapeSubMaster(worldName, guildName) {
     try {
         const guildUrl = await fetchGuildUrl(worldName, guildName);
         const guildResponse = await axios.get(guildUrl);
@@ -40,15 +40,12 @@ async function scrapeGuild(worldName, guildName) {
         const subMasterNames = $('tr:has(td:contains("부마스터")) dl dt a').map((index, element) => {
             return $(element).text().trim();
         }).get();
-
-        console.log('Sub Master Names:', subMasterNames);
+        return subMasterNames;
     } catch (error) {
         console.error('scrapeGuild 실패:', error.message);
     }
 }
 
 module.exports = {
-    scrapeGuild,
+    scrapeSubMaster,
 }
-
-scrapeGuild("스카니아", "새벽");
