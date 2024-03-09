@@ -3,7 +3,7 @@ const sequelize = require('../db.js');
 const Guild = require('./Guild.js');
 const World = require('./World.js');
 
-const Characters = sequelize.define('Characters', {
+const Character = sequelize.define('Characters', {
   id: {         // index
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -25,6 +25,11 @@ const Characters = sequelize.define('Characters', {
       model: Guild,
       key: 'id',
     },
+  },
+  guild_role: {     // 길드 직위
+    type: DataTypes.STRING(12),
+    allowNull: false,
+    defaultValue: '길드원',
   },
   name: {           // 캐릭터명  
     type: DataTypes.STRING(12),
@@ -62,4 +67,4 @@ const Characters = sequelize.define('Characters', {
   engine: 'InnoDB',
 });
 
-module.exports = Characters;
+module.exports = Character;
