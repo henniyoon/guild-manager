@@ -1,4 +1,5 @@
 const APIService = require('./apiService.js');
+const ScrapingService = require('./scrapingService.js');
 const GuildService = require('./guildService.js');
 const CharacterService = require('./characterService.js');
 
@@ -12,11 +13,22 @@ function findNewAndRemovedMembers(preGuildMembers, updatedGuildMembers) {
 async function createOrUpdateGuildPage(guildName, worldName) {
     const apiDate = new Date(APIService.apiDate());
     const guildExists = await GuildService.getGuild(guildName, worldName);
+    console.log("guildExists.master_name", guildExists.master_name);
+    const subMasterNames = await ScrapingService.scrapeSubMaster(worldName, guildName);
+    console.log("subMasterNamse: ", subMasterNames);
+    let guildRole = '';
 
     if (!guildExists) {
         const guildMembers = await GuildService.createGuild(guildName, worldName);
         for (const guildMember of guildMembers) {
-            await CharacterService.createCharacter(guildName, worldName, guildMember);
+            if (guildExists && guildExists.master_name === guildMember) {     // 길드 마스터 여부 확인
+                guildRole = '마스터';
+            } else if (subMasterNames.includes(guildMember)) {    // 길드 부마스터 여부 확인
+                guildRole = '부마스터';
+            } else {
+                guildRole = '길드원';
+            }
+            await CharacterService.createCharacter(guildName, worldName, guildMember, guildRole);
         }
     } else if (guildExists.last_updated < apiDate) {
         const preGuildMembers = await CharacterService.getCharactersByGuild(guildName, worldName);
@@ -29,10 +41,18 @@ async function createOrUpdateGuildPage(guildName, worldName) {
         for (const guildMember of guildMembers) {
             const characterExist = await CharacterService.getCharacter(guildMember);
 
-            if (!characterExist) {
-                await CharacterService.createCharacter(guildName, worldName, guildMember);
+            if (guildExists && guildExists.master_name === guildMember) {     // 길드 마스터 여부 확인
+                guildRole = '마스터';
+            } else if (subMasterNames.includes(guildMember)) {    // 길드 부마스터 여부 확인
+                guildRole = '부마스터';
             } else {
-                await CharacterService.updateCharacter(guildMember);
+                guildRole = '길드원';
+            }
+            console.log("guildRole: ", guildRole);
+            if (!characterExist) {
+                await CharacterService.createCharacter(guildName, worldName, guildMember, guildRole);
+            } else {
+                await CharacterService.updateCharacter(guildMember, guildRole);
             }
         }
         if (removedMembers) {
