@@ -3,7 +3,7 @@ const APIService = require('./apiService.js');
 const WorldService = require('./worldService.js');
 
 async function getGuild(guildName, worldName) {
-    const worldId = await WorldService.getWorldId(worldName);
+    const worldId = await WorldService.getWorldId(worldName); 
     return await Guild.findOne({ where: { name: guildName, world_id: worldId } });
 }
 
