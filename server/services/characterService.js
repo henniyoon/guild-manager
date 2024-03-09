@@ -24,6 +24,22 @@ async function getCharactersByGuild(guildName, worldName) {
     return characters;
 }
 
+async function getSubMasterNames(guildName, worldName) {
+    try {
+        const guildId = await GuildService.getGuildId(guildName, worldName);
+        const subMasters = await Character.findAll({
+            where: { guild_id: guildId, guild_role: '부마스터' },
+            attributes: ['main_character_name']
+        });
+        const subMasterNames = subMasters.map(subMaster => subMaster.main_character_name);
+        
+        return subMasterNames;
+    } catch (error) {
+        console.error('에러 발생:', error);
+        throw new Error('서버 에러');
+    }
+}
+
 async function createCharacter(guildName, worldName, characterName, guildRole) {
     const worldId = await WorldService.getWorldId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldName);
@@ -128,6 +144,7 @@ module.exports = {
     getCharacter,
     getCharacterByOcid,
     getCharactersByGuild,
+    getSubMasterNames,
     createCharacter,
     updateCharacter,
     removeGuildCharacter,
