@@ -2,7 +2,6 @@ const TimeService = require('./timeService.js');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { deflate } = require('zlib');
 const configPath = path.join(__dirname, '../config/config.json');
 const configData = fs.readFileSync(configPath, 'utf-8');
 const config = JSON.parse(configData);
