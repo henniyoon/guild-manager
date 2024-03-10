@@ -124,8 +124,41 @@ async function updateCharacter(characterName, guildRole) {
             return update;
         }
     } catch (error) {
-        console.error('에러 발생:', error);
-        console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
+        console.error('updateCharacter 실패:', error);
+    }
+}
+
+async function updateCharacterName(ocid) {
+    try {
+        const character = await getCharacterByOcid(ocid);
+
+        let apiData = await APIService.getCharacterBasicData(ocid);
+        apiData = {
+            ...apiData,
+            ... await APIService.getMainCharacterName(apiData.world_name, ocid)
+        };
+        const worldId = await WorldService.getWorldId(apiData.world_name);
+        const guildId = await GuildService.getGuildId(apiData.character_guild_name, apiData.world_name);
+
+        const apiDate = new Date(apiData.date);
+        apiDate.setHours(apiDate.getHours() + 9);
+
+        const updatedCharacterName = {
+            world_id: worldId,
+            guild_id: guildId,
+            name: apiData.character_name,
+            class: apiData.character_class,
+            level: apiData.character_level,
+            main_character_name: apiData.ranking[0].character_name,
+            image: apiData.character_image,
+            last_updated: apiDate,
+        };
+        const update = await character.update(updatedCharacterName);
+
+        return update;
+
+    } catch (error) {
+        console.error("updateCharacterName 실패: ", error);
     }
 }
 
@@ -148,7 +181,6 @@ module.exports = {
     getSubMasterNames,
     createCharacter,
     updateCharacter,
+    updateCharacterName,
     removeGuildCharacter,
 }
-
-updateCharacter("별링", "길드원");
