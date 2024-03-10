@@ -89,6 +89,15 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
     const [maxDate, setMaxDate] = useState(dayjs());
     const [hoveredDay, setHoveredDay] = useState<Dayjs | null>(null);
     const [isCalendarOpen, setCalendarOpen] = useState(false);
+    const [weekNumber, setWeekNumber] = useState(0);
+
+    useEffect(() => {
+        const week = selectedDate?.day() === 0
+        ? selectedDate.subtract(1, 'day').week()
+        : selectedDate?.week();
+        setWeekNumber(week || 0);
+    }, [selectedDate]);
+   
 
     useEffect(() => {
         const today = dayjs();
@@ -111,7 +120,7 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
         <div style={{ marginLeft: '20px' }}>
             <Button variant='outlined' style={{ textAlign: 'center' }} onClick={openCalendar}>
                 <CalendarMonthTwoToneIcon style={{ fontSize: '16px', marginRight: '5px' }}/>
-                {dayjs(selectedDate).year()}년 {dayjs(selectedDate).week()}주차
+                {dayjs(selectedDate).year()}년 {weekNumber}주차
             </Button>
 
             <Dialog open={isCalendarOpen} onClose={closeCalendar}>

@@ -69,11 +69,15 @@ const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().subtract(1, 'day'));
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   // selectedDate를 yyyy-WWW 형식으로 포맷팅하는 함수
   const getFormattedDate = () => {
+    const weekNumber = selectedDate?.day() === 0
+      ? selectedDate.subtract(1, 'day').week()
+      : selectedDate?.week();
+
     return selectedDate
-      ? `${selectedDate.year()}-W${selectedDate.week().toString().padStart(2, '0')}`
+      ? `${selectedDate.year()}-W${weekNumber?.toString().padStart(2, '0')}`
       : '';
   };
   const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
