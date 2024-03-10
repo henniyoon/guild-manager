@@ -38,6 +38,8 @@ const AdminPageManual: FC = () => (
               <li>메이플 해상도: 1366 x 768</li>
               <li>창의 왼쪽 상단에 길드컨텐츠 창이 오도록 배치</li>
               <li>닉네임 오름차순 정렬 후 1페이지부터 캡쳐</li>
+              <li style={{color: 'red'}}>마우스로 데이터를 가리지 않게 주의!</li>
+              <li style={{color: 'red'}}>클릭하여 파란색 줄이 생기지 않도록 주의!</li>
               <img src="/SampleAdminImage.png" alt="sample" style={{ width: '300px', height: 'auto' }} />
             </ul>
           </li>
