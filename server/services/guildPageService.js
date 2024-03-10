@@ -43,8 +43,6 @@ async function createOrUpdateGuildPage(guildName, worldName) {
                 ? '마스터'
                 : (subMasterNames.includes(guildMember) ? '부마스터' : '길드원');
 
-            console.log("guildRole: ", guildRole);
-
             if (!characterExist) {
                 await CharacterService.createCharacter(guildName, worldName, guildMember, guildRole);
             } else {
