@@ -53,7 +53,6 @@ async function createOrUpdateGuildPage(guildName, worldName) {
                 await CharacterService.createCharacter(guildName, worldName, member, guildRole);
             }
         }));
-        console.log("members:", members);
     }
 }
 
