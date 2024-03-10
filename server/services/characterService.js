@@ -93,6 +93,7 @@ async function createCharacter(guildName, worldName, characterName, guildRole) {
 
 async function updateCharacter(characterName, guildRole) {
     try {
+        const character = await getCharacter(characterName);
         let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
             ...apiData,
@@ -100,15 +101,6 @@ async function updateCharacter(characterName, guildRole) {
             ... await APIService.getMainCharacterName(apiData.world_name, apiData.ocid)
         };
         if (apiData) {
-            let character = '';
-            
-            const characterByOcid = await getCharacterByOcid(apiData.ocid);
-            const characterByName = await getCharacter(characterName);
-            if (characterByName) {
-                character = characterByName;
-            } else if (characterByOcid) {
-                character = characterByOcid;
-            }
             const worldId = await WorldService.getWorldId(apiData.world_name);
             const guildId = await GuildService.getGuildId(apiData.character_guild_name, apiData.world_name);
 
@@ -158,3 +150,5 @@ module.exports = {
     updateCharacter,
     removeGuildCharacter,
 }
+
+updateCharacter("별링", "길드원");
