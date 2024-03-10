@@ -102,26 +102,34 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   // 전처리된 이미지에 대해 OCR 처리
   // 각 영역별로 OCR 명령어 실행
   async function processOcr(processedFiles) {
-    const processedImagePaths = processedFiles
-      .map((file) => `"${file}"`)
-      .join(" ");
+    const processedImagePaths = processedFiles.map((file) => `"${file}"`).join(" ");
     const command = `python ocr.py ${processedImagePaths}`;
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         if (error || stderr) {
+          console.error("OCR 실행 중 오류 발생:", error || stderr);
           reject(error || stderr);
         } else {
-          resolve(
-            stdout
-              .trim()
-              .split("\n")
-              .map((result) => JSON.parse(result.replace(/'/g, '"')))
-          );
+          try {
+            const results = stdout.trim().split("\n").map(line => {
+              try {
+                // JSON 데이터를 안전하게 파싱합니다.
+                return JSON.parse(line.replace(/'/g, '"'));
+              } catch (parseError) {
+                // 파싱 중 오류가 발생한 경우, 로그를 남기고 빈 객체를 반환합니다.
+                console.error("JSON 파싱 중 오류 발생:", parseError);
+                return {}; // 오류가 발생한 항목 대신 빈 객체 반환
+              }
+            });
+            resolve(results);
+          } catch (e) {
+            console.error("OCR 결과 처리 중 오류 발생:", e);
+            reject(e);
+          }
         }
       });
     });
   }
-
   try {
     const resultsWeekly = await processOcr(weekly_score_Area);
     const resultsSuro = await processOcr(suro_score_Area);
