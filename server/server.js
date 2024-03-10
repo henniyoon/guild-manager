@@ -57,41 +57,46 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   const flag_score_Area = [];
 
   for (const file of req.files) {
-    // 주간 점수 영역 전처리
-    const processedFilePathWeekly = path.join(
-      processedDirPath,
-      `weekly_${file.originalname}`
-    );
-    await sharp(file.path)
-      .extract({ left: 462, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathWeekly);
-    weekly_score_Area.push(processedFilePathWeekly);
+    try {
+      // 주간 점수 영역 전처리
+      const processedFilePathWeekly = path.join(
+        processedDirPath,
+        `weekly_${file.originalname}`
+      );
+      await sharp(file.path)
+        .extract({ left: 462, top: 151, width: 60, height: 415 })
+        .threshold(120)
+        .blur(0.5)
+        .toFile(processedFilePathWeekly);
+      weekly_score_Area.push(processedFilePathWeekly);
 
-    // 수로 점수 영역 전처리
-    const processedFilePathSuro = path.join(
-      processedDirPath,
-      `suro_${file.originalname}`
-    );
-    await sharp(file.path)
-      .extract({ left: 604, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathSuro);
-    suro_score_Area.push(processedFilePathSuro);
+      // 수로 점수 영역 전처리
+      const processedFilePathSuro = path.join(
+        processedDirPath,
+        `suro_${file.originalname}`
+      );
+      await sharp(file.path)
+        .extract({ left: 604, top: 151, width: 60, height: 415 })
+        .threshold(120)
+        .blur(0.5)
+        .toFile(processedFilePathSuro);
+      suro_score_Area.push(processedFilePathSuro);
 
-    // 플래그 점수 영역 전처리
-    const processedFilePathFlag = path.join(
-      processedDirPath,
-      `flag_${file.originalname}`
-    );
-    await sharp(file.path)
-      .extract({ left: 528, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathFlag);
-    flag_score_Area.push(processedFilePathFlag);
+      // 플래그 점수 영역 전처리
+      const processedFilePathFlag = path.join(
+        processedDirPath,
+        `flag_${file.originalname}`
+      );
+      await sharp(file.path)
+        .extract({ left: 528, top: 151, width: 60, height: 415 })
+        .threshold(120)
+        .blur(0.5)
+        .toFile(processedFilePathFlag);
+      flag_score_Area.push(processedFilePathFlag);
+    } catch (error) {
+      console.error("이미지 처리 중 오류 발생:", error);
+      return res.status(500).send("올바른 이미지를 등록해주세요.");
+    }
   }
 
   // 전처리된 이미지에 대해 OCR 처리
