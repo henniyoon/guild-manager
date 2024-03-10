@@ -13,7 +13,7 @@ async function createOrUpdateGuildPage(guildName, worldName) {
     const apiDate = new Date(APIService.apiDate());
     const guildExists = await GuildService.getGuild(guildName, worldName);
     const subMasterNames = await ScrapingService.scrapeSubMaster(worldName, guildName);
-    
+
     let guildRole = '';
 
     if (!guildExists) {
@@ -32,31 +32,27 @@ async function createOrUpdateGuildPage(guildName, worldName) {
 
         // 길드 정보 업데이트
         const guildMembers = await GuildService.updateGuild(guildName, worldName);
-
         // 신규 가입자, 탈퇴자 조회
         const { newMembers, removedMembers } = findNewAndRemovedMembers(preGuildMemberNames, guildMembers);
+        const members = [...guildMembers, ...removedMembers];
+        
+        await Promise.all(members.map(async (member) => {
+            const character = await APIService.getCharacterOcid(member);
+            const characterOcidExist = await CharacterService.getCharacterByOcid(character.ocid);
+            const characterExist = await CharacterService.getCharacter(member);
 
-        await Promise.all(guildMembers.map(async (guildMember) => {
-            const characterExist = await CharacterService.getCharacter(guildMember);
-
-            guildRole = (guildExists && guildExists.master_name === guildMember)
+            guildRole = (guildExists && guildExists.master_name === member)
                 ? '마스터'
-                : (subMasterNames.includes(guildMember) ? '부마스터' : '길드원');
+                : (subMasterNames.includes(member) ? '부마스터' : '길드원');
 
-            console.log("guildRole: ", guildRole);
-
-            if (!characterExist) {
-                await CharacterService.createCharacter(guildName, worldName, guildMember, guildRole);
+            if (characterExist) {
+                await CharacterService.updateCharacter(member, guildRole);
+            } else if (characterOcidExist) {
+                await CharacterService.updateCharacterName(character.ocid);
             } else {
-                await CharacterService.updateCharacter(guildMember, guildRole);
+                await CharacterService.createCharacter(guildName, worldName, member, guildRole);
             }
         }));
-
-        if (removedMembers) {
-            await Promise.all(removedMembers.map(async (removedMember) => {
-                await CharacterService.removeGuildCharacter(removedMember);
-            }));
-        }
     }
 }
 
