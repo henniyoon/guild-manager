@@ -1,3 +1,4 @@
+const sequelize = require('../db.js');
 const Guild = require('../models/Guild.js');
 const Character = require('../models/Character.js');
 const WorldService = require('./worldService.js');
@@ -23,10 +24,26 @@ async function getCharactersByGuild(guildName, worldName) {
     return characters;
 }
 
-async function createCharacter(guildName, worldName, characterName) {
+async function getSubMasterNames(guildName, worldName) {
+    try {
+        const guildId = await GuildService.getGuildId(guildName, worldName);
+        const subMasters = await Character.findAll({
+            where: { guild_id: guildId, guild_role: '부마스터' },
+            attributes: ['main_character_name']
+        });
+        const subMasterNames = subMasters.map(subMaster => subMaster.main_character_name);
+
+        return subMasterNames;
+    } catch (error) {
+        console.error('에러 발생:', error);
+        throw new Error('서버 에러');
+    }
+}
+
+async function createCharacter(guildName, worldName, characterName, guildRole) {
     const worldId = await WorldService.getWorldId(worldName);
     const guildId = await GuildService.getGuildId(guildName, worldName);
-    console.log("guildId: ", guildId);
+
     try {
         let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
@@ -41,6 +58,7 @@ async function createCharacter(guildName, worldName, characterName) {
         const character = {
             world_id: worldId,
             guild_id: guildId,
+            guild_role: guildRole,
             name: characterName,
             ocid: apiData.ocid,
             class: apiData.character_class,
@@ -51,7 +69,6 @@ async function createCharacter(guildName, worldName, characterName) {
         };
 
         const createdCharacter = await Character.create(character);
-        // console.log(characterName, "캐릭터 정보 추가 성공");
 
         return createdCharacter;
     } catch (error) {
@@ -74,39 +91,74 @@ async function createCharacter(guildName, worldName, characterName) {
     }
 }
 
-async function updateCharacter(characterName) {
+async function updateCharacter(characterName, guildRole) {
     try {
         const character = await getCharacter(characterName);
-       
-        let apiData = await APIService.getCharacterBasicData(character.ocid)
+        let apiData = await APIService.getCharacterOcid(characterName);
         apiData = {
             ...apiData,
-            ... await APIService.getMainCharacterName(apiData.world_name, character.ocid)
+            ... await APIService.getCharacterBasicData(apiData.ocid),
+            ... await APIService.getMainCharacterName(apiData.world_name, apiData.ocid)
         };
-        // console.log(apiData);
-        // 업데이트 시점에는 길드를 옮기거나 월드 리프 했을 가능성이 있음!
+        if (apiData) {
+            const worldId = await WorldService.getWorldId(apiData.world_name);
+            const guildId = await GuildService.getGuildId(apiData.character_guild_name, apiData.world_name);
+
+            const apiDate = new Date(apiData.date);
+            apiDate.setHours(apiDate.getHours() + 9);
+
+            const updatedCharacter = {
+                world_id: worldId,
+                guild_id: guildId,
+                guild_role: guildRole,
+                name: apiData.character_name,
+                ocid: apiData.ocid,
+                class: apiData.character_class,
+                level: apiData.character_level,
+                main_character_name: apiData.ranking[0].character_name,
+                image: apiData.character_image,
+                last_updated: apiDate,
+            };
+            const update = await character.update(updatedCharacter);
+
+            return update;
+        }
+    } catch (error) {
+        console.error('updateCharacter 실패:', error);
+    }
+}
+
+async function updateCharacterName(ocid) {
+    try {
+        const character = await getCharacterByOcid(ocid);
+
+        let apiData = await APIService.getCharacterBasicData(ocid);
+        apiData = {
+            ...apiData,
+            ... await APIService.getMainCharacterName(apiData.world_name, ocid)
+        };
         const worldId = await WorldService.getWorldId(apiData.world_name);
         const guildId = await GuildService.getGuildId(apiData.character_guild_name, apiData.world_name);
-        
+
         const apiDate = new Date(apiData.date);
         apiDate.setHours(apiDate.getHours() + 9);
 
-        const updatedCharacter = {
+        const updatedCharacterName = {
             world_id: worldId,
             guild_id: guildId,
-            name: characterName,
+            name: apiData.character_name,
             class: apiData.character_class,
             level: apiData.character_level,
             main_character_name: apiData.ranking[0].character_name,
             image: apiData.character_image,
             last_updated: apiDate,
         };
-        // console.log(characterName, "캐릭터 정보 업데이트 성공");
-        return await Character.update(updatedCharacter, { where: { ocid: character.ocid } });
-        
+        const update = await character.update(updatedCharacterName);
+
+        return update;
+
     } catch (error) {
-        console.error('에러 발생:', error);
-        console.log("에러 발생으로 캐릭터 정보 업데이트 실패");
+        console.error("updateCharacterName 실패: ", error);
     }
 }
 
@@ -114,19 +166,21 @@ async function removeGuildCharacter(characterName) {
     try {
         const character = await getCharacter(characterName);
         const nullGuild = { guild_id: null };
-        await Character.update(nullGuild, { where: { ocid: character.ocid }});
+        await Character.update(nullGuild, { where: { ocid: character.ocid } });
         console.log("탈퇴자 길드 null 설정 성공")
     } catch (error) {
         console.error('에러 발생:', error);
         console.log("에러 발생으로 탈퇴자 길드 null 설정 실패");
     }
-} 
+}
 
 module.exports = {
     getCharacter,
     getCharacterByOcid,
     getCharactersByGuild,
+    getSubMasterNames,
     createCharacter,
     updateCharacter,
+    updateCharacterName,
     removeGuildCharacter,
 }

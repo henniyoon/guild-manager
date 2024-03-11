@@ -3,7 +3,7 @@ const APIService = require('./apiService.js');
 const WorldService = require('./worldService.js');
 
 async function getGuild(guildName, worldName) {
-    const worldId = await WorldService.getWorldId(worldName);
+    const worldId = await WorldService.getWorldId(worldName); 
     return await Guild.findOne({ where: { name: guildName, world_id: worldId } });
 }
 
@@ -75,11 +75,10 @@ async function updateGuild(guildName, worldName) {
             last_updated: apiDate,
         };
 
-        await Guild.update(updatedGuild, { where: { oguild_id: guild.oguild_id } })
+        await guild.update(updatedGuild);   // Sequelize의 모델 인스턴스 업데이트 메서드 사용
         console.log("길드 정보 업데이트 성공");
 
         return apiData.guild_member;
-
     } catch (error) {
         console.error('에러 발생:', error);
         throw new Error('서버 에러');
