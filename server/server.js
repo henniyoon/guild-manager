@@ -97,25 +97,34 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   // 전처리된 이미지에 대해 OCR 처리
   // 각 영역별로 OCR 명령어 실행
   async function processOcr(processedFiles) {
-    const processedImagePaths = processedFiles
-      .map((file) => `"${file}"`)
-      .join(" ");
+    const processedImagePaths = processedFiles.map((file) => `"${file}"`).join(" ");
     const command = `python ocr.py ${processedImagePaths}`;
     return new Promise((resolve, reject) => {
-      exec(command, (error, stdout, stderr) => {
-        if (error || stderr) {
-          reject(error || stderr);
-        } else {
-          resolve(
-            stdout
-              .trim()
-              .split("\n")
-              .map((result) => JSON.parse(result.replace(/'/g, '"')))
-          );
-        }
-      });
+        exec(command, (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.error("OCR 명령어 실행 중 오류:", error || stderr);
+                reject(error || stderr);
+            } else {
+                try {
+                    const results = stdout.trim().split("\n").map(line => {
+                        try {
+                            return JSON.parse(line.replace(/'/g, '"'));
+                        } catch (parseError) {
+                            console.error("JSON 파싱 중 오류:", parseError);
+                            // 오류가 발생한 경우, null을 반환하거나 다른 방식으로 처리
+                            return null;
+                        }
+                    });
+                    resolve(results);
+                } catch (e) {
+                    console.error("OCR 처리 중 예외 발생:", e);
+                    reject(e);
+                }
+            }
+        });
     });
-  }
+}
+
 
   try {
     const resultsWeekly = await processOcr(weekly_score_Area);
