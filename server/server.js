@@ -57,37 +57,41 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   const flag_score_Area = [];
 
   for (const file of req.files) {
-    try {
-      // 주간 점수 영역 전처리
-      const processedFilePathWeekly = path.join(processedDirPath, `weekly_${file.originalname}`);
-      await sharp(file.path)
-        .extract({ left: 462, top: 151, width: 60, height: 415 })
-        .threshold(120)
-        .blur(0.5)
-        .toFile(processedFilePathWeekly);
-  
-      // 수로 점수 영역 전처리
-      const processedFilePathSuro = path.join(processedDirPath, `suro_${file.originalname}`);
-      await sharp(file.path)
-        .extract({ left: 604, top: 151, width: 60, height: 415 })
-        .threshold(120)
-        .blur(0.5)
-        .toFile(processedFilePathSuro);
-  
-      // 플래그 점수 영역 전처리
-      const processedFilePathFlag = path.join(processedDirPath, `flag_${file.originalname}`);
-      await sharp(file.path)
-        .extract({ left: 528, top: 151, width: 60, height: 415 })
-        .threshold(120)
-        .blur(0.5)
-        .toFile(processedFilePathFlag);
-  
-      // 여기에 전처리된 이미지 파일 경로를 배열 또는 다른 구조에 저장하는 로직을 추가합니다.
-    } catch (error) {
-      console.error("이미지 전처리 중 오류 발생:", error);
-      // 적절한 에러 처리 로직을 구현합니다. 예를 들어, 사용자에게 에러 응답을 반환할 수 있습니다.
-      return res.status(500).send({ message: "이미지 전처리 중 오류가 발생했습니다." });
-    }
+    // 주간 점수 영역 전처리
+    const processedFilePathWeekly = path.join(
+      processedDirPath,
+      `weekly_${file.originalname}`
+    );
+    await sharp(file.path)
+      .extract({ left: 462, top: 151, width: 60, height: 415 })
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathWeekly);
+    weekly_score_Area.push(processedFilePathWeekly);
+
+    // 수로 점수 영역 전처리
+    const processedFilePathSuro = path.join(
+      processedDirPath,
+      `suro_${file.originalname}`
+    );
+    await sharp(file.path)
+      .extract({ left: 604, top: 151, width: 60, height: 415 })
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathSuro);
+    suro_score_Area.push(processedFilePathSuro);
+
+    // 플래그 점수 영역 전처리
+    const processedFilePathFlag = path.join(
+      processedDirPath,
+      `flag_${file.originalname}`
+    );
+    await sharp(file.path)
+      .extract({ left: 528, top: 151, width: 60, height: 415 })
+      .threshold(120)
+      .blur(0.5)
+      .toFile(processedFilePathFlag);
+    flag_score_Area.push(processedFilePathFlag);
   }
 
   // 전처리된 이미지에 대해 OCR 처리
