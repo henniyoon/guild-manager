@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { Grid, Box, Typography, TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
+import { Grid, Box, Typography, TextField, Select, MenuItem, Button, IconButton, CircularProgress } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
@@ -91,6 +91,7 @@ const Adminpage: React.FC = () => {
   const [suroScoreTotal, setSuroScoreTotal] = useState(0);
   const [flagScoreTotal, setFlagScoreTotal] = useState(0);
   const [isHidden, setIsHidden] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const toggleDisplay = () => {
     setIsHidden(!isHidden);
   };
@@ -406,11 +407,12 @@ const Adminpage: React.FC = () => {
 
   // 파일 서버로 전송
   const handleUploadFiles = (files: File[]) => {
+    setIsLoading(true); // 로딩 시작
     const formData = new FormData();
     files.forEach((file) => {
       formData.append("files", file);
     });
-
+  
     fetch("/uploadImages", {
       method: "POST",
       body: formData,
@@ -425,7 +427,8 @@ const Adminpage: React.FC = () => {
       .catch((error) => {
         console.error("업로드 실패:", error);
         alert("파일 업로드 실패.");
-      });
+      })
+      .finally(() => setIsLoading(false)); // 로딩 종료
   };
 
   // 문자열을 숫자로 변환하는 함수
@@ -733,6 +736,13 @@ const Adminpage: React.FC = () => {
           초기화
         </Button>
       </div>
+      {
+  isLoading && (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <CircularProgress />
+    </div>
+  )
+}
 
       <div
         className={styles.tableInfoContainer}
