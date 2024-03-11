@@ -125,7 +125,6 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     });
 }
 
-
   try {
     const resultsWeekly = await processOcr(weekly_score_Area);
     const resultsSuro = await processOcr(suro_score_Area);
