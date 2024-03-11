@@ -55,75 +55,70 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
   const weekly_score_Area = [];
   const suro_score_Area = [];
   const flag_score_Area = [];
+  const processedDirPath = './processed'; // 처리된 이미지를 저장할 디렉터리 경로 설정 필요
 
   for (const file of req.files) {
-    // 주간 점수 영역 전처리
-    const processedFilePathWeekly = path.join(
-      processedDirPath,
-      `weekly_${file.originalname}`
-    );
-    await sharp(file.path)
-      .extract({ left: 462, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathWeekly);
-    weekly_score_Area.push(processedFilePathWeekly);
+    try {
+      // 주간 점수 영역 전처리
+      const processedFilePathWeekly = path.join(processedDirPath, `weekly_${file.originalname}`);
+      await sharp(file.path)
+        .extract({ left: 462, top: 151, width: 60, height: 415 })
+        .threshold(120)
+        .blur(0.5)
+        .toFile(processedFilePathWeekly);
+      weekly_score_Area.push(processedFilePathWeekly);
 
-    // 수로 점수 영역 전처리
-    const processedFilePathSuro = path.join(
-      processedDirPath,
-      `suro_${file.originalname}`
-    );
-    await sharp(file.path)
-      .extract({ left: 604, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathSuro);
-    suro_score_Area.push(processedFilePathSuro);
-
-    // 플래그 점수 영역 전처리
-    const processedFilePathFlag = path.join(
-      processedDirPath,
-      `flag_${file.originalname}`
-    );
-    await sharp(file.path)
-      .extract({ left: 528, top: 151, width: 60, height: 415 })
-      .threshold(120)
-      .blur(0.5)
-      .toFile(processedFilePathFlag);
-    flag_score_Area.push(processedFilePathFlag);
+      // 수로 점수 영역 전처리
+      const processedFilePathSuro = path.join(processedDirPath, `suro_${file.originalname}`);
+      await sharp(file.path)
+        .extract({ left: 528, top: 151, width: 60, height: 415 })
+        .threshold(120)
+        .blur(0.5)
+        .toFile(processedFilePathSuro);
+      suro_score_Area.push(processedFilePathSuro);
+      
+      // 플래그 점수 영역 전처리
+      const processedFilePathFlag = path.join(processedDirPath, `flag_${file.originalname}`);
+      await sharp(file.path)
+        .extract({ left: 604, top: 151, width: 60, height: 415 })
+        .threshold(120)
+        .blur(0.5)
+        .toFile(processedFilePathFlag);
+      flag_score_Area.push(processedFilePathFlag);
+    } catch (error) {
+      console.error("이미지 전처리 중 오류 발생:", error);
+      return res.status(500).send({ message: "이미지 전처리 중 오류가 발생했습니다." });
+    }
   }
 
-  // 전처리된 이미지에 대해 OCR 처리
-  // 각 영역별로 OCR 명령어 실행
+  // 전처리된 이미지에 대해 OCR 처리하는 함수
   async function processOcr(processedFiles) {
     const processedImagePaths = processedFiles.map((file) => `"${file}"`).join(" ");
     const command = `python ocr.py ${processedImagePaths}`;
     return new Promise((resolve, reject) => {
-        exec(command, (error, stdout, stderr) => {
-            if (error || stderr) {
-                console.error("OCR 명령어 실행 중 오류:", error || stderr);
-                reject(error || stderr);
-            } else {
-                try {
-                    const results = stdout.trim().split("\n").map(line => {
-                        try {
-                            return JSON.parse(line.replace(/'/g, '"'));
-                        } catch (parseError) {
-                            console.error("JSON 파싱 중 오류:", parseError);
-                            // 오류가 발생한 경우, null을 반환하거나 다른 방식으로 처리
-                            return null;
-                        }
-                    });
-                    resolve(results);
-                } catch (e) {
-                    console.error("OCR 처리 중 예외 발생:", e);
-                    reject(e);
-                }
-            }
-        });
+      exec(command, (error, stdout, stderr) => {
+        if (error || stderr) {
+          console.error("OCR 명령어 실행 중 오류:", error || stderr);
+          reject(error || stderr);
+        } else {
+          try {
+            const results = stdout.trim().split("\n").map(line => {
+              try {
+                return JSON.parse(line.replace(/'/g, '"'));
+              } catch (parseError) {
+                console.error("JSON 파싱 중 오류:", parseError);
+                return null;
+              }
+            });
+            resolve(results);
+          } catch (e) {
+            console.error("OCR 처리 중 예외 발생:", e);
+            reject(e);
+          }
+        }
+      });
     });
-}
+  }
 
   try {
     const resultsWeekly = await processOcr(weekly_score_Area);
@@ -131,11 +126,8 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     const resultsFlag = await processOcr(flag_score_Area);
 
     // 전처리된 파일들을 삭제하는 로직
-    cleanUpOldFiles('uploads', MAX_FILES);
-    const allProcessedFiles = suro_score_Area.concat(
-      weekly_score_Area,
-      flag_score_Area
-    );
+    // cleanUpOldFiles('uploads', MAX_FILES); // 이 함수의 구현 내용에 따라 필요할 수 있음
+    const allProcessedFiles = weekly_score_Area.concat(suro_score_Area, flag_score_Area);
     for (const filePath of allProcessedFiles) {
       await fs.promises.unlink(filePath);
     }
@@ -145,18 +137,9 @@ app.post("/uploadImages", upload.array("files", 15), async (req, res) => {
     // 합쳐진 결과 반환
     res.send({
       message: "OCR 처리 및 파일 삭제 완료",
-      weekly_score_Area: resultsWeekly.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      ),
-      suro_score_Area: resultsFlag.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      ),
-      flag_score_Area: resultsSuro.reduce(
-        (acc, current) => acc.concat(current),
-        []
-      ),
+      weekly_score_Area: resultsWeekly.reduce((acc, current) => acc.concat(current), []),
+      suro_score_Area: resultsSuro.reduce((acc, current) => acc.concat(current), []),
+      flag_score_Area: resultsFlag.reduce((acc, current) => acc.concat(current), []),
     });
   } catch (error) {
     console.error(`OCR 처리 중 오류: ${error}`);
