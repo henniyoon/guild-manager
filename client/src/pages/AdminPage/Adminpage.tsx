@@ -390,14 +390,20 @@ const Adminpage: React.FC = () => {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      const filesArray = Array.from(event.target.files).slice(0, 15); // 최대 15개 파일 선택
-      setSelectedFiles(filesArray);
-      console.log("선택된 파일들:", filesArray);
-
+      const filesArray = Array.from(event.target.files).filter(file => 
+        file.name.endsWith('.jpeg') || file.name.endsWith('.jpg') || file.name.endsWith('.png')
+      );
+  
+      if (filesArray.length !== event.target.files.length) {
+        alert("JPEG 또는 PNG 파일만 업로드할 수 있습니다.");
+        return; // 비허용 파일 포함 시 함수 종료
+      }
+  
       // 파일 선택 후 자동으로 업로드 실행
       handleUploadFiles(filesArray);
     }
   };
+  
 
   // 컴포넌트 내부에서
   const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
@@ -778,7 +784,7 @@ const Adminpage: React.FC = () => {
             style={{ display: "none" }}
             multiple
             onChange={handleFileSelect}
-            accept="image/*"
+            accept=".jpeg, .jpg, .png"
             ref={fileInputRef} // React Ref 사용
           />
         </>
