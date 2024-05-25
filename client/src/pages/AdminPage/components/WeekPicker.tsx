@@ -14,7 +14,7 @@ import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone';
 dayjs.extend(weekOfYear);
 dayjs.extend(updateLocale);
 dayjs.updateLocale('ko', {
-    weekStart: 1,
+    // weekStart: 1,
 });
 
 interface CustomPickerDayProps extends PickersDayProps<Dayjs> {
@@ -39,22 +39,30 @@ const CustomPickersDay = styled(PickersDay, {
             backgroundColor: theme.palette.primary[theme.palette.mode],
         },
     }),
-    ...(day.day() === 1 && {
+    ...(day.day() === 4 && {
         borderTopLeftRadius: '50%',
         borderBottomLeftRadius: '50%',
     }),
-    ...(day.day() === 0 && {
+    ...(day.day() === 3 && {
         borderTopRightRadius: '50%',
         borderBottomRightRadius: '50%',
     }),
 })) as React.ComponentType<CustomPickerDayProps>;
+
+const getCustomWeekNumber = (date: Dayjs) => {
+    // 기준일을 목요일로 설정
+    const baseDay = 4; // 목요일
+    const dayOfWeek = date.day();
+    const startOfWeek = dayOfWeek >= baseDay ? date : date.subtract(7, 'day');
+    return startOfWeek.week();
+};
 
 const isInSameWeek = (dayA: Dayjs, dayB: Dayjs | null | undefined) => {
     if (dayB == null) {
         return false;
     }
 
-    return dayA.isSame(dayB, 'week');
+    return getCustomWeekNumber(dayA) === getCustomWeekNumber(dayB);
 };
 
 function Day(
@@ -89,15 +97,14 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
     const [maxDate, setMaxDate] = useState(dayjs());
     const [hoveredDay, setHoveredDay] = useState<Dayjs | null>(null);
     const [isCalendarOpen, setCalendarOpen] = useState(false);
-    const [weekNumber, setWeekNumber] = useState(0);
+    const [weekNumber, setWeekNumber] = useState(0);   
 
     useEffect(() => {
-        const week = selectedDate?.day() === 0
-        ? selectedDate.subtract(1, 'day').week()
-        : selectedDate?.week();
-        setWeekNumber(week || 0);
+        if (selectedDate) {
+            const week = getCustomWeekNumber(selectedDate);
+            setWeekNumber(week);
+        }
     }, [selectedDate]);
-   
 
     useEffect(() => {
         const today = dayjs();
@@ -138,7 +145,7 @@ const WeekPicker: React.FC<WeekPickerProps> = ({ selectedDate, onDateChange }) =
                             day: (ownerState: { day: Dayjs }) => ({
                                 selectedDay: selectedDate,
                                 hoveredDay,
-                                weekNumber: ownerState.day.week(),
+                                weekNumber: getCustomWeekNumber(ownerState.day),
                                 onPointerEnter: () => setHoveredDay(ownerState.day),
                                 onPointerLeave: () => setHoveredDay(null),
                             }),
